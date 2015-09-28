@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "dependencies": {
+    "amdainty": "1.0.0",
+    "cogs-transformer-babel": "1.0.12",
+    "cogs-transformer-concat-amd": "1.0.6",
+    "cogs-transformer-directives": "1.0.3",
+    "cogs-transformer-replace": "1.0.1",
+    "cogs-transformer-text": "1.0.3",
+    "cogs-transformer-uglify-js": "1.0.2",
+    "cogs": "1.0.7",
+    "express": "4.13.3",
+    "live-socket": "0.9.5",
+    "node-uuid": "1.4.3",
+    "orgsync-logger": "1.2.6",
+    "ws": "0.8.0"
+  },
+  "devDependencies": {
+    "watchy": "0.6.4"
+  },
+  "scripts": {
+    "start": "node build/node_modules/server"
+  }
+}

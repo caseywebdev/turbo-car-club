@@ -1,0 +1,10 @@
+app:
+  image: node:4.1.1
+  volumes:
+    - .:/code
+  working_dir: /code
+  ports:
+    - '80:80'
+  environment:
+    PORT: 80
+  command: make dev
