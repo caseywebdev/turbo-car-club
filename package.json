@@ -10,9 +10,10 @@
     "cogs-transformer-uglify-js": "1.0.2",
     "cogs": "1.0.7",
     "express": "4.13.3",
-    "live-socket": "0.9.5",
+    "live-socket": "0.9.6",
     "node-uuid": "1.4.3",
     "orgsync-logger": "1.2.6",
+    "react": "0.14.0-rc1",
     "ws": "0.8.0"
   },
   "devDependencies": {

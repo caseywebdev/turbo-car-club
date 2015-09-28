@@ -21,8 +21,9 @@ export default class {
     this.listeners = {};
     this.candidates = [];
     this.conn = new RTCPeerConnection(PC_CONFIG);
-    this.conn.onicecandidate = ({candidate}) =>
-      candidate && this.sendCandidate(candidate);
+    this.conn.ondatachannel = ::this.handleDataChannel;
+    this.conn.onicecandidate = ::this.handleIceCandidate;
+    this.conn.onsignalingstatechange = ::this.handleSignalingStateChange;
   }
 
   call() {
@@ -38,16 +39,15 @@ export default class {
     switch (type) {
     case 'offer': return this.handleOffer(new RTCSessionDescription(data));
     case 'answer': return this.handleAnswer(new RTCSessionDescription(data));
-    case 'call-answered': return this.flushCandidates();
+    case 'stable': return this.handleStable();
     case 'candidates':
       return _.each(data, candidate =>
-        this.addCandidate(new RTCIceCandidate(candidate))
+        this.conn.addIceCandidate(new RTCIceCandidate(candidate))
       );
     }
   }
 
   handleOffer(offer) {
-    this.conn.ondatachannel = ({channel}) => this.setDataChannel(channel);
     this.conn.setRemoteDescription(offer, () =>
       this.conn.createAnswer(data =>
         this.conn.setLocalDescription(data, () =>
@@ -59,9 +59,14 @@ export default class {
 
   handleAnswer(answer) {
     this.conn.setRemoteDescription(answer, () => {
-      this.trigger('signal', {type: 'call-answered'});
-      this.flushCandidates();
+      this.trigger('signal', {type: 'stable'});
+      this.handleStable();
     }, :: this.handleError);
+  }
+
+  handleStable() {
+    this.sendCandidates(this.candidates);
+    delete this.candidates;
   }
 
   handleError(er) {
@@ -78,13 +83,19 @@ export default class {
     this.trigger(parsed.n, parsed.d);
   }
 
-  addCandidate(candidate) {
-    this.conn.addIceCandidate(candidate);
+  handleDataChannel({channel}) {
+    this.setDataChannel(channel);
   }
 
-  flushCandidates() {
-    this.sendCandidates(this.candidates);
-    delete this.candidates;
+  handleIceCandidate({candidate}) {
+    if (candidate) this.sendCandidate(candidate);
+  }
+
+  handleSignalingStateChange() {
+    switch (this.conn.signalingState) {
+    case 'stable': return this.trigger('open');
+    case 'closed': return this.trigger('closed');
+    }
   }
 
   sendCandidates(data) {
@@ -100,6 +111,10 @@ export default class {
     if (!this.channel || this.channel.readyState !== 'open') return this;
     this.channel.send(JSON.stringify({n, d}));
     return this;
+  }
+
+  close() {
+    if (this.conn.signalingState !== 'closed') this.conn.close();
   }
 
   on(name, cb) {
