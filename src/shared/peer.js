@@ -92,10 +92,7 @@ export default class {
   }
 
   handleSignalingStateChange() {
-    switch (this.conn.signalingState) {
-    case 'stable': return this.trigger('open');
-    case 'closed': return this.trigger('closed');
-    }
+    if (this.conn.signalingState === 'closed') this.trigger('closed');
   }
 
   sendCandidates(data) {
