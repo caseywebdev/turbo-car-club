@@ -1,14 +1,13 @@
 import _ from 'underscore';
 import ArenaLight from 'client/lights/arena';
 import CarMesh from 'client/meshes/car';
+import FloorMesh from 'client/meshes/floor';
 import Live from 'live';
 import Peer from 'shared/peer';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import THREE from 'three';
 import WorldLight from 'client/lights/world';
-
-const MAP_SIZE = 128;
 
 const RENDERER = new THREE.WebGLRenderer();
 RENDERER.setSize(window.innerWidth, window.innerHeight);
@@ -25,6 +24,15 @@ window.addEventListener('resize', () => {
   CAMERA.aspect = window.innerWidth / window.innerHeight;
   CAMERA.updateProjectionMatrix();
 });
+
+const KEYS = window.KEYS = {};
+
+document.addEventListener('keydown',
+  ({key, which}) => KEYS[key || which] = true
+);
+document.addEventListener('keyup',
+  ({key, which}) => KEYS[key || which] = false
+);
 
 export default class extends Component {
   state = {
@@ -77,16 +85,11 @@ export default class extends Component {
 
     this.scene.add(WorldLight());
     this.scene.add(ArenaLight());
-
-    var plane = new THREE.PlaneBufferGeometry(MAP_SIZE, MAP_SIZE);
-    var material = new THREE.MeshLambertMaterial({color: 0x333333});
-    var floor = new THREE.Mesh(plane, material);
-    floor.receiveShadow = true;
-    floor.rotation.x = -Math.PI / 2;
-    this.scene.add(floor);
+    this.scene.add(FloorMesh());
+    this.ball = new THREE.Vector3(0, 0, 0);
     this.car = CarMesh();
-    this.car.az = 0;
-    this.car.vz = 0;
+    this.car.gas = 0;
+    this.car.speed = 0;
     this.scene.add(this.car);
     this.renderMap();
   }
@@ -99,22 +102,26 @@ export default class extends Component {
   renderMap() {
     this.rafId = requestAnimationFrame(::this.renderMap);
     const pad = navigator.getGamepads()[0];
-    if (pad && pad.timestamp !== this.lastCheck) {
+    if (KEYS[40]) this.car.gas = 1;
+    else if (KEYS[38]) this.car.gas = -1;
+    else if (pad) {
       const {6: reverse, 7: forward} = pad.buttons;
-      this.car.az = -(forward.value - reverse.value) * 0.1;
+      this.car.gas = forward.value - reverse.value;
       this.lastCheck = pad.timestamp;
-    }
-    this.car.vz = (this.car.vz + this.car.az) * 0.9;
-    this.car.position.z += this.car.vz;
+    } else this.car.gas = 0;
+    this.car.speed = (this.car.speed + (this.car.gas * 0.1)) * 0.9;
+    this.car.position.z += this.car.speed;
     this.updateCamera();
     RENDERER.render(this.scene, CAMERA);
   }
 
   updateCamera() {
-    CAMERA.position.x = this.car.position.x + 2;
-    CAMERA.position.y = this.car.position.y + 10;
-    CAMERA.position.z = 10;
-    CAMERA.lookAt(this.car.position);
+    const {position} = this.car;
+    const back = this.ball.clone().setY(0).sub(position.clone().setY(0)).setLength(10);
+    CAMERA.position.x = position.x - back.x;
+    CAMERA.position.y = position.y + 3;
+    CAMERA.position.z = position.z - back.z;
+    CAMERA.lookAt(this.ball);
   }
 
   render() {

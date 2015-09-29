@@ -1,25 +1,24 @@
-import config from 'shared/config';
 import THREE from 'three';
 
-const {width, height, depth} = config.car.size;
+const MAP_SIZE = 128;
 
-const GEOMETRY = new THREE.BoxGeometry(width, height, depth);
+const GEOMETRY = new THREE.PlaneBufferGeometry(MAP_SIZE, MAP_SIZE);
 
 const TEXTURE_URL = '/textures/checker.jpg';
 const DIFFUSE_TEXTURE = THREE.ImageUtils.loadTexture(TEXTURE_URL);
 DIFFUSE_TEXTURE.wrapS = THREE.RepeatWrapping;
 DIFFUSE_TEXTURE.wrapT = THREE.RepeatWrapping;
-DIFFUSE_TEXTURE.repeat.set(1, 1);
+DIFFUSE_TEXTURE.repeat.set(MAP_SIZE / 16, MAP_SIZE / 16);
 DIFFUSE_TEXTURE.magFilter = THREE.NearestFilter;
 
 const MATERIAL = new THREE.MeshLambertMaterial({
-  color: 0x0000ff,
+  color: 0xff0000,
   map: DIFFUSE_TEXTURE
 });
 
 export default () => {
   const mesh = new THREE.Mesh(GEOMETRY, MATERIAL);
-  mesh.position.y = height / 2;
-  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.rotation.x = -Math.PI / 2;
   return mesh;
 };
