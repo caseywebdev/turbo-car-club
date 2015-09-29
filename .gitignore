@@ -1,4 +1,5 @@
 /build
 /node_modules
+/public/index.css
 /public/index.js
 /public/manifest.json

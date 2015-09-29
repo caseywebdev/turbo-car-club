@@ -22,9 +22,14 @@ module.exports = {
         MINIFY ? {name: 'uglify-js', except: '**/*+(-|_|.)min.js'} : [],
         {name: 'replace', options: {patterns: {__DEV__: (!MINIFY).toString()}}}
       )
+    },
+    scss: {
+      out: 'css',
+      transformers: [].concat('directives', 'sass', MINIFY ? 'csso' : [])
     }
   },
   builds: {
-    'src/client/index.js': 'public'
+    'src/client/index.js': 'public',
+    'src/styles/index.scss': 'public'
   }
 };
