@@ -7,6 +7,7 @@ module.exports = {
     frag: {out: 'js', transformers: 'text'},
     js: {
       transformers: [].concat(
+        'eslint',
         'directives',
         {
           name: 'babel',
