@@ -1,11 +1,14 @@
 import _ from 'underscore';
+import ArenaLight from 'client/lights/arena';
+import CarMesh from 'client/meshes/car';
 import Live from 'live';
 import Peer from 'shared/peer';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import THREE from 'three';
+import WorldLight from 'client/lights/world';
 
-const MAP_SIZE = 32;
+const MAP_SIZE = 128;
 
 const RENDERER = new THREE.WebGLRenderer();
 RENDERER.setSize(window.innerWidth, window.innerHeight);
@@ -14,7 +17,8 @@ RENDERER.shadowMap.cullFace = THREE.CullFaceBack;
 RENDERER.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const CAMERA = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-CAMERA.up = new THREE.Vector3(0, 0, 1);
+CAMERA.aspect = window.innerWidth / window.innerHeight;
+CAMERA.updateProjectionMatrix();
 
 window.addEventListener('resize', () => {
   RENDERER.setSize(window.innerWidth, window.innerHeight);
@@ -24,7 +28,7 @@ window.addEventListener('resize', () => {
 
 export default class extends Component {
   state = {
-    mice: {}
+    cars: {}
   }
 
   constructor(props) {
@@ -36,7 +40,7 @@ export default class extends Component {
         _.each(_.difference(current, rest), id => {
           this.getPeer(id).close();
           delete this.peers[id];
-          this.setState({mice: _.omit(this.state.mice, id)});
+          this.setState({cars: _.omit(this.state.cars, id)});
         });
         _.each(_.difference(rest, current), id => {
           if (self > id) this.getPeer(id).call();
@@ -59,9 +63,9 @@ export default class extends Component {
   }
 
   handleMouse(id, [x, y]) {
-    const {mice} = this.state;
-    mice[id] = {x, y};
-    this.setState({mice});
+    const {cars} = this.state;
+    cars[id] = {x, y};
+    this.setState({cars});
   }
 
   componentDidMount() {
@@ -71,31 +75,20 @@ export default class extends Component {
     RENDERER.domElement.style.display = 'block';
     el.appendChild(RENDERER.domElement);
 
-    var light = new THREE.DirectionalLight(0xffffff, 0.9);
-    light.position.set(MAP_SIZE / 2, MAP_SIZE / 2, 10);
-    light.target.position.set(MAP_SIZE / 2 + 2, MAP_SIZE / 2 - 2, 0);
-    light.castShadow = true;
-    light.shadowCameraNear = 0;
-    light.shadowCameraFar = MAP_SIZE;
-    light.shadowCameraTop = MAP_SIZE;
-    light.shadowCameraBottom = -MAP_SIZE;
-    light.shadowCameraLeft = -MAP_SIZE;
-    light.shadowCameraRight = MAP_SIZE;
-    // light.shadowCameraVisible = true;
-    light.shadowMapWidth = light.shadowMapHeight = 2048;
-
-    this.scene.add(light);
-    light.target.updateMatrixWorld();
+    this.scene.add(WorldLight());
+    this.scene.add(ArenaLight());
 
     var plane = new THREE.PlaneBufferGeometry(MAP_SIZE, MAP_SIZE);
-    var material = new THREE.MeshLambertMaterial();
+    var material = new THREE.MeshLambertMaterial({color: 0x333333});
     var floor = new THREE.Mesh(plane, material);
     floor.receiveShadow = true;
-    floor.position.set(MAP_SIZE / 2, MAP_SIZE / 2, 0);
+    floor.rotation.x = -Math.PI / 2;
     this.scene.add(floor);
-    this.balls = {};
-
-    this.renderMap(Date.now());
+    this.car = CarMesh();
+    this.car.az = 0;
+    this.car.vz = 0;
+    this.scene.add(this.car);
+    this.renderMap();
   }
 
   componentWillUnmount() {
@@ -105,18 +98,23 @@ export default class extends Component {
 
   renderMap() {
     this.rafId = requestAnimationFrame(::this.renderMap);
+    const pad = navigator.getGamepads()[0];
+    if (pad && pad.timestamp !== this.lastCheck) {
+      const {6: reverse, 7: forward} = pad.buttons;
+      this.car.az = -(forward.value - reverse.value) * 0.1;
+      this.lastCheck = pad.timestamp;
+    }
+    this.car.vz = (this.car.vz + this.car.az) * 0.9;
+    this.car.position.z += this.car.vz;
     this.updateCamera();
     RENDERER.render(this.scene, CAMERA);
   }
 
   updateCamera() {
-    var user = this.state.user;
-    if (!user) return;
-    user = _.find(this.props.game.objects, {type: 'user', id: user.id});
-    if (!user) return;
-    CAMERA.position.x = user.mesh.position.x;
-    CAMERA.position.y = user.mesh.position.y;
-    CAMERA.position.z = 25;
+    CAMERA.position.x = this.car.position.x + 2;
+    CAMERA.position.y = this.car.position.y + 10;
+    CAMERA.position.z = 10;
+    CAMERA.lookAt(this.car.position);
   }
 
   render() {
