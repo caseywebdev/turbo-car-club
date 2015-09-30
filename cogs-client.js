@@ -12,7 +12,7 @@ module.exports = {
         {
           name: 'babel',
           only: 'src/**/*.js',
-          except: 'src/client/init.js',
+          except: ['src/client/init.js', 'src/client/init-worker.js'],
           options: {modules: 'amd', stage: 0}
         },
         {
@@ -30,6 +30,7 @@ module.exports = {
   },
   builds: {
     'src/client/index.js': 'public',
+    'src/client/worker.js': 'public',
     'src/styles/index.scss': 'public'
   }
 };

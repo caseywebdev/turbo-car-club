@@ -3,7 +3,8 @@ import THREE from 'three';
 
 const {width, height, depth} = config.car.size;
 
-const GEOMETRY = new THREE.BoxGeometry(width, height, depth);
+const BASE_GEO = new THREE.BoxGeometry(width, height, depth);
+const TOP_GEO = new THREE.BoxGeometry(width * 0.75, 0.25, 2);
 
 const TEXTURE_URL = '/textures/checker.jpg';
 const DIFFUSE_TEXTURE = THREE.ImageUtils.loadTexture(TEXTURE_URL);
@@ -18,8 +19,17 @@ const MATERIAL = new THREE.MeshLambertMaterial({
 });
 
 export default () => {
-  const mesh = new THREE.Mesh(GEOMETRY, MATERIAL);
-  mesh.position.y = height / 2;
-  mesh.castShadow = true;
-  return mesh;
+  const obj = new THREE.Object3D();
+  const base = new THREE.Mesh(BASE_GEO, MATERIAL);
+  base.castShadow = true;
+  obj.add(base);
+
+  const top = new THREE.Mesh(TOP_GEO, MATERIAL);
+  top.castShadow = true;
+  top.position.y = 0.75;
+  top.position.z = 0.75;
+  obj.add(top);
+
+  obj.position.y = height / 2;
+  return obj;
 };
