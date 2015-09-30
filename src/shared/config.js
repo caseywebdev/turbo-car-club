@@ -1,4 +1,9 @@
 export default {
+  ball: {
+    size: {
+      radius: 4
+    }
+  },
   car: {
     size: {
       width: 2,

@@ -1,5 +1,6 @@
 import _ from 'underscore';
 import ArenaLight from 'client/lights/arena';
+import BallMesh from 'client/meshes/ball';
 import CarMesh from 'client/meshes/car';
 import FloorMesh from 'client/meshes/floor';
 import Live from 'live';
@@ -66,15 +67,22 @@ export default class extends Component {
   }
 
   getCar(id) {
-    if (this.cars[id]) return this.cars[id];
-    this.scene.add(this.cars[id] = CarMesh());
+    let car = this.cars[id];
+    if (car) return car;
+    car = this.cars[id] = CarMesh();
+    car.gas = car.wheel = car.speed = 0;
+    this.scene.add(car);
+    return car;
   }
 
-  handleUpdate(id, [px, pz, ry]) {
+  handleUpdate(id, [px, pz, ry, s, g, w]) {
     const car = this.getCar(id);
     car.position.x = px;
     car.position.z = pz;
     car.rotation.y = ry;
+    car.speed = s;
+    car.gas = g;
+    car.wheel = w;
   }
 
   componentDidMount() {
@@ -87,12 +95,9 @@ export default class extends Component {
     this.scene.add(WorldLight());
     this.scene.add(ArenaLight());
     this.scene.add(FloorMesh());
-    this.ball = new THREE.Vector3(0, 0, 0);
-    this.car = CarMesh();
-    this.car.gas = 0;
-    this.car.wheel = 0;
-    this.car.speed = 0;
-    this.scene.add(this.car);
+    this.scene.add(this.ball = BallMesh());
+    this.car = this.getCar('self');
+    this.car.position.z = 10;
     this.renderMap();
   }
 
@@ -104,8 +109,8 @@ export default class extends Component {
   renderMap() {
     this.rafId = requestAnimationFrame(::this.renderMap);
     const pad = navigator.getGamepads()[0];
-    if (KEYS[40]) this.car.gas = 1;
-    else if (KEYS[38]) this.car.gas = -1;
+    if (KEYS[38]) this.car.gas = 1;
+    else if (KEYS[40]) this.car.gas = -1;
     else if (pad) {
       const {6: reverse, 7: forward} = pad.buttons;
       this.car.gas = forward.value - reverse.value;
@@ -115,34 +120,48 @@ export default class extends Component {
     else if (KEYS[39]) this.car.wheel = 1;
     else if (pad) {
       const [wheel] = pad.axes;
-      this.car.wheel = Math.abs(wheel < 0.2) ? 0 : wheel;
+      this.car.wheel = Math.abs(wheel) < 0.2 ? 0 : wheel;
     } else this.car.wheel = 0;
 
-    this.car.speed = (this.car.speed + (this.car.gas * 0.1)) * 0.9;
-    const {speed, wheel} = this.car;
-    this.car.rotation.y += speed * wheel * Math.PI * 0.02;
-    this.car.position.x += speed * Math.sin(this.car.rotation.y);
-    this.car.position.z += speed * Math.cos(this.car.rotation.y);
+    _.each(this.cars, car => {
+      car.speed = (car.speed + (car.gas * 0.1)) * 0.9;
+      const {speed, wheel} = car;
+      car.rotation.y -= speed * wheel * Math.PI * 0.02;
+      car.position.x -= speed * Math.sin(car.rotation.y);
+      car.position.z -= speed * Math.cos(car.rotation.y);
+    });
 
     _.each(this.peers, peer =>
       peer.send('u', [
         this.car.position.x,
         this.car.position.z,
-        this.car.rotation.y
+        this.car.rotation.y,
+        this.car.speed,
+        this.car.gas,
+        this.car.wheel
       ])
     );
+
+    this.ball.position.y = 10 + Math.cos(Date.now() / 1000) * 6;
 
     this.updateCamera();
     RENDERER.render(this.scene, CAMERA);
   }
 
   updateCamera() {
-    const {position} = this.car;
-    const back = this.ball.clone().setY(0).sub(position.clone().setY(0)).setLength(10);
-    CAMERA.position.x = position.x - back.x;
-    CAMERA.position.y = position.y + 3;
-    CAMERA.position.z = position.z - back.z;
-    CAMERA.lookAt(this.ball);
+    const {ball: {position: bp}, car: {position: cp}} = this;
+    const back = bp.clone().setY(0).sub(cp.clone().setY(0)).setLength(15);
+    CAMERA.position.x = cp.x - back.x;
+    CAMERA.position.y = cp.y + 2;
+    CAMERA.position.z = cp.z - back.z;
+    CAMERA.lookAt(bp);
+    // const back = this.car.rotation.clone().setY(0).setLength(10);
+    // CAMERA.position.x = position.x - back.x;
+    // CAMERA.position.y = position.y + 3;
+    // CAMERA.position.z = position.z - back.z;
+    // CAMERA.rotation.x = 0;
+    // CAMERA.rotation.y = this.car.rotation.y;
+    // CAMERA.rotation.z = 0;
   }
 
   render() {
