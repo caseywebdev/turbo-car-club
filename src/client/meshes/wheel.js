@@ -1,26 +1,29 @@
 import config from 'shared/config';
 import THREE from 'three';
 
-const {radius} = config.ball;
+const {radius, width} = config.car.wheel;
 
-const SUBDIVISIONS = 16;
+const SEGMENTS = 16;
 
-const GEOMETRY = new THREE.SphereGeometry(radius, SUBDIVISIONS, SUBDIVISIONS);
+const GEOMETRY = new THREE.CylinderGeometry(radius, radius, width, SEGMENTS);
 
 const TEXTURE_URL = '/textures/checker.jpg';
 const DIFFUSE_TEXTURE = THREE.ImageUtils.loadTexture(TEXTURE_URL);
 DIFFUSE_TEXTURE.wrapS = THREE.RepeatWrapping;
 DIFFUSE_TEXTURE.wrapT = THREE.RepeatWrapping;
-DIFFUSE_TEXTURE.repeat.set(4, 4);
+DIFFUSE_TEXTURE.repeat.set(1, 1);
 DIFFUSE_TEXTURE.magFilter = THREE.NearestFilter;
 
 const MATERIAL = new THREE.MeshLambertMaterial({
-  color: 0x00ff00,
+  color: 0x666666,
   map: DIFFUSE_TEXTURE
 });
 
 export default () => {
   const mesh = new THREE.Mesh(GEOMETRY, MATERIAL);
+  mesh.rotation.z = Math.PI / 2;
   mesh.castShadow = true;
-  return mesh;
+  const obj = new THREE.Object3D();
+  obj.add(mesh);
+  return obj;
 };

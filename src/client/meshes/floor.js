@@ -1,6 +1,6 @@
 import THREE from 'three';
 
-const MAP_SIZE = 128;
+const MAP_SIZE = 1024;
 
 const GEOMETRY = new THREE.PlaneBufferGeometry(MAP_SIZE, MAP_SIZE);
 

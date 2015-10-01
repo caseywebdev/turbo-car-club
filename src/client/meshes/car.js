@@ -22,12 +22,13 @@ export default () => {
   const obj = new THREE.Object3D();
   const base = new THREE.Mesh(BASE_GEO, MATERIAL);
   base.castShadow = true;
+  base.position.y = -0.25 / 2;
   obj.add(base);
 
   const top = new THREE.Mesh(TOP_GEO, MATERIAL);
   top.castShadow = true;
-  top.position.y = 0.5;
-  top.position.z = 0.75;
+  top.position.y = (height - 0.25) / 2;
+  top.position.z = -0.75;
   obj.add(top);
 
   obj.position.y = height / 2;

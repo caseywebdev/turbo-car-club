@@ -1,4 +1,5 @@
 import _ from 'underscore';
+import CAMERA from 'client/camera';
 import ArenaLight from 'client/lights/arena';
 import BallBody from 'shared/bodies/ball';
 import BallMesh from 'client/meshes/ball';
@@ -10,26 +11,11 @@ import Live from 'live';
 import Peer from 'shared/peer';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
+import RENDERER from 'client/renderer';
 import THREE from 'three';
+import WheelMesh from 'client/meshes/wheel';
 import WorldLight from 'client/lights/world';
 import WorldObject from 'shared/objects/world';
-
-const RENDERER = new THREE.WebGLRenderer();
-RENDERER.setSize(window.innerWidth, window.innerHeight);
-RENDERER.shadowMap.enabled = true;
-RENDERER.shadowMap.cullFace = THREE.CullFaceBack;
-RENDERER.shadowMap.type = THREE.PCFSoftShadowMap;
-RENDERER.domElement.style.display = 'block';
-
-const CAMERA = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-CAMERA.aspect = window.innerWidth / window.innerHeight;
-CAMERA.updateProjectionMatrix();
-
-window.addEventListener('resize', () => {
-  RENDERER.setSize(window.innerWidth, window.innerHeight);
-  CAMERA.aspect = window.innerWidth / window.innerHeight;
-  CAMERA.updateProjectionMatrix();
-});
 
 const KEYS = {};
 
@@ -48,9 +34,9 @@ export default class extends Component {
     this.world = WorldObject();
     this.world.addRigidBody(FloorBody());
     this.ball = {body: BallBody(), mesh: BallMesh()};
-    this.ball.body.getWorldTransform().getOrigin().setY(10);
-    this.ball.body.getLinearVelocity().setY(10);
-    this.ball.body.getAngularVelocity().setX(-10);
+    this.ball.body.getWorldTransform().getOrigin().setX(20);
+    this.ball.body.getWorldTransform().getOrigin().setY(4);
+    this.ball.body.getWorldTransform().getOrigin().setY(-20);
     this.world.addRigidBody(this.ball.body);
     this.scene = new THREE.Scene();
     this.scene.add(WorldLight());
@@ -58,12 +44,9 @@ export default class extends Component {
     this.scene.add(FloorMesh());
     this.scene.add(this.ball.mesh);
     this.car = this.getCar('self');
-    this.car.body.getAngularVelocity().setZ(10);
-    this.car.body.getLinearVelocity().setY(15);
-    this.car.body.getLinearVelocity().setX(-10);
-    this.car.body.getLinearVelocity().setZ(-10);
-    this.car.body.getWorldTransform().getOrigin().setZ(20);
-    this.car.body.getWorldTransform().getOrigin().setX(20);
+    this.car.body.getRigidBody().getWorldTransform().getOrigin().setX(0);
+    this.car.body.getRigidBody().getWorldTransform().getOrigin().setY(10);
+    this.car.body.getRigidBody().getWorldTransform().getOrigin().setZ(0);
 
     (this.live = new Live())
       .on('peers', ({self, rest}) => {
@@ -96,16 +79,25 @@ export default class extends Component {
     if (car) return car;
     const mesh = CarMesh();
     this.scene.add(mesh);
-    const body = CarBody();
-    this.world.addRigidBody(body);
-    return this.cars[id] = {body, mesh, gas: 0, wheel: 0};
+    const body = CarBody(this.world);
+    const wheels = _.times(body.getNumWheels(), i => {
+      const mesh = WheelMesh();
+      this.scene.add(mesh);
+      window.wheel = body.getWheelInfo(i);
+      return {body: body.getWheelInfo(i), mesh};
+    });
+    return this.cars[id] = {body, mesh, wheels, gas: 0, wheel: 0};
   }
 
-  handleUpdate(id, [px, pz, ry, g, w]) {
+  handleUpdate(id, [px, py, pz, rx, ry, rz, rw, g, w]) {
     const car = this.getCar(id);
-    car.mesh.position.x = px;
-    car.mesh.position.z = pz;
-    car.mesh.rotation.y = ry;
+    car.body.getRigidBody().getWorldTransform().getOrigin().setX(px);
+    car.body.getRigidBody().getWorldTransform().getOrigin().setY(py);
+    car.body.getRigidBody().getWorldTransform().getOrigin().setZ(pz);
+    car.body.getRigidBody().getWorldTransform().getRotation().setX(rx);
+    car.body.getRigidBody().getWorldTransform().getRotation().setY(ry);
+    car.body.getRigidBody().getWorldTransform().getRotation().setZ(rz);
+    car.body.getRigidBody().getWorldTransform().getRotation().setW(rw);
     car.gas = g;
     car.wheel = w;
   }
@@ -140,30 +132,40 @@ export default class extends Component {
     this.world.stepSimulation(1 / 60, 1, 1 / 60);
 
     _.each(this.cars, car => {
-      // car.speed = (car.speed + (car.gas * 0.1)) * 0.9;
-      // const {speed, wheel} = car;
-      // car.rotation.y -= speed * wheel * Math.PI * 0.02;
-      // car.position.x -= speed * Math.sin(car.rotation.y);
-      // car.position.z -= speed * Math.cos(car.rotation.y);
-      // car.body.getWorldTransform().getOrigin().setX(car.position.x);
-      // car.body.getWorldTransform().getOrigin().setY(car.position.y);
-      // car.body.getWorldTransform().getOrigin().setZ(car.position.z);
-      // const quat = new Ammo.btQuaternion();
-      // quat.setEuler(car.rotation.x, car.rotation.y, car.rotation.z);
-      // car.body.getWorldTransform().setRotation(quat);
-      const p = car.body.getWorldTransform().getOrigin();
+      car.body.applyEngineForce(car.gas * 1000, 2);
+      car.body.applyEngineForce(car.gas * 1000, 3);
+      // car.body.setBrake(1, 2);
+      // car.body.setBrake(1, 3);
+      car.body.setSteeringValue(-car.wheel * 0.3, 0);
+      car.body.setSteeringValue(-car.wheel * 0.3, 1);
+      car.body.setSteeringValue(car.wheel * 0.3, 2);
+      car.body.setSteeringValue(car.wheel * 0.3, 3);
+      const p = car.body.getRigidBody().getWorldTransform().getOrigin();
       car.mesh.position.set(p.x(), p.y(), p.z());
-      const r = car.body.getWorldTransform().getRotation();
+      const r = car.body.getRigidBody().getWorldTransform().getRotation();
       car.mesh.rotation.setFromQuaternion(
         new THREE.Quaternion(r.x(), r.y(), r.z(), r.w())
       );
+      _.each(car.wheels, (wheel, i) => {
+        const transform = car.body.getWheelTransformWS(i);
+        const p = transform.getOrigin();
+        wheel.mesh.position.set(p.x(), p.y(), p.z());
+        const r = transform.getRotation();
+        wheel.mesh.rotation.setFromQuaternion(
+          new THREE.Quaternion(r.x(), r.y(), r.z(), r.w())
+        );
+      });
     });
 
     _.each(this.peers, peer =>
       peer.send('u', [
-        this.car.mesh.position.x,
-        this.car.mesh.position.z,
-        this.car.mesh.rotation.y,
+        this.car.body.getRigidBody().getWorldTransform().getOrigin().x(),
+        this.car.body.getRigidBody().getWorldTransform().getOrigin().y(),
+        this.car.body.getRigidBody().getWorldTransform().getOrigin().z(),
+        this.car.body.getRigidBody().getWorldTransform().getRotation().x(),
+        this.car.body.getRigidBody().getWorldTransform().getRotation().y(),
+        this.car.body.getRigidBody().getWorldTransform().getRotation().z(),
+        this.car.body.getRigidBody().getWorldTransform().getRotation().w(),
         this.car.gas,
         this.car.wheel
       ])
