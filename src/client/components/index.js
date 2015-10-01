@@ -1,7 +1,10 @@
 import _ from 'underscore';
 import ArenaLight from 'client/lights/arena';
+import BallBody from 'shared/bodies/ball';
 import BallMesh from 'client/meshes/ball';
+import CarBody from 'shared/bodies/car';
 import CarMesh from 'client/meshes/car';
+import FloorBody from 'shared/bodies/floor';
 import FloorMesh from 'client/meshes/floor';
 import Live from 'live';
 import Peer from 'shared/peer';
@@ -9,12 +12,14 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import THREE from 'three';
 import WorldLight from 'client/lights/world';
+import WorldObject from 'shared/objects/world';
 
 const RENDERER = new THREE.WebGLRenderer();
 RENDERER.setSize(window.innerWidth, window.innerHeight);
 RENDERER.shadowMap.enabled = true;
 RENDERER.shadowMap.cullFace = THREE.CullFaceBack;
 RENDERER.shadowMap.type = THREE.PCFSoftShadowMap;
+RENDERER.domElement.style.display = 'block';
 
 const CAMERA = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
 CAMERA.aspect = window.innerWidth / window.innerHeight;
@@ -26,7 +31,7 @@ window.addEventListener('resize', () => {
   CAMERA.updateProjectionMatrix();
 });
 
-const KEYS = window.KEYS = {};
+const KEYS = {};
 
 document.addEventListener('keydown',
   ({key, which}) => KEYS[key || which] = true
@@ -35,47 +40,31 @@ document.addEventListener('keyup',
   ({key, which}) => KEYS[key || which] = false
 );
 
-import Ammo from 'ammo';
-
-const collisionConfig = new Ammo.btDefaultCollisionConfiguration();
-const dispatcher = new Ammo.btCollisionDispatcher(collisionConfig);
-const broadphase = new Ammo.btDbvtBroadphase();
-const solver = new Ammo.btSequentialImpulseConstraintSolver();
-const world = new Ammo.btDiscreteDynamicsWorld(
-  dispatcher,
-  broadphase,
-  solver,
-  collisionConfig
-);
-world.setGravity(new Ammo.btVector3(0, -9.8, 0));
-const floorShape = new Ammo.btStaticPlaneShape(new Ammo.btVector3(0, 1, 0), 0);
-let rbci = new Ammo.btRigidBodyConstructionInfo(0, null, floorShape);
-rbci.set_m_friction(1);
-rbci.set_m_rollingFriction(1);
-rbci.set_m_restitution(1);
-world.addRigidBody(new Ammo.btRigidBody(rbci));
-
-const sphereShape = new Ammo.btSphereShape(4);
-const localInertia = new Ammo.btVector3();
-sphereShape.calculateLocalInertia(1, localInertia);
-rbci = new Ammo.btRigidBodyConstructionInfo(1, null, sphereShape, localInertia);
-window.rbci = rbci;
-rbci.set_m_friction(1);
-rbci.set_m_restitution(1);
-rbci.set_m_rollingFriction(1);
-rbci.set_m_angularDamping(0.1);
-const ballBody = new Ammo.btRigidBody(rbci);
-ballBody.getWorldTransform().getOrigin().setY(10);
-ballBody.getAngularVelocity().setX(10);
-ballBody.getAngularVelocity().setZ(5);
-window.ball = ballBody;
-world.addRigidBody(ballBody);
-
 export default class extends Component {
   constructor(props) {
     super(props);
     this.cars = {};
     this.peers = {};
+    this.world = WorldObject();
+    this.world.addRigidBody(FloorBody());
+    this.ball = {body: BallBody(), mesh: BallMesh()};
+    this.ball.body.getWorldTransform().getOrigin().setY(10);
+    this.ball.body.getLinearVelocity().setY(10);
+    this.ball.body.getAngularVelocity().setX(-10);
+    this.world.addRigidBody(this.ball.body);
+    this.scene = new THREE.Scene();
+    this.scene.add(WorldLight());
+    this.scene.add(ArenaLight());
+    this.scene.add(FloorMesh());
+    this.scene.add(this.ball.mesh);
+    this.car = this.getCar('self');
+    this.car.body.getAngularVelocity().setZ(10);
+    this.car.body.getLinearVelocity().setY(15);
+    this.car.body.getLinearVelocity().setX(-10);
+    this.car.body.getLinearVelocity().setZ(-10);
+    this.car.body.getWorldTransform().getOrigin().setZ(20);
+    this.car.body.getWorldTransform().getOrigin().setX(20);
+
     (this.live = new Live())
       .on('peers', ({self, rest}) => {
         const current = _.keys(this.peers);
@@ -107,12 +96,8 @@ export default class extends Component {
     if (car) return car;
     const mesh = CarMesh();
     this.scene.add(mesh);
-    const chassisShape = new Ammo.btBoxShape(new Ammo.btVector3(2, 1, 4));
-    // const localInertia = new Ammo.btVector3();
-    // shape.calculateLocalInertia(10, localInertia);
-    const rbci = new Ammo.btRigidBodyConstructionInfo(0, null, shape);
-    const body = new Ammo.btRigidBody(rbci);
-    world.addRigidBody(body);
+    const body = CarBody();
+    this.world.addRigidBody(body);
     return this.cars[id] = {body, mesh, gas: 0, wheel: 0};
   }
 
@@ -126,18 +111,7 @@ export default class extends Component {
   }
 
   componentDidMount() {
-    const el = ReactDOM.findDOMNode(this);
-    this.scene = new THREE.Scene();
-
-    RENDERER.domElement.style.display = 'block';
-    el.appendChild(RENDERER.domElement);
-
-    this.scene.add(WorldLight());
-    this.scene.add(ArenaLight());
-    this.scene.add(FloorMesh());
-    this.scene.add(this.ball = BallMesh());
-    this.car = this.getCar('self');
-    this.car.mesh.position.z = 10;
+    ReactDOM.findDOMNode(this).appendChild(RENDERER.domElement);
     this.renderMap();
   }
 
@@ -163,7 +137,7 @@ export default class extends Component {
       this.car.wheel = Math.abs(wheel) < 0.2 ? 0 : wheel;
     } else this.car.wheel = 0;
 
-    world.stepSimulation(1 / 60, 1, 1 / 60);
+    this.world.stepSimulation(1 / 60, 1, 1 / 60);
 
     _.each(this.cars, car => {
       // car.speed = (car.speed + (car.gas * 0.1)) * 0.9;
@@ -195,10 +169,10 @@ export default class extends Component {
       ])
     );
 
-    const origin = ballBody.getWorldTransform().getOrigin();
-    this.ball.position.set(origin.x(), origin.y(), origin.z());
-    const r = ballBody.getWorldTransform().getRotation();
-    this.ball.rotation.setFromQuaternion(
+    const origin = this.ball.body.getWorldTransform().getOrigin();
+    this.ball.mesh.position.set(origin.x(), origin.y(), origin.z());
+    const r = this.ball.body.getWorldTransform().getRotation();
+    this.ball.mesh.rotation.setFromQuaternion(
       new THREE.Quaternion(r.x(), r.y(), r.z(), r.w())
     );
 
@@ -207,7 +181,7 @@ export default class extends Component {
   }
 
   updateCamera() {
-    const {ball: {position: bp}, car: {mesh: {position: cp}}} = this;
+    const {ball: {mesh: {position: bp}}, car: {mesh: {position: cp}}} = this;
     const back = bp.clone().setY(0).sub(cp.clone().setY(0)).setLength(15);
     CAMERA.position.x = cp.x - back.x;
     CAMERA.position.y = cp.y + 2;

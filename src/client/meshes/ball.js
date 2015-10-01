@@ -1,7 +1,7 @@
 import config from 'shared/config';
 import THREE from 'three';
 
-const {radius} = config.ball.size;
+const {radius} = config.ball;
 
 const SUBDIVISIONS = 16;
 

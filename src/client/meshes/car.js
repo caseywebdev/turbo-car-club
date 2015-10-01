@@ -1,9 +1,9 @@
 import config from 'shared/config';
 import THREE from 'three';
 
-const {width, height, depth} = config.car.size;
+const {width, height, depth} = config.car;
 
-const BASE_GEO = new THREE.BoxGeometry(width, height, depth);
+const BASE_GEO = new THREE.BoxGeometry(width, height - 0.25, depth);
 const TOP_GEO = new THREE.BoxGeometry(width * 0.75, 0.25, 2);
 
 const TEXTURE_URL = '/textures/checker.jpg';
@@ -26,7 +26,7 @@ export default () => {
 
   const top = new THREE.Mesh(TOP_GEO, MATERIAL);
   top.castShadow = true;
-  top.position.y = 0.75;
+  top.position.y = 0.5;
   top.position.z = 0.75;
   obj.add(top);
 
