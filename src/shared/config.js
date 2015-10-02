@@ -11,16 +11,19 @@ export default {
     }
   },
   car: {
-    width: 5,
+    width: 2,
     height: 1.4,
-    depth: 10,
+    depth: 5,
     mass: 100,
     props: {
-      friction: 1
+      friction: 1,
+      rollingFriction: 1,
+      angularDamping: 0.1,
+      linearDamping: 0.1
     },
     wheel: {
       width: 0.3,
-      radius: 1
+      radius: 0.4
     }
   },
   floor: {

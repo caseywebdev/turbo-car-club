@@ -1,3 +1,3 @@
-// = require node_modules/ammo.js/builds/ammo.js
+import Ammo from '../node_modules/ammo.js/ammo';
 
-export default window.Ammo;
+export default Ammo;

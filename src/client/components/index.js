@@ -54,7 +54,11 @@ export default class extends Component {
         _.each(_.difference(current, rest), id => {
           this.getPeer(id).close();
           delete this.peers[id];
-          this.scene.remove(this.getCar(id));
+          const car = this.getCar(id);
+          this.scene.remove(car.mesh);
+          this.world.removeAction(car.body);
+          this.world.removeRigidBody(car.body.getRigidBody());
+          _.each(car.wheels, wheel => this.scene.remove(wheel.mesh));
           delete this.cars[id];
         });
         _.each(_.difference(rest, current), id => {
@@ -71,6 +75,7 @@ export default class extends Component {
     peer = peers[id] = new Peer({id});
     peer.on('signal', data => this.live.send('signal', {id, data}));
     peer.on('u', _.bind(this.handleUpdate, this, id));
+    peer.on('b', _.bind(this.handleBallUpdate, this));
     return peer;
   }
 
@@ -83,7 +88,6 @@ export default class extends Component {
     const wheels = _.times(body.getNumWheels(), i => {
       const mesh = WheelMesh();
       this.scene.add(mesh);
-      window.wheel = body.getWheelInfo(i);
       return {body: body.getWheelInfo(i), mesh};
     });
     return this.cars[id] = {body, mesh, wheels, gas: 0, wheel: 0};
@@ -100,6 +104,17 @@ export default class extends Component {
     car.body.getRigidBody().getWorldTransform().getRotation().setW(rw);
     car.gas = g;
     car.wheel = w;
+  }
+
+  handleBallUpdate([px, py, pz, rx, ry, rz, rw]) {
+    const ball = this.ball;
+    ball.body.getWorldTransform().getOrigin().setX(px);
+    ball.body.getWorldTransform().getOrigin().setY(py);
+    ball.body.getWorldTransform().getOrigin().setZ(pz);
+    ball.body.getWorldTransform().getRotation().setX(rx);
+    ball.body.getWorldTransform().getRotation().setY(ry);
+    ball.body.getWorldTransform().getRotation().setZ(rz);
+    ball.body.getWorldTransform().getRotation().setW(rw);
   }
 
   componentDidMount() {
@@ -134,30 +149,24 @@ export default class extends Component {
     _.each(this.cars, car => {
       car.body.applyEngineForce(car.gas * 1000, 2);
       car.body.applyEngineForce(car.gas * 1000, 3);
-      // car.body.setBrake(1, 2);
-      // car.body.setBrake(1, 3);
-      car.body.setSteeringValue(-car.wheel * 0.3, 0);
-      car.body.setSteeringValue(-car.wheel * 0.3, 1);
-      car.body.setSteeringValue(car.wheel * 0.3, 2);
-      car.body.setSteeringValue(car.wheel * 0.3, 3);
+      car.body.setBrake(1, 2);
+      car.body.setBrake(1, 3);
+      car.body.setSteeringValue(-car.wheel * 0.5, 0);
+      car.body.setSteeringValue(-car.wheel * 0.5, 1);
       const p = car.body.getRigidBody().getWorldTransform().getOrigin();
       car.mesh.position.set(p.x(), p.y(), p.z());
       const r = car.body.getRigidBody().getWorldTransform().getRotation();
-      car.mesh.rotation.setFromQuaternion(
-        new THREE.Quaternion(r.x(), r.y(), r.z(), r.w())
-      );
+      car.mesh.quaternion.set(r.x(), r.y(), r.z(), r.w());
       _.each(car.wheels, (wheel, i) => {
         const transform = car.body.getWheelTransformWS(i);
         const p = transform.getOrigin();
         wheel.mesh.position.set(p.x(), p.y(), p.z());
         const r = transform.getRotation();
-        wheel.mesh.rotation.setFromQuaternion(
-          new THREE.Quaternion(r.x(), r.y(), r.z(), r.w())
-        );
+        wheel.mesh.quaternion.set(r.x(), r.y(), r.z(), r.w());
       });
     });
 
-    _.each(this.peers, peer =>
+    _.each(this.peers, peer => {
       peer.send('u', [
         this.car.body.getRigidBody().getWorldTransform().getOrigin().x(),
         this.car.body.getRigidBody().getWorldTransform().getOrigin().y(),
@@ -168,15 +177,22 @@ export default class extends Component {
         this.car.body.getRigidBody().getWorldTransform().getRotation().w(),
         this.car.gas,
         this.car.wheel
-      ])
-    );
+      ]);
+      peer.send('b', [
+        this.ball.body.getWorldTransform().getOrigin().x(),
+        this.ball.body.getWorldTransform().getOrigin().y(),
+        this.ball.body.getWorldTransform().getOrigin().z(),
+        this.ball.body.getWorldTransform().getRotation().x(),
+        this.ball.body.getWorldTransform().getRotation().y(),
+        this.ball.body.getWorldTransform().getRotation().z(),
+        this.ball.body.getWorldTransform().getRotation().w()
+      ]);
+    });
 
     const origin = this.ball.body.getWorldTransform().getOrigin();
     this.ball.mesh.position.set(origin.x(), origin.y(), origin.z());
     const r = this.ball.body.getWorldTransform().getRotation();
-    this.ball.mesh.rotation.setFromQuaternion(
-      new THREE.Quaternion(r.x(), r.y(), r.z(), r.w())
-    );
+    this.ball.mesh.quaternion.set(r.x(), r.y(), r.z(), r.w());
 
     this.updateCamera();
     RENDERER.render(this.scene, CAMERA);
