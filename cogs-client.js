@@ -19,7 +19,10 @@ module.exports = {
           name: 'concat-amd',
           options: {base: 'src', extensions: ['js', 'vert', 'frag']}
         },
-        MINIFY ? {name: 'uglify-js', except: '**/*+(-|_|.)min.js'} : [],
+        MINIFY ? {
+          name: 'uglify-js',
+          except: ['**/*+(-|_|.)min.js', 'node_modules/ammo.js/ammo.js']
+        } : [],
         {name: 'replace', options: {patterns: {__DEV__: (!MINIFY).toString()}}}
       )
     },
