@@ -1,4 +1,5 @@
 import _ from 'underscore';
+import Ammo from 'ammo';
 import CAMERA from 'client/camera';
 import ArenaLight from 'client/lights/arena';
 import BallBody from 'shared/bodies/ball';
@@ -93,28 +94,30 @@ export default class extends Component {
     return this.cars[id] = {body, mesh, wheels, gas: 0, wheel: 0};
   }
 
-  handleUpdate(id, [px, py, pz, rx, ry, rz, rw, g, w]) {
+  handleUpdate(id, [px, py, pz, rx, ry, rz, rw, lx, ly, lz, ax, ay, az, g, w]) {
     const car = this.getCar(id);
-    car.body.getRigidBody().getWorldTransform().getOrigin().setX(px);
-    car.body.getRigidBody().getWorldTransform().getOrigin().setY(py);
-    car.body.getRigidBody().getWorldTransform().getOrigin().setZ(pz);
-    car.body.getRigidBody().getWorldTransform().getRotation().setX(rx);
-    car.body.getRigidBody().getWorldTransform().getRotation().setY(ry);
-    car.body.getRigidBody().getWorldTransform().getRotation().setZ(rz);
-    car.body.getRigidBody().getWorldTransform().getRotation().setW(rw);
+    car.body.getRigidBody().setWorldTransform(
+      new Ammo.btTransform(
+        new Ammo.btQuaternion(rx, ry, rz, rw),
+        new Ammo.btVector3(px, py, pz)
+      )
+    );
+    car.body.getRigidBody().setLinearVelocity(new Ammo.btVector3(lx, ly, lz));
+    car.body.getRigidBody().setAngularVelocity(new Ammo.btVector3(ax, ay, az));
     car.gas = g;
     car.wheel = w;
   }
 
-  handleBallUpdate([px, py, pz, rx, ry, rz, rw]) {
+  handleBallUpdate([px, py, pz, rx, ry, rz, rw, lx, ly, lz, ax, ay, az]) {
     const ball = this.ball;
-    ball.body.getWorldTransform().getOrigin().setX(px);
-    ball.body.getWorldTransform().getOrigin().setY(py);
-    ball.body.getWorldTransform().getOrigin().setZ(pz);
-    ball.body.getWorldTransform().getRotation().setX(rx);
-    ball.body.getWorldTransform().getRotation().setY(ry);
-    ball.body.getWorldTransform().getRotation().setZ(rz);
-    ball.body.getWorldTransform().getRotation().setW(rw);
+    ball.body.setWorldTransform(
+      new Ammo.btTransform(
+        new Ammo.btQuaternion(rx, ry, rz, rw),
+        new Ammo.btVector3(px, py, pz)
+      )
+    );
+    ball.body.setLinearVelocity(new Ammo.btVector3(lx, ly, lz));
+    ball.body.setAngularVelocity(new Ammo.btVector3(ax, ay, az));
   }
 
   componentDidMount() {
@@ -167,25 +170,47 @@ export default class extends Component {
     });
 
     _.each(this.peers, peer => {
+      const car = this.car.body.getRigidBody();
+      let p = car.getWorldTransform().getOrigin();
+      let r = car.getWorldTransform().getRotation();
+      let l = car.getLinearVelocity();
+      let a = car.getAngularVelocity();
       peer.send('u', [
-        this.car.body.getRigidBody().getWorldTransform().getOrigin().x(),
-        this.car.body.getRigidBody().getWorldTransform().getOrigin().y(),
-        this.car.body.getRigidBody().getWorldTransform().getOrigin().z(),
-        this.car.body.getRigidBody().getWorldTransform().getRotation().x(),
-        this.car.body.getRigidBody().getWorldTransform().getRotation().y(),
-        this.car.body.getRigidBody().getWorldTransform().getRotation().z(),
-        this.car.body.getRigidBody().getWorldTransform().getRotation().w(),
+        p.x(),
+        p.y(),
+        p.z(),
+        r.x(),
+        r.y(),
+        r.z(),
+        r.w(),
+        l.x(),
+        l.y(),
+        l.z(),
+        a.x(),
+        a.y(),
+        a.z(),
         this.car.gas,
         this.car.wheel
       ]);
+      const ball = this.ball.body;
+      p = ball.getWorldTransform().getOrigin();
+      r = ball.getWorldTransform().getRotation();
+      l = ball.getLinearVelocity();
+      a = ball.getAngularVelocity();
       peer.send('b', [
-        this.ball.body.getWorldTransform().getOrigin().x(),
-        this.ball.body.getWorldTransform().getOrigin().y(),
-        this.ball.body.getWorldTransform().getOrigin().z(),
-        this.ball.body.getWorldTransform().getRotation().x(),
-        this.ball.body.getWorldTransform().getRotation().y(),
-        this.ball.body.getWorldTransform().getRotation().z(),
-        this.ball.body.getWorldTransform().getRotation().w()
+        p.x(),
+        p.y(),
+        p.z(),
+        r.x(),
+        r.y(),
+        r.z(),
+        r.w(),
+        l.x(),
+        l.y(),
+        l.z(),
+        a.x(),
+        a.y(),
+        a.z()
       ]);
     });
 
