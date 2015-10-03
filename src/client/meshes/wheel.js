@@ -1,7 +1,7 @@
 import config from 'shared/config';
 import THREE from 'three';
 
-const {radius, width} = config.car.wheel;
+const {radius, width} = config.wheel;
 
 const SEGMENTS = 16;
 
@@ -11,11 +11,11 @@ const TEXTURE_URL = '/textures/checker.jpg';
 const DIFFUSE_TEXTURE = THREE.ImageUtils.loadTexture(TEXTURE_URL);
 DIFFUSE_TEXTURE.wrapS = THREE.RepeatWrapping;
 DIFFUSE_TEXTURE.wrapT = THREE.RepeatWrapping;
-DIFFUSE_TEXTURE.repeat.set(1, 1);
+DIFFUSE_TEXTURE.repeat.set(1, 0);
 DIFFUSE_TEXTURE.magFilter = THREE.NearestFilter;
 
 const MATERIAL = new THREE.MeshLambertMaterial({
-  color: 0x666666,
+  color: 0xff0000,
   map: DIFFUSE_TEXTURE
 });
 

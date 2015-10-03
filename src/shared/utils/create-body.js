@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import Ammo from 'ammo';
 
-const LOCAL_INERTIA = new Ammo.btVector3();
+const LOCAL_INERTIA = new Ammo.btVector3(0, 0, 0);
 
 export default (options) => {
   const {mass, props, shape, startTrans} = options;
@@ -13,5 +13,7 @@ export default (options) => {
     LOCAL_INERTIA
   );
   _.each(props, (val, key) => rbci[`set_m_${key}`](val));
-  return new Ammo.btRigidBody(rbci);
+  const body = new Ammo.btRigidBody(rbci);
+  body.setActivationState(4);
+  return body;
 };

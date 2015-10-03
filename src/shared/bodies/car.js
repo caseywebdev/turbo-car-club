@@ -1,57 +1,43 @@
 import _ from 'underscore';
 import Ammo from 'ammo';
-import createBody from 'shared/utils/create-body';
+import ChassisBody from 'shared/bodies/chassis';
 import config from 'shared/config';
+import WheelBody from 'shared/bodies/wheel';
 
-const {width, height, depth, wheel: {radius}} = config.car;
-
-const CHASSIS_SHAPE =
-  new Ammo.btBoxShape(new Ammo.btVector3(width / 2, height / 2, depth / 2));
+const {chassis: {width, height, depth}, wheel: {radius, width: wheelWidth}} =
+  config;
 
 const WHEEL_CONNECTION_POINTS = _.map([
-  [width / 2, 1.3, depth / 2],
-  [-width / 2, 1.3, depth / 2],
-  [-width / 2, 1.3, -depth / 2],
-  [width / 2, 1.3, -depth / 2]
+  [(width - wheelWidth) / 1.7, -height / 2 + radius - 0.2, depth / 2.1 - radius],
+  [-(width - wheelWidth) / 1.7, -height / 2 + radius - 0.2, depth / 2.1 - radius],
+  [-(width - wheelWidth) / 1.7, -height / 2 + radius - 0.2, -depth / 2.1 + radius],
+  [(width - wheelWidth) / 1.7, -height / 2 + radius - 0.2, -depth / 2.1 + radius]
 ], ([x, y, z]) => new Ammo.btVector3(x, y, z));
 
-const WHEEL_DIRECTION = new Ammo.btVector3(0, -1, 0);
-const WHEEL_AXLE = new Ammo.btVector3(-1, 0, 0);
-const SUSPENSION_REST_LENGTH = 0.6;
-const TUNING = new Ammo.btVehicleTuning();
-
 export default (world) => {
-  const localTrans = new Ammo.btTransform();
-  localTrans.setIdentity();
-  localTrans.setOrigin(new Ammo.btVector3(0, 1.3, 0));
-  const shape = new Ammo.btCompoundShape();
-  shape.addChildShape(localTrans, CHASSIS_SHAPE);
-  const startTrans = new Ammo.btTransform();
-  startTrans.setIdentity();
-  startTrans.setOrigin(new Ammo.btVector3(0, 0, 0));
-  const chassis = createBody({shape, startTrans, ...config.car});
+  const chassis = ChassisBody();
   world.addRigidBody(chassis);
-
-  const raycaster = new Ammo.btDefaultVehicleRaycaster(world);
-  const vehicle =
-    new Ammo.btRaycastVehicle(TUNING, chassis, raycaster);
-  _.each(WHEEL_CONNECTION_POINTS, (point, i) => {
-    vehicle.addWheel(
-      point,
-      WHEEL_DIRECTION,
-      WHEEL_AXLE,
-      SUSPENSION_REST_LENGTH,
-      radius,
-      TUNING,
-      i < 2
+  const wheels = _.map(WHEEL_CONNECTION_POINTS, point => {
+    const body = WheelBody();
+    world.addRigidBody(body);
+    const localA = new Ammo.btTransform();
+    localA.setIdentity();
+    localA.setOrigin(point);
+    const localB = new Ammo.btTransform();
+    localB.setIdentity();
+    const constraint = new Ammo.btGeneric6DofSpringConstraint(
+      chassis,
+      body,
+      localA,
+      localB,
+      true
     );
-    const wheel = vehicle.getWheelInfo(i);
-    wheel.set_m_wheelsDampingRelaxation(2.3);
-    wheel.set_m_wheelsDampingCompression(4.4);
-    wheel.set_m_rollInfluence(0.1);
-    wheel.set_m_suspensionStiffness(20);
-    wheel.set_m_frictionSlip(1000);
+    constraint.setLinearLowerLimit(new Ammo.btVector3(0, 0, 0));
+    constraint.setLinearUpperLimit(new Ammo.btVector3(0, 0, 0));
+    constraint.setAngularLowerLimit(new Ammo.btVector3(0, 0, 0));
+    constraint.setAngularUpperLimit(new Ammo.btVector3(-1, 0, 0));
+    world.addConstraint(constraint, true);
+    return {body, constraint};
   });
-  world.addAction(vehicle);
-  return vehicle;
+  return {chassis, wheels};
 };

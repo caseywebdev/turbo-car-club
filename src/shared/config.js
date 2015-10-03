@@ -1,7 +1,7 @@
 export default {
   ball: {
     radius: 4,
-    mass: 1,
+    mass: 10,
     props: {
       friction: 1,
       restitution: 1,
@@ -10,20 +10,28 @@ export default {
       linearDamping: 0.1
     }
   },
-  car: {
-    width: 2,
-    height: 1.4,
-    depth: 5,
+  chassis: {
+    width: 4,
+    height: 1.5,
+    depth: 6,
     mass: 100,
     props: {
       friction: 1,
       rollingFriction: 1,
       angularDamping: 0.1,
+      linearDamping: 0.1,
+      restitution: 0.3
+    }
+  },
+  wheel: {
+    width: 1,
+    radius: 0.6,
+    mass: 100,
+    props: {
+      friction: 10,
+      rollingFriction: 1,
+      angularDamping: 0.1,
       linearDamping: 0.1
-    },
-    wheel: {
-      width: 0.3,
-      radius: 0.4
     }
   },
   floor: {

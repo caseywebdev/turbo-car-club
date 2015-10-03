@@ -1,5 +1,3 @@
-import _ from 'underscore';
-
 const resolveKey = key =>
   typeof window === 'undefined' ? require('wrtc')[key] : (
     window[key] ||
@@ -16,8 +14,7 @@ const PC_CONFIG = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]};
 const DC_CONFIG = {ordered: false, maxRetransmits: 0};
 
 export default class {
-  constructor({id}) {
-    this.id = id;
+  constructor() {
     this.listeners = {};
     this.candidates = [];
     this.conn = new RTCPeerConnection(PC_CONFIG);
@@ -41,7 +38,7 @@ export default class {
     case 'answer': return this.handleAnswer(new RTCSessionDescription(data));
     case 'stable': return this.handleStable();
     case 'candidates':
-      return _.each(data, candidate =>
+      return data.forEach(candidate =>
         this.conn.addIceCandidate(new RTCIceCandidate(candidate))
       );
     }
@@ -122,17 +119,12 @@ export default class {
   }
 
   off(name, cb) {
-    if (!name) {
-      this.listeners = {};
-      return this;
-    }
+    if (!name) this.listeners = {};
+    if (!cb) delete this.listeners[name];
     let listeners = this.listeners[name];
     if (!listeners) return this;
-    if (cb) {
-      this.listeners[name] = _.without(listeners, cb);
-      if (!listeners.length) delete this.listeners[name];
-    }
-    else delete this.listeners[name];
+    listeners = this.listeners[name] = listeners.reject(_cb => _cb !== cb);
+    if (!listeners.length) delete this.listeners[name];
     return this;
   }
 
