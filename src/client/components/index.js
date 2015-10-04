@@ -33,7 +33,7 @@ export default class extends Component {
     this.cars = {};
     this.peers = {};
     this.world = WorldObject();
-    this.world.addRigidBody(FloorBody());
+    this.world.addRigidBody(this.floor = FloorBody());
     this.ball = {body: BallBody(), mesh: BallMesh()};
     this.ball.body.getWorldTransform().getOrigin().setX(10);
     this.ball.body.getWorldTransform().getOrigin().setY(4);
@@ -45,7 +45,7 @@ export default class extends Component {
     this.scene.add(FloorMesh());
     this.scene.add(this.ball.mesh);
     this.car = this.getCar('self');
-    this.car.chassis.body.getWorldTransform().getOrigin().setY(5);
+    this.car.chassis.body.getWorldTransform().getOrigin().setY(2);
 
     (this.live = new Live())
       .on('peers', ({self, rest}) => {
@@ -171,20 +171,67 @@ export default class extends Component {
             new Ammo.btVector3(-1, Math.PI * car.steering * 0.2, 0),
           );
         }
-        wheel.body.setFriction(car.handbrake ? 0.1 : 10);
         const trans = wheel.body.getWorldTransform();
         if (i > 1) {
-          const b = trans.getBasis();
-          const f = new Ammo.btVector3(car.gas * 2000, 0, 0);
-          wheel.body.applyTorque(
-            new Ammo.btVector3(b.getRow(0).dot(f), b.getRow(1).dot(f), b.getRow(2).dot(f))
-          );
+          wheel.body.setFriction(car.handbrake ? 0.5 : 10);
+          if (car.handbrake) {
+            wheel.body.getAngularVelocity().setValue(0, 0, 0);
+          } else {
+            const b = trans.getBasis();
+            const f = new Ammo.btVector3(car.gas * 1000, 0, 0);
+            wheel.body.applyTorque(
+              new Ammo.btVector3(b.getRow(0).dot(f), b.getRow(1).dot(f), b.getRow(2).dot(f))
+            );
+          }
         }
         const p = trans.getOrigin();
         wheel.mesh.position.set(p.x(), p.y(), p.z());
         const r = trans.getRotation();
         wheel.mesh.quaternion.set(r.x(), r.y(), r.z(), r.w());
       });
+
+      const isTouching = wheel => {
+        let touching = false;
+        const dispatcher = this.world.getDispatcher();
+        const wheelPtr = wheel.body.getCollisionShape().ptr;
+        const chassisPtr = car.chassis.body.getCollisionShape().ptr;
+        _.times(dispatcher.getNumManifolds(), i => {
+          const manifold = dispatcher.getManifoldByIndexInternal(i);
+          const a = manifold.getBody0().getCollisionShape().ptr;
+          const b = manifold.getBody1().getCollisionShape().ptr;
+          if ((a === wheelPtr || b === wheelPtr) &&
+              (a !== chassisPtr && b !== chassisPtr)) {
+            _.times(manifold.getNumContacts(), j => {
+              const point = manifold.getContactPoint(j);
+              if (point.getDistance() < 0) touching = true;
+            });
+          }
+        });
+        return touching;
+      };
+
+      const swayBar = (l, r) => {
+        const lTravel = Math.max(0, Math.min(1, l.constraint.getTranslationalLimitMotor().get_m_currentLinearDiff().y() / 0.2));
+        const rTravel = Math.max(0, Math.min(1, r.constraint.getTranslationalLimitMotor().get_m_currentLinearDiff().y() / 0.2));
+        const lGrounded = isTouching(l);
+        const rGrounded = isTouching(r);
+        const rollForce = (lTravel - rTravel) * 2000;
+        if (lGrounded) {
+          car.chassis.body.applyForce(
+            new Ammo.btVector3(0, rollForce, 0),
+            l.body.getWorldTransform().getOrigin()
+          );
+        }
+        if (rGrounded) {
+          car.chassis.body.applyForce(
+            new Ammo.btVector3(0, -rollForce, 0),
+            r.body.getWorldTransform().getOrigin()
+          );
+        }
+      };
+
+      swayBar(car.wheels[0], car.wheels[1]);
+      swayBar(car.wheels[2], car.wheels[3]);
     });
 
     _.each(this.peers, peer => {

@@ -26,11 +26,11 @@ export default {
   wheel: {
     width: 1,
     radius: 0.6,
-    mass: 100,
+    mass: 10,
     props: {
       friction: 10,
       rollingFriction: 1,
-      angularDamping: 0.1,
+      angularDamping: 0.5,
       linearDamping: 0.1
     }
   },
