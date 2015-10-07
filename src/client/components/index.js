@@ -6,6 +6,7 @@ import BallBody from 'shared/bodies/ball';
 import BallMesh from 'client/meshes/ball';
 import CarBody from 'shared/bodies/car';
 import ChassisMesh from 'client/meshes/chassis';
+import createBody from 'shared/utils/create-body';
 import FloorBody from 'shared/bodies/floor';
 import FloorMesh from 'client/meshes/floor';
 import Live from 'live';
@@ -33,11 +34,31 @@ export default class extends Component {
     this.cars = {};
     this.peers = {};
     this.world = WorldObject();
-    this.world.addRigidBody(this.floor = FloorBody());
+    this.world.addRigidBody(FloorBody());
+
+    let wall;
+    this.world.addRigidBody(wall = createBody({
+      shape: new Ammo.btStaticPlaneShape(new Ammo.btVector3(1, 0, 0), 0)
+    }));
+    wall.getWorldTransform().getOrigin().setX(-64);
+    this.world.addRigidBody(wall = createBody({
+      shape: new Ammo.btStaticPlaneShape(new Ammo.btVector3(-1, 0, 0), 0)
+    }));
+    wall.getWorldTransform().getOrigin().setX(64);
+    this.world.addRigidBody(wall = createBody({
+      shape: new Ammo.btStaticPlaneShape(new Ammo.btVector3(0, 0, 1), 0)
+    }));
+    wall.getWorldTransform().getOrigin().setZ(-64);
+    this.world.addRigidBody(wall = createBody({
+      shape: new Ammo.btStaticPlaneShape(new Ammo.btVector3(0, 0, -1), 0)
+    }));
+    wall.getWorldTransform().getOrigin().setZ(64);
+
+    this.world.addRigidBody(FloorBody());
     this.ball = {body: BallBody(), mesh: BallMesh()};
-    this.ball.body.getWorldTransform().getOrigin().setX(10);
+    this.ball.body.getWorldTransform().getOrigin().setX(-10);
     this.ball.body.getWorldTransform().getOrigin().setY(4);
-    this.ball.body.getWorldTransform().getOrigin().setZ(10);
+    this.ball.body.getWorldTransform().getOrigin().setZ(-10);
     this.world.addRigidBody(this.ball.body);
     this.scene = new THREE.Scene();
     this.scene.add(WorldLight());
@@ -45,7 +66,7 @@ export default class extends Component {
     this.scene.add(FloorMesh());
     this.scene.add(this.ball.mesh);
     this.car = this.getCar('self');
-    this.car.chassis.body.getWorldTransform().getOrigin().setY(2);
+    this.car.chassis.body.getWorldTransform().getOrigin().setY(4);
 
     (this.live = new Live())
       .on('peers', ({self, rest}) => {
@@ -75,7 +96,9 @@ export default class extends Component {
     const {peers} = this;
     let peer = peers[id];
     if (peer) return peer;
-    return peers[id] = new Peer()
+    peer = peers[id] = new Peer();
+    peer.id = id;
+    return peer
       .on('signal', data => this.live.send('signal', {id, data}))
       .on('u', _.bind(this.handleUpdate, this, id))
       .on('b', _.bind(this.handleBallUpdate, this))
@@ -87,20 +110,21 @@ export default class extends Component {
     if (car) return car;
     const chassisMesh = ChassisMesh();
     this.scene.add(chassisMesh);
-    let {chassis, wheels} = CarBody(this.world);
+    const {vehicle, chassis} = CarBody(this.world);
     return this.cars[id] = {
+      vehicle,
       chassis: {body: chassis, mesh: chassisMesh},
-      wheels: _.map(wheels, wheel => {
+      wheels: _.times(4, () => {
         const mesh = WheelMesh();
         this.scene.add(mesh);
-        return _.extend({mesh}, wheel);
+        return {mesh};
       }),
       gas: 0,
       steering: 0
     };
   }
 
-  handleUpdate(id, [px, py, pz, rx, ry, rz, rw, lx, ly, lz, ax, ay, az, g, s]) {
+  handleUpdate(id, [px, py, pz, rx, ry, rz, rw, lx, ly, lz, ax, ay, az, g, s, hb]) {
     const car = this.getCar(id);
     car.chassis.body.setWorldTransform(
       new Ammo.btTransform(
@@ -112,6 +136,7 @@ export default class extends Component {
     car.chassis.body.setAngularVelocity(new Ammo.btVector3(ax, ay, az));
     car.gas = g;
     car.steering = s;
+    car.handbrake = hb;
   }
 
   handleBallUpdate([px, py, pz, rx, ry, rz, rw, lx, ly, lz, ax, ay, az]) {
@@ -153,7 +178,9 @@ export default class extends Component {
       this.car.steering = Math.abs(steering) < 0.2 ? 0 : steering;
     } else this.car.steering = 0;
 
-    if (pad) this.car.handbrake = pad.buttons[2].pressed;
+    if (KEYS[32]) this.car.handbrake = true;
+    else if (pad) this.car.handbrake = pad.buttons[2].pressed;
+    else this.car.handbrake = false;
 
     this.world.stepSimulation(1 / 60, 1, 1 / 60);
     _.each(this.cars, car => {
@@ -162,78 +189,27 @@ export default class extends Component {
       car.chassis.mesh.position.set(p.x(), p.y(), p.z());
       const r = trans.getRotation();
       car.chassis.mesh.quaternion.set(r.x(), r.y(), r.z(), r.w());
-      _.each(car.wheels, (wheel, i) => {
-        if (i < 2) {
-          wheel.constraint.setAngularLowerLimit(
-            new Ammo.btVector3(0, Math.PI * car.steering * 0.2, 0)
-          );
-          wheel.constraint.setAngularUpperLimit(
-            new Ammo.btVector3(-1, Math.PI * car.steering * 0.2, 0),
-          );
-        }
-        const trans = wheel.body.getWorldTransform();
-        if (i > 1) {
-          wheel.body.setFriction(car.handbrake ? 0.5 : 10);
-          if (car.handbrake) {
-            wheel.body.getAngularVelocity().setValue(0, 0, 0);
-          } else {
-            const b = trans.getBasis();
-            const f = new Ammo.btVector3(car.gas * 1000, 0, 0);
-            wheel.body.applyTorque(
-              new Ammo.btVector3(b.getRow(0).dot(f), b.getRow(1).dot(f), b.getRow(2).dot(f))
-            );
-          }
-        }
+      car.vehicle.setSteeringValue(-Math.PI * car.steering * 0.2, 0);
+      car.vehicle.setSteeringValue(-Math.PI * car.steering * 0.2, 1);
+      car.vehicle.applyEngineForce(car.gas * 1000, 2);
+      car.vehicle.applyEngineForce(car.gas * 1000, 3);
+      _.each(car.wheels, ({mesh}, i) => {
+        const trans = car.vehicle.getWheelTransformWS(i);
         const p = trans.getOrigin();
-        wheel.mesh.position.set(p.x(), p.y(), p.z());
+        mesh.position.set(p.x(), p.y(), p.z());
         const r = trans.getRotation();
-        wheel.mesh.quaternion.set(r.x(), r.y(), r.z(), r.w());
+        mesh.quaternion.set(r.x(), r.y(), r.z(), r.w());
+        const info = car.vehicle.getWheelInfo(i);
+        if (i > 1) {
+          if (car.handbrake) info.set_m_engineForce(0);
+          info.set_m_frictionSlip(car.handbrake ? 0.5 : 1000);
+        }
       });
-
-      const isTouching = wheel => {
-        let touching = false;
-        const dispatcher = this.world.getDispatcher();
-        const wheelPtr = wheel.body.getCollisionShape().ptr;
-        const chassisPtr = car.chassis.body.getCollisionShape().ptr;
-        _.times(dispatcher.getNumManifolds(), i => {
-          const manifold = dispatcher.getManifoldByIndexInternal(i);
-          const a = manifold.getBody0().getCollisionShape().ptr;
-          const b = manifold.getBody1().getCollisionShape().ptr;
-          if ((a === wheelPtr || b === wheelPtr) &&
-              (a !== chassisPtr && b !== chassisPtr)) {
-            _.times(manifold.getNumContacts(), j => {
-              const point = manifold.getContactPoint(j);
-              if (point.getDistance() < 0) touching = true;
-            });
-          }
-        });
-        return touching;
-      };
-
-      const swayBar = (l, r) => {
-        const lTravel = Math.max(0, Math.min(1, l.constraint.getTranslationalLimitMotor().get_m_currentLinearDiff().y() / 0.2));
-        const rTravel = Math.max(0, Math.min(1, r.constraint.getTranslationalLimitMotor().get_m_currentLinearDiff().y() / 0.2));
-        const lGrounded = isTouching(l);
-        const rGrounded = isTouching(r);
-        const rollForce = (lTravel - rTravel) * 2000;
-        if (lGrounded) {
-          car.chassis.body.applyForce(
-            new Ammo.btVector3(0, rollForce, 0),
-            l.body.getWorldTransform().getOrigin()
-          );
-        }
-        if (rGrounded) {
-          car.chassis.body.applyForce(
-            new Ammo.btVector3(0, -rollForce, 0),
-            r.body.getWorldTransform().getOrigin()
-          );
-        }
-      };
-
-      swayBar(car.wheels[0], car.wheels[1]);
-      swayBar(car.wheels[2], car.wheels[3]);
     });
 
+    const shouldSendBall = _.first(_.sortBy(
+      [this.live.id].concat(_.map(this.peers, 'id'))
+    )) === this.live.id;
     _.each(this.peers, peer => {
       const car = this.car.chassis.body;
       let p = car.getWorldTransform().getOrigin();
@@ -255,8 +231,10 @@ export default class extends Component {
         a.y(),
         a.z(),
         this.car.gas,
-        this.car.steering
+        this.car.steering,
+        this.car.handbrake
       ]);
+      if (!shouldSendBall) return;
       const ball = this.ball.body;
       p = ball.getWorldTransform().getOrigin();
       r = ball.getWorldTransform().getRotation();

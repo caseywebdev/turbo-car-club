@@ -2,45 +2,45 @@ import _ from 'underscore';
 import Ammo from 'ammo';
 import ChassisBody from 'shared/bodies/chassis';
 import config from 'shared/config';
-import WheelBody from 'shared/bodies/wheel';
 
 const {chassis: {width, height, depth}, wheel: {radius, width: wheelWidth}} =
   config;
 
 const WHEEL_CONNECTION_POINTS = _.map([
-  [(width - wheelWidth) / 1.7, -height / 2 + radius - 0.4, depth / 2.1 - radius],
-  [-(width - wheelWidth) / 1.7, -height / 2 + radius - 0.4, depth / 2.1 - radius],
-  [-(width - wheelWidth) / 1.7, -height / 2 + radius - 0.4, -depth / 2.1 + radius],
-  [(width - wheelWidth) / 1.7, -height / 2 + radius - 0.4, -depth / 2.1 + radius]
+  [(width - wheelWidth) / 1.7, -height / 2 + radius * 1.6, depth / 2.1 - radius],
+  [-(width - wheelWidth) / 1.7, -height / 2 + radius * 1.6, depth / 2.1 - radius],
+  [-(width - wheelWidth) / 1.7, -height / 2 + radius * 1.6, -depth / 2.1 + radius],
+  [(width - wheelWidth) / 1.7, -height / 2 + radius * 1.6, -depth / 2.1 + radius]
 ], ([x, y, z]) => new Ammo.btVector3(x, y, z));
+
+const WHEEL_DIRECTION = new Ammo.btVector3(0, -1, 0);
+const WHEEL_AXLE = new Ammo.btVector3(-1, 0, 0);
+const SUSPENSION_REST_LENGTH = radius;
+const TUNING = new Ammo.btVehicleTuning();
 
 export default (world) => {
   const chassis = ChassisBody();
   world.addRigidBody(chassis);
-  const wheels = _.map(WHEEL_CONNECTION_POINTS, point => {
-    const body = WheelBody();
-    world.addRigidBody(body);
-    const localA = new Ammo.btTransform();
-    localA.setIdentity();
-    localA.setOrigin(point);
-    const localB = new Ammo.btTransform();
-    localB.setIdentity();
-    const constraint = new Ammo.btGeneric6DofSpring2Constraint(
-      chassis,
-      body,
-      localA,
-      localB,
-      Ammo.RO_XYZ
+  const raycaster = new Ammo.btDefaultVehicleRaycaster(world);
+  const vehicle = new Ammo.btRaycastVehicle(TUNING, chassis, raycaster);
+  vehicle.setCoordinateSystem(0, 1, 2);
+  _.each(WHEEL_CONNECTION_POINTS, (point, i) => {
+    vehicle.addWheel(
+      point,
+      WHEEL_DIRECTION,
+      WHEEL_AXLE,
+      SUSPENSION_REST_LENGTH,
+      radius,
+      TUNING,
+      i < 2
     );
-    constraint.enableSpring(1, true);
-    constraint.setStiffness(1, 500);
-    constraint.setDamping(1, 100);
-    constraint.setLinearLowerLimit(new Ammo.btVector3(0, 0, 0));
-    constraint.setLinearUpperLimit(new Ammo.btVector3(0, 0.2, 0));
-    constraint.setAngularLowerLimit(new Ammo.btVector3(0, 0, 0));
-    constraint.setAngularUpperLimit(new Ammo.btVector3(-1, 0, 0));
-    world.addConstraint(constraint, true);
-    return {body, constraint};
+    const wheel = vehicle.getWheelInfo(i);
+    wheel.set_m_wheelsDampingCompression(4);
+    wheel.set_m_wheelsDampingRelaxation(5);
+    wheel.set_m_rollInfluence(0);
+    wheel.set_m_suspensionStiffness(50);
+    wheel.set_m_frictionSlip(1000);
   });
-  return {chassis, wheels};
+  world.addAction(vehicle);
+  return {vehicle, chassis};
 };

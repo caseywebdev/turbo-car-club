@@ -18,8 +18,8 @@ export default {
     props: {
       friction: 1,
       rollingFriction: 1,
-      angularDamping: 0.1,
-      linearDamping: 0.1,
+      angularDamping: 0.2,
+      linearDamping: 0.3,
       restitution: 0.3
     }
   },
