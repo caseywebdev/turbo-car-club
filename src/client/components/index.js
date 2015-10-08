@@ -199,10 +199,11 @@ export default class extends Component {
       car.chassis.mesh.position.set(p.x(), p.y(), p.z());
       const r = trans.getRotation();
       car.chassis.mesh.quaternion.set(r.x(), r.y(), r.z(), r.w());
-      car.vehicle.setSteeringValue(-Math.PI * car.steering * 0.2, 0);
-      car.vehicle.setSteeringValue(-Math.PI * car.steering * 0.2, 1);
-      car.vehicle.applyEngineForce(car.gas * 1000, 2);
-      car.vehicle.applyEngineForce(car.gas * 1000, 3);
+      car.vehicle.setSteeringValue(-Math.PI * car.steering * 0.1, 0);
+      car.vehicle.setSteeringValue(-Math.PI * car.steering * 0.1, 1);
+      car.vehicle.applyEngineForce(car.gas * 2000, 2);
+      car.vehicle.applyEngineForce(car.gas * 2000, 3);
+      let grounded = false;
       _.each(car.wheels, ({mesh}, i) => {
         const trans = car.vehicle.getWheelTransformWS(i);
         const p = trans.getOrigin();
@@ -218,7 +219,20 @@ export default class extends Component {
             config.car.frictionSlip
           );
         }
+        if (info.get_m_raycastInfo().get_m_isInContact()) grounded = true;
       });
+
+      if (grounded) {
+        const b = car.chassis.body.getWorldTransform().getBasis();
+        const f = new Ammo.btVector3(0, -2000, 0);
+        car.chassis.body.applyForce(
+          new Ammo.btVector3(
+            b.getRow(0).dot(f),
+            b.getRow(1).dot(f),
+            b.getRow(2).dot(f)
+          )
+        );
+      }
     });
 
     const shouldSendBall = _.first(_.sortBy(
