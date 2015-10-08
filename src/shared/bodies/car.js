@@ -4,7 +4,7 @@ import ChassisBody from 'shared/bodies/chassis';
 import config from 'shared/config';
 
 const {chassis: {width, height, depth}, wheel: {radius, width: wheelWidth}} =
-  config;
+  config.car;
 
 const WHEEL_CONNECTION_POINTS = _.map([
   [(width - wheelWidth) / 1.7, -height / 2 + radius * 1.6, depth / 2.1 - radius],
@@ -35,11 +35,11 @@ export default (world) => {
       i < 2
     );
     const wheel = vehicle.getWheelInfo(i);
-    wheel.set_m_wheelsDampingCompression(4);
-    wheel.set_m_wheelsDampingRelaxation(5);
-    wheel.set_m_rollInfluence(0);
-    wheel.set_m_suspensionStiffness(50);
-    wheel.set_m_frictionSlip(1000);
+    wheel.set_m_wheelsDampingCompression(config.car.wheelsDampingCompression);
+    wheel.set_m_wheelsDampingRelaxation(config.car.wheelsDampingRelaxation);
+    wheel.set_m_rollInfluence(config.car.rollInfluence);
+    wheel.set_m_suspensionStiffness(config.car.suspensionStiffness);
+    wheel.set_m_frictionSlip(config.car.frictionSlip);
   });
   world.addAction(vehicle);
   return {vehicle, chassis};

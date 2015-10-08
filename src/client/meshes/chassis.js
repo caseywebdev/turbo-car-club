@@ -1,7 +1,7 @@
 import config from 'shared/config';
 import THREE from 'three';
 
-const {width, height, depth} = config.chassis;
+const {width, height, depth} = config.car.chassis;
 
 const BASE_GEO = new THREE.BoxGeometry(width, height - 0.25, depth);
 const TOP_GEO = new THREE.BoxGeometry(width * 0.75, 0.25, 2);

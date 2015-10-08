@@ -6,6 +6,7 @@ import BallBody from 'shared/bodies/ball';
 import BallMesh from 'client/meshes/ball';
 import CarBody from 'shared/bodies/car';
 import ChassisMesh from 'client/meshes/chassis';
+import config from 'shared/config';
 import createBody from 'shared/utils/create-body';
 import FloorBody from 'shared/bodies/floor';
 import FloorMesh from 'client/meshes/floor';
@@ -28,32 +29,21 @@ document.addEventListener('keyup',
   ({key, which}) => KEYS[key || which] = false
 );
 
+const WALLS = [
+  [48, 1, 4],
+  [51, 1, 2],
+  [54, 1, 1],
+  [57, 1, 1 / 2],
+  [60, 1, 1 / 4],
+  [64, 1, 0]
+];
+
 export default class extends Component {
   constructor(props) {
     super(props);
     this.cars = {};
     this.peers = {};
     this.world = WorldObject();
-    this.world.addRigidBody(FloorBody());
-
-    let wall;
-    this.world.addRigidBody(wall = createBody({
-      shape: new Ammo.btStaticPlaneShape(new Ammo.btVector3(1, 0, 0), 0)
-    }));
-    wall.getWorldTransform().getOrigin().setX(-64);
-    this.world.addRigidBody(wall = createBody({
-      shape: new Ammo.btStaticPlaneShape(new Ammo.btVector3(-1, 0, 0), 0)
-    }));
-    wall.getWorldTransform().getOrigin().setX(64);
-    this.world.addRigidBody(wall = createBody({
-      shape: new Ammo.btStaticPlaneShape(new Ammo.btVector3(0, 0, 1), 0)
-    }));
-    wall.getWorldTransform().getOrigin().setZ(-64);
-    this.world.addRigidBody(wall = createBody({
-      shape: new Ammo.btStaticPlaneShape(new Ammo.btVector3(0, 0, -1), 0)
-    }));
-    wall.getWorldTransform().getOrigin().setZ(64);
-
     this.world.addRigidBody(FloorBody());
     this.ball = {body: BallBody(), mesh: BallMesh()};
     this.ball.body.getWorldTransform().getOrigin().setX(-10);
@@ -67,6 +57,26 @@ export default class extends Component {
     this.scene.add(this.ball.mesh);
     this.car = this.getCar('self');
     this.car.chassis.body.getWorldTransform().getOrigin().setY(4);
+
+    _.each(WALLS, ([d, x, y]) => {
+      let body;
+      this.world.addRigidBody(body = createBody({
+        shape: new Ammo.btStaticPlaneShape(new Ammo.btVector3(x, y, 0), 0)
+      }));
+      body.getWorldTransform().getOrigin().setX(-d);
+      this.world.addRigidBody(body = createBody({
+        shape: new Ammo.btStaticPlaneShape(new Ammo.btVector3(-x, y, 0), 0)
+      }));
+      body.getWorldTransform().getOrigin().setX(d);
+      this.world.addRigidBody(body = createBody({
+        shape: new Ammo.btStaticPlaneShape(new Ammo.btVector3(0, y, x), 0)
+      }));
+      body.getWorldTransform().getOrigin().setZ(-d);
+      this.world.addRigidBody(body = createBody({
+        shape: new Ammo.btStaticPlaneShape(new Ammo.btVector3(0, y, -x), 0)
+      }));
+      body.getWorldTransform().getOrigin().setZ(d);
+    });
 
     (this.live = new Live())
       .on('peers', ({self, rest}) => {
@@ -201,8 +211,12 @@ export default class extends Component {
         mesh.quaternion.set(r.x(), r.y(), r.z(), r.w());
         const info = car.vehicle.getWheelInfo(i);
         if (i > 1) {
-          if (car.handbrake) info.set_m_engineForce(0);
-          info.set_m_frictionSlip(car.handbrake ? 0.5 : 1000);
+          car.vehicle.setBrake(car.handbrake ? 100 : 0, i);
+          info.set_m_frictionSlip(
+            car.handbrake ?
+            config.car.handbrakeFrictionSlip :
+            config.car.frictionSlip
+          );
         }
       });
     });

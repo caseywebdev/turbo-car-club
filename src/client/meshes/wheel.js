@@ -1,7 +1,7 @@
 import config from 'shared/config';
 import THREE from 'three';
 
-const {radius, width} = config.wheel;
+const {radius, width} = config.car.wheel;
 
 const SEGMENTS = 16;
 
