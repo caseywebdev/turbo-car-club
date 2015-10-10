@@ -13,10 +13,11 @@ export default {
   car: {
     wheelsDampingCompression: 4,
     wheelsDampingRelaxation: 5,
-    rollInfluence: 0.1,
-    suspensionStiffness: 30,
+    rollInfluence: 0,
+    suspensionStiffness: 25,
     frictionSlip: 50,
-    handbrakeFrictionSlip: 1,
+    handbrakeFrontFrictionSlip: 1,
+    handbrakeRearFrictionSlip: 0.5,
     chassis: {
       width: 4,
       height: 1.5,

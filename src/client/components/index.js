@@ -204,8 +204,6 @@ export default class extends Component {
       car.chassis.mesh.quaternion.set(r.x(), r.y(), r.z(), r.w());
       car.vehicle.setSteeringValue(-Math.PI * car.steering * 0.1, 0);
       car.vehicle.setSteeringValue(-Math.PI * car.steering * 0.1, 1);
-      car.vehicle.applyEngineForce(car.gas * 2000, 2);
-      car.vehicle.applyEngineForce(car.gas * 2000, 3);
       let grounded = 0;
       _.each(car.wheels, ({mesh}, i) => {
         const trans = car.vehicle.getWheelTransformWS(i);
@@ -214,35 +212,44 @@ export default class extends Component {
         const r = trans.getRotation();
         mesh.quaternion.set(r.x(), r.y(), r.z(), r.w());
         const info = car.vehicle.getWheelInfo(i);
-        if (i > 1) {
-          car.vehicle.setBrake(car.handbrake ? 100 : 0, i);
+        if (i < 2) {
+          car.vehicle.setBrake(car.handbrake ? 10 : 0, i);
           info.set_m_frictionSlip(
             car.handbrake ?
-            config.car.handbrakeFrictionSlip :
+            config.car.handbrakeFrontFrictionSlip :
+            config.car.frictionSlip
+          );
+        } else {
+          car.vehicle.setBrake(car.handbrake ? 10 : 0, i);
+          info.set_m_frictionSlip(
+            car.handbrake ?
+            config.car.handbrakeRearFrictionSlip :
             config.car.frictionSlip
           );
         }
         if (info.get_m_raycastInfo().get_m_isInContact()) ++grounded;
       });
 
-      if (grounded >= 2) {
-        const b = car.chassis.body.getWorldTransform().getBasis();
-        const f = new Ammo.btVector3(0, -3000, 0);
-        car.chassis.body.applyForce(
-          new Ammo.btVector3(
-            b.getRow(0).dot(f),
-            b.getRow(1).dot(f),
-            b.getRow(2).dot(f)
-          )
-        );
-      }
+      const b = car.chassis.body.getWorldTransform().getBasis();
+      const f = new Ammo.btVector3(
+        0,
+        -grounded * 500,
+        grounded * car.gas * 750
+      );
+      car.chassis.body.applyCentralForce(
+        new Ammo.btVector3(
+          b.getRow(0).dot(f),
+          b.getRow(1).dot(f),
+          b.getRow(2).dot(f)
+        )
+      );
 
       if (grounded && car.jumpState >= 2) car.jumpState = 0;
 
       if (grounded === 4 && !car.jumpState && KEYS[32]) {
         const b = car.chassis.body.getWorldTransform().getBasis();
         const f = new Ammo.btVector3(0, 1000, 0);
-        car.chassis.body.applyImpulse(
+        car.chassis.body.applyCentralImpulse(
           new Ammo.btVector3(
             b.getRow(0).dot(f),
             b.getRow(1).dot(f),
@@ -259,7 +266,7 @@ export default class extends Component {
       if (grounded === 0 && car.jumpState === 3 && KEYS[32]) {
         const b = car.chassis.body.getWorldTransform().getBasis();
         const f = new Ammo.btVector3(0, 1000, 0);
-        car.chassis.body.applyImpulse(
+        car.chassis.body.applyCentralImpulse(
           new Ammo.btVector3(
             b.getRow(0).dot(f),
             b.getRow(1).dot(f),
