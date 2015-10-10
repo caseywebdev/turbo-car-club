@@ -14,20 +14,20 @@ export default {
     wheelsDampingCompression: 4,
     wheelsDampingRelaxation: 5,
     rollInfluence: 0.1,
-    suspensionStiffness: 50,
+    suspensionStiffness: 30,
     frictionSlip: 50,
-    handbrakeFrictionSlip: 0.1,
+    handbrakeFrictionSlip: 1,
     chassis: {
       width: 4,
       height: 1.5,
       depth: 6,
       mass: 100,
       props: {
-        friction: 1,
-        rollingFriction: 1,
+        friction: 0.5,
+        rollingFriction: 0.5,
         angularDamping: 0.2,
         linearDamping: 0.3,
-        restitution: 0.7
+        restitution: 0.2
       }
     },
     wheel: {
@@ -39,7 +39,7 @@ export default {
     props: {
       friction: 1,
       rollingFriction: 1,
-      restitution: 1
+      restitution: 0.5
     }
   }
 };

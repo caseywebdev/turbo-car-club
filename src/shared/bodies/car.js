@@ -15,7 +15,7 @@ const WHEEL_CONNECTION_POINTS = _.map([
 
 const WHEEL_DIRECTION = new Ammo.btVector3(0, -1, 0);
 const WHEEL_AXLE = new Ammo.btVector3(-1, 0, 0);
-const SUSPENSION_REST_LENGTH = radius;
+const SUSPENSION_REST_LENGTH = radius * 2;
 const TUNING = new Ammo.btVehicleTuning();
 
 export default (world) => {

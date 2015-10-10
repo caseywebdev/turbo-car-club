@@ -22,9 +22,12 @@ import WorldObject from 'shared/objects/world';
 
 const KEYS = {};
 
-document.addEventListener('keydown',
-  ({key, which}) => KEYS[key || which] = true
-);
+let ballCam = false;
+
+document.addEventListener('keydown', ({key, which}) => {
+  KEYS[key || which] = true;
+  if (which === 89) ballCam = !ballCam;
+});
 document.addEventListener('keyup',
   ({key, which}) => KEYS[key || which] = false
 );
@@ -56,7 +59,7 @@ export default class extends Component {
     this.scene.add(FloorMesh());
     this.scene.add(this.ball.mesh);
     this.car = this.getCar('self');
-    this.car.chassis.body.getWorldTransform().getOrigin().setY(4);
+    this.car.chassis.body.getWorldTransform().getOrigin().setY(10);
 
     _.each(WALLS, ([d, x, y]) => {
       let body;
@@ -188,7 +191,7 @@ export default class extends Component {
       this.car.steering = Math.abs(steering) < 0.2 ? 0 : steering;
     } else this.car.steering = 0;
 
-    if (KEYS[32]) this.car.handbrake = true;
+    if (KEYS[16]) this.car.handbrake = true;
     else if (pad) this.car.handbrake = pad.buttons[2].pressed;
     else this.car.handbrake = false;
 
@@ -203,7 +206,7 @@ export default class extends Component {
       car.vehicle.setSteeringValue(-Math.PI * car.steering * 0.1, 1);
       car.vehicle.applyEngineForce(car.gas * 2000, 2);
       car.vehicle.applyEngineForce(car.gas * 2000, 3);
-      let grounded = false;
+      let grounded = 0;
       _.each(car.wheels, ({mesh}, i) => {
         const trans = car.vehicle.getWheelTransformWS(i);
         const p = trans.getOrigin();
@@ -219,12 +222,12 @@ export default class extends Component {
             config.car.frictionSlip
           );
         }
-        if (info.get_m_raycastInfo().get_m_isInContact()) grounded = true;
+        if (info.get_m_raycastInfo().get_m_isInContact()) ++grounded;
       });
 
-      if (grounded) {
+      if (grounded >= 2) {
         const b = car.chassis.body.getWorldTransform().getBasis();
-        const f = new Ammo.btVector3(0, -2000, 0);
+        const f = new Ammo.btVector3(0, -3000, 0);
         car.chassis.body.applyForce(
           new Ammo.btVector3(
             b.getRow(0).dot(f),
@@ -232,6 +235,38 @@ export default class extends Component {
             b.getRow(2).dot(f)
           )
         );
+      }
+
+      if (grounded && car.jumpState >= 2) car.jumpState = 0;
+
+      if (grounded === 4 && !car.jumpState && KEYS[32]) {
+        const b = car.chassis.body.getWorldTransform().getBasis();
+        const f = new Ammo.btVector3(0, 1000, 0);
+        car.chassis.body.applyImpulse(
+          new Ammo.btVector3(
+            b.getRow(0).dot(f),
+            b.getRow(1).dot(f),
+            b.getRow(2).dot(f)
+          )
+        );
+        car.jumpState = 1;
+      }
+
+      if (!grounded && car.jumpState === 1) car.jumpState = 2;
+
+      if (car.jumpState === 2 && !KEYS[32]) car.jumpState = 3;
+
+      if (grounded === 0 && car.jumpState === 3 && KEYS[32]) {
+        const b = car.chassis.body.getWorldTransform().getBasis();
+        const f = new Ammo.btVector3(0, 1000, 0);
+        car.chassis.body.applyImpulse(
+          new Ammo.btVector3(
+            b.getRow(0).dot(f),
+            b.getRow(1).dot(f),
+            b.getRow(2).dot(f)
+          )
+        );
+        car.jumpState = 4;
       }
     });
 
@@ -295,13 +330,22 @@ export default class extends Component {
   }
 
   updateCamera() {
-    const bp = this.ball.mesh.position;
     const cp = this.car.chassis.mesh.position;
-    const back = bp.clone().setY(0).sub(cp.clone().setY(0)).setLength(15);
-    CAMERA.position.x = cp.x - back.x;
-    CAMERA.position.y = cp.y + 2;
-    CAMERA.position.z = cp.z - back.z;
-    CAMERA.lookAt(bp);
+    if (ballCam) {
+      const bp = this.ball.mesh.position;
+      const back = bp.clone().setY(0).sub(cp.clone().setY(0)).setLength(15);
+      CAMERA.position.x = cp.x - back.x;
+      CAMERA.position.y = cp.y + 2;
+      CAMERA.position.z = cp.z - back.z;
+      CAMERA.lookAt(bp);
+    } else {
+      const q = this.car.chassis.mesh.quaternion;
+      const r = new THREE.Euler().setFromQuaternion(q, 'YXZ');
+      CAMERA.position.x = cp.x - Math.sin(r.y) * 20;
+      CAMERA.position.y = cp.y + 5;
+      CAMERA.position.z = cp.z - Math.cos(r.y) * 20;
+      CAMERA.lookAt(cp.clone().add(new THREE.Vector3(0, 2, 0)));
+    }
   }
 
   render() {

@@ -8,7 +8,7 @@
     "cogs-transformer-concat-amd": "1.0.6",
     "cogs-transformer-csso": "1.0.4",
     "cogs-transformer-directives": "1.0.3",
-    "cogs-transformer-eslint": "1.0.11",
+    "cogs-transformer-eslint": "1.0.12",
     "cogs-transformer-replace": "1.0.1",
     "cogs-transformer-sass": "1.0.4",
     "cogs-transformer-text": "1.0.3",
