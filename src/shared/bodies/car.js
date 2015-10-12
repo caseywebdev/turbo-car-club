@@ -3,19 +3,22 @@ import Ammo from 'ammo';
 import ChassisBody from 'shared/bodies/chassis';
 import config from 'shared/config';
 
-const {chassis: {width, height, depth}, wheel: {radius, width: wheelWidth}} =
-  config.car;
+const {
+  chassis: {width, height, depth},
+  wheel: {radius},
+  connectionPointOffset: [cp0, cp1, cp2]
+} = config.car;
 
 const WHEEL_CONNECTION_POINTS = _.map([
-  [(width - wheelWidth) / 1.7, -height / 2 + radius * 1.6, depth / 2.1 - radius],
-  [-(width - wheelWidth) / 1.7, -height / 2 + radius * 1.6, depth / 2.1 - radius],
-  [-(width - wheelWidth) / 1.7, -height / 2 + radius * 1.6, -depth / 2.1 + radius],
-  [(width - wheelWidth) / 1.7, -height / 2 + radius * 1.6, -depth / 2.1 + radius]
+  [width / 2 + cp0, -height / 2 - cp1, depth / 2 + cp2],
+  [-width / 2 - cp0, -height / 2 - cp1, depth / 2 + cp2],
+  [-width / 2 - cp0, -height / 2 - cp1, -depth / 2 - cp2],
+  [width / 2 + cp0, -height / 2 - cp1, -depth / 2 - cp2]
 ], ([x, y, z]) => new Ammo.btVector3(x, y, z));
 
 const WHEEL_DIRECTION = new Ammo.btVector3(0, -1, 0);
 const WHEEL_AXLE = new Ammo.btVector3(-1, 0, 0);
-const SUSPENSION_REST_LENGTH = radius * 2;
+const SUSPENSION_REST_LENGTH = config.car.suspensionRestLength;
 const TUNING = new Ammo.btVehicleTuning();
 
 export default (world) => {

@@ -22,12 +22,9 @@ import WorldObject from 'shared/objects/world';
 
 const KEYS = {};
 
-let ballCam = false;
-
-document.addEventListener('keydown', ({key, which}) => {
-  KEYS[key || which] = true;
-  if (which === 89) ballCam = !ballCam;
-});
+document.addEventListener('keydown',
+  ({key, which}) => KEYS[key || which] = true
+);
 document.addEventListener('keyup',
   ({key, which}) => KEYS[key || which] = false
 );
@@ -59,7 +56,7 @@ export default class extends Component {
     this.scene.add(FloorMesh());
     this.scene.add(this.ball.mesh);
     this.car = this.getCar('self');
-    this.car.chassis.body.getWorldTransform().getOrigin().setY(10);
+    this.car.chassis.body.getWorldTransform().getOrigin().setY(3);
 
     _.each(WALLS, ([d, x, y]) => {
       let body;
@@ -133,7 +130,8 @@ export default class extends Component {
         return {mesh};
       }),
       gas: 0,
-      steering: 0
+      steering: 0,
+      ballCam: true
     };
   }
 
@@ -195,15 +193,29 @@ export default class extends Component {
     else if (pad) this.car.handbrake = pad.buttons[2].pressed;
     else this.car.handbrake = false;
 
-    this.world.stepSimulation(1 / 60, 1, 1 / 60);
+    if (KEYS[66]) this.car.boost = true;
+    else if (pad) this.car.boost = pad.buttons[1].pressed;
+    else this.car.boost = false;
+
+    if (KEYS[32]) this.car.jump = true;
+    else if (pad) this.car.jump = pad.buttons[0].pressed;
+    else this.car.jump = false;
+
+    if (KEYS[89] && !this.prevPressed) this.car.ballCam = !this.car.ballCam;
+    else if (pad && pad.buttons[3].pressed && !this.prevPressed) {
+      this.car.ballCam = !this.car.ballCam;
+    }
+    this.prevPressed = KEYS[89] || (pad && pad.buttons[3].pressed);
+
+    this.world.stepSimulation(1 / 60, 0, 1 / 60);
     _.each(this.cars, car => {
       const trans = car.chassis.body.getWorldTransform();
       const p = trans.getOrigin();
       car.chassis.mesh.position.set(p.x(), p.y(), p.z());
       const r = trans.getRotation();
       car.chassis.mesh.quaternion.set(r.x(), r.y(), r.z(), r.w());
-      car.vehicle.setSteeringValue(-Math.PI * car.steering * 0.1, 0);
-      car.vehicle.setSteeringValue(-Math.PI * car.steering * 0.1, 1);
+      car.vehicle.setSteeringValue(-car.steering * config.car.steering, 0);
+      car.vehicle.setSteeringValue(-car.steering * config.car.steering, 1);
       let grounded = 0;
       _.each(car.wheels, ({mesh}, i) => {
         const trans = car.vehicle.getWheelTransformWS(i);
@@ -233,8 +245,10 @@ export default class extends Component {
       const b = car.chassis.body.getWorldTransform().getBasis();
       const f = new Ammo.btVector3(
         0,
-        -grounded * 500,
-        grounded * car.gas * 750
+        -grounded * config.car.sticky,
+        car.boost ?
+        config.car.boostAcceleration :
+        grounded * car.gas * config.car.acceleration
       );
       car.chassis.body.applyCentralForce(
         new Ammo.btVector3(
@@ -246,9 +260,9 @@ export default class extends Component {
 
       if (grounded && car.jumpState >= 2) car.jumpState = 0;
 
-      if (grounded === 4 && !car.jumpState && KEYS[32]) {
+      if (grounded === 4 && !car.jumpState && car.jump) {
         const b = car.chassis.body.getWorldTransform().getBasis();
-        const f = new Ammo.btVector3(0, 1000, 0);
+        const f = new Ammo.btVector3(0, config.car.jump, 0);
         car.chassis.body.applyCentralImpulse(
           new Ammo.btVector3(
             b.getRow(0).dot(f),
@@ -261,11 +275,11 @@ export default class extends Component {
 
       if (!grounded && car.jumpState === 1) car.jumpState = 2;
 
-      if (car.jumpState === 2 && !KEYS[32]) car.jumpState = 3;
+      if (car.jumpState === 2 && !car.jump) car.jumpState = 3;
 
-      if (grounded === 0 && car.jumpState === 3 && KEYS[32]) {
+      if (grounded === 0 && car.jumpState === 3 && car.jump) {
         const b = car.chassis.body.getWorldTransform().getBasis();
-        const f = new Ammo.btVector3(0, 1000, 0);
+        const f = new Ammo.btVector3(0, config.car.jump, 0);
         car.chassis.body.applyCentralImpulse(
           new Ammo.btVector3(
             b.getRow(0).dot(f),
@@ -338,9 +352,9 @@ export default class extends Component {
 
   updateCamera() {
     const cp = this.car.chassis.mesh.position;
-    if (ballCam) {
+    if (this.car.ballCam) {
       const bp = this.ball.mesh.position;
-      const back = bp.clone().setY(0).sub(cp.clone().setY(0)).setLength(15);
+      const back = bp.clone().setY(0).sub(cp.clone().setY(0)).setLength(5);
       CAMERA.position.x = cp.x - back.x;
       CAMERA.position.y = cp.y + 2;
       CAMERA.position.z = cp.z - back.z;
@@ -348,10 +362,10 @@ export default class extends Component {
     } else {
       const q = this.car.chassis.mesh.quaternion;
       const r = new THREE.Euler().setFromQuaternion(q, 'YXZ');
-      CAMERA.position.x = cp.x - Math.sin(r.y) * 20;
-      CAMERA.position.y = cp.y + 5;
-      CAMERA.position.z = cp.z - Math.cos(r.y) * 20;
-      CAMERA.lookAt(cp.clone().add(new THREE.Vector3(0, 2, 0)));
+      CAMERA.position.x = cp.x - Math.sin(r.y) * 5;
+      CAMERA.position.y = cp.y + 2;
+      CAMERA.position.z = cp.z - Math.cos(r.y) * 5;
+      CAMERA.lookAt(cp.clone().add(new THREE.Vector3(0, 1, 0)));
     }
   }
 
