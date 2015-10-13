@@ -2,4 +2,7 @@
 // = requireself
 // = require ./init-worker.js
 
-import 'ammo';
+import Game from 'shared/objects/game';
+
+const game = new Game(message => postMessage(message));
+onmessage = e => game.handleMessage(e.data);

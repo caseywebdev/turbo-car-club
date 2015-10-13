@@ -67,7 +67,7 @@ export default class {
   }
 
   handleError(er) {
-    console.error(er);
+    throw er;
   }
 
   setDataChannel(channel) {

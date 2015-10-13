@@ -1,4 +1,5 @@
 export default {
+  sps: 60,
   ball: {
     radius: 1,
     mass: 1,

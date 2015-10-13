@@ -45,5 +45,5 @@ export default (world) => {
     wheel.set_m_frictionSlip(config.car.frictionSlip);
   });
   world.addAction(vehicle);
-  return {vehicle, chassis};
+  return vehicle;
 };
