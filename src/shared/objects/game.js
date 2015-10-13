@@ -16,13 +16,15 @@ const WALLS = [
   [64, 1, 0]
 ];
 
-const STEP_TIME = 1 / config.sps;
+const STEP_TIME = 1 / config.sps / 2;
 
 const serializeBody = trans => {
   const o = trans.getOrigin();
   const r = trans.getRotation();
   return [o.x(), o.y(), o.z(), r.x(), r.y(), r.z(), r.w()];
 };
+
+const defer = typeof setImmediate === 'function' ? setImmediate : _.defer;
 
 export default class {
   constructor(send) {
@@ -33,6 +35,8 @@ export default class {
     this.ball.getWorldTransform().getOrigin().setX(-10);
     this.ball.getWorldTransform().getOrigin().setY(10);
     this.ball.getWorldTransform().getOrigin().setZ(-10);
+    this.ball.getAngularVelocity().setX(100);
+    this.ball.getAngularVelocity().setZ(-100);
     this.world.addRigidBody(this.ball);
     this.cars = {};
 
@@ -59,17 +63,13 @@ export default class {
   }
 
   start() {
-    this.frame = 0;
-    this.lastFrame = _.now() - (STEP_TIME * 1000);
-    this.tick();
-  }
-
-  tick() {
-    if (_.now() - this.lastFrame >= STEP_TIME * 1000) this.step();
-    this.tickTimeoutId = _.defer(::this.tick);
+    this.time = 0;
+    this.lastStep = _.now();
+    this.step();
   }
 
   step() {
+    this.tickTimeoutId = defer(::this.step);
     _.each(this.cars, car => {
       car.vehicle.setSteeringValue(-car.steering * config.car.steering, 0);
       car.vehicle.setSteeringValue(-car.steering * config.car.steering, 1);
@@ -140,9 +140,12 @@ export default class {
         car.jumpState = 4;
       }
     });
-    this.lastFrame = _.now();
-    ++this.frame;
-    this.world.stepSimulation(1 / config.sps, 0, 1 / config.sps);
+    const now = _.now();
+    const dt = (now - this.lastStep) / 1000;
+    this.time += dt;
+    const maxSubSteps = Math.max(1, Math.ceil(dt / STEP_TIME));
+    this.world.stepSimulation(dt, maxSubSteps, STEP_TIME);
+    this.lastStep = now;
     this.send({
       name: 'frame',
       data: {

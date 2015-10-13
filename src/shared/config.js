@@ -4,11 +4,10 @@ export default {
     radius: 1,
     mass: 1,
     props: {
-      friction: 0.8,
+      friction: 0.5,
       restitution: 0.8,
-      rollingFriction: 0.8,
-      angularDamping: 0.1,
-      linearDamping: 0.1
+      angularDamping: 0.2,
+      linearDamping: 0.2
     }
   },
   car: {
@@ -33,7 +32,6 @@ export default {
       mass: 100,
       props: {
         friction: 0.5,
-        rollingFriction: 0.5,
         angularDamping: 0.2,
         linearDamping: 0.2,
         restitution: 0.2
@@ -46,8 +44,7 @@ export default {
   },
   floor: {
     props: {
-      friction: 1,
-      rollingFriction: 1,
+      friction: 0.6,
       restitution: 0.5
     }
   }
