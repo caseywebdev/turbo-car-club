@@ -28,7 +28,12 @@ module.exports = {
     },
     scss: {
       out: 'css',
-      transformers: [].concat('directives', 'sass', MINIFY ? 'csso' : [])
+      transformers: [].concat(
+        'scss-lint',
+        'directives',
+        'sass',
+        MINIFY ? 'csso' : []
+      )
     }
   },
   builds: {

@@ -11,6 +11,7 @@
     "cogs-transformer-eslint": "1.0.12",
     "cogs-transformer-replace": "1.0.1",
     "cogs-transformer-sass": "1.0.4",
+    "cogs-transformer-scss-lint": "1.0.1",
     "cogs-transformer-text": "1.0.3",
     "cogs-transformer-uglify-js": "1.0.2",
     "cogs": "1.0.7",
@@ -24,13 +25,10 @@
     "react-dom": "0.14.0",
     "three": "0.72.0",
     "underscore": "1.8.3",
+    "wrtc": "0.0.58",
     "ws": "0.8.0"
   },
   "devDependencies": {
     "watchy": "0.6.5"
-  },
-  "scripts": {
-    "postinstall": "make postinstall",
-    "start": "node build/node_modules/server"
   }
 }

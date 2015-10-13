@@ -1,7 +1,14 @@
 app:
-  image: node:4.1.1
+  build: .
   volumes:
-    - .:/code
+    - ./public/textures:/code/public/textures
+    - ./public/index.html:/code/public/index.html
+    - ./src:/code/src
+    - ./.eslintrc:/code/.eslintrc
+    - ./.scss-lint.yml:/code/.scss-lint.yml
+    - ./cogs-client.js:/code/cogs-client.js
+    - ./cogs-server.js:/code/cogs-server.js
+    - ./Makefile:/code/Makefile
   working_dir: /code
   ports:
     - '80:80'
