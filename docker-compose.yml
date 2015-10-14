@@ -1,6 +1,5 @@
 app:
-  # image: quay.io/turbocarclub/turbo-car-club:0.0.1
-  image: b4d61a59d3a9
+  image: quay.io/turbocarclub/turbo-car-club:0.0.2
   volumes:
     - ./public/textures:/code/public/textures
     - ./public/index.html:/code/public/index.html
