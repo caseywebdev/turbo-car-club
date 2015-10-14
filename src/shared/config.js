@@ -1,5 +1,6 @@
 export default {
-  sps: 60,
+  fixedTimeStep: 1 / 60,
+  maxSubSteps: 10,
   ball: {
     radius: 1,
     mass: 1,

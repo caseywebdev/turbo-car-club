@@ -3,9 +3,9 @@ import log from 'server/utils/log';
 
 export default (socket, {id, data}, cb) => {
   const recipient = app.live.sockets[id];
-  log.info(`Signal: ${data.type} from ${id} for ${socket.id}`);
+  log.info(`${socket.id} signaled ${id}: ${data.type}`);
   if (recipient) return recipient.send('signal', {id: socket.id, data});
-  const er = new Error(`Recipient ${socket.id} not found!`);
+  const er = new Error(`Recipient ${id} not found!`);
   log.error(er.message);
   cb(er);
 };

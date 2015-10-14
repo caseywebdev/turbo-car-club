@@ -1,4 +1,4 @@
-import Ammo from 'ammo';
+import Ammo from 'ammo.js';
 import config from 'shared/config';
 import createBody from 'shared/utils/create-body';
 

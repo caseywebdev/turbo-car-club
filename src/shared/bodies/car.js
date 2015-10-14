@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import Ammo from 'ammo';
+import Ammo from 'ammo.js';
 import ChassisBody from 'shared/bodies/chassis';
 import config from 'shared/config';
 

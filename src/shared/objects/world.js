@@ -1,4 +1,4 @@
-import Ammo from 'ammo';
+import Ammo from 'ammo.js';
 
 const COLLISION_CONFIGURATION = new Ammo.btDefaultCollisionConfiguration();
 const DISPATCHER = new Ammo.btCollisionDispatcher(COLLISION_CONFIGURATION);

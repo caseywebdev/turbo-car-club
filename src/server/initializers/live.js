@@ -20,9 +20,9 @@ const wss = new ws.Server({server});
 const sockets = {};
 
 wss.on('connection', ws => {
-  const socket = new Live(ws);
-  _.each(LISTENERS, (cb, name) => socket.on(name, cb));
-  socket.emit('open', socket);
+  const socket = new Live({socket: ws});
+  _.each(LISTENERS, (cb, name) => socket.on(name, _.partial(cb, socket)));
+  socket.trigger('open');
 });
 
 export default {sockets, wss};

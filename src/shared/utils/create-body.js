@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import Ammo from 'ammo';
+import Ammo from 'ammo.js';
 
 const LOCAL_INERTIA = new Ammo.btVector3(0, 0, 0);
 

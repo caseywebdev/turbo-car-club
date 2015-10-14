@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import Ammo from 'ammo';
+import Ammo from 'ammo.js';
 import CarBody from 'shared/bodies/car';
 import createBody from 'shared/utils/create-body';
 import config from 'shared/config';
@@ -16,7 +16,8 @@ const WALLS = [
   [64, 1, 0]
 ];
 
-const STEP_TIME = 1 / config.sps / 2;
+const FIXED_TIME_STEP = config.fixedTimeStep;
+const MAX_SUB_STEPS = config.maxSubSteps;
 
 const serializeBody = trans => {
   const o = trans.getOrigin();
@@ -35,8 +36,8 @@ export default class {
     this.ball.getWorldTransform().getOrigin().setX(-10);
     this.ball.getWorldTransform().getOrigin().setY(10);
     this.ball.getWorldTransform().getOrigin().setZ(-10);
-    this.ball.getAngularVelocity().setX(100);
-    this.ball.getAngularVelocity().setZ(-100);
+    this.ball.getAngularVelocity().setX(10);
+    this.ball.getAngularVelocity().setZ(-10);
     this.world.addRigidBody(this.ball);
     this.cars = {};
 
@@ -143,8 +144,7 @@ export default class {
     const now = _.now();
     const dt = (now - this.lastStep) / 1000;
     this.time += dt;
-    const maxSubSteps = Math.max(1, Math.ceil(dt / STEP_TIME));
-    this.world.stepSimulation(dt, maxSubSteps, STEP_TIME);
+    this.world.stepSimulation(dt, MAX_SUB_STEPS, FIXED_TIME_STEP);
     this.lastStep = now;
     this.send({
       name: 'frame',

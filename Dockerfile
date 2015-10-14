@@ -1,4 +1,4 @@
-FROM node:0.12.7
+FROM node:4.2.1
 ENV \
   PORT=80 \
   MINIFY=1

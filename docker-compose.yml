@@ -1,5 +1,6 @@
 app:
-  image: quay.io/turbocarclub/turbo-car-club:0.0.1
+  # image: quay.io/turbocarclub/turbo-car-club:0.0.1
+  image: b4d61a59d3a9
   volumes:
     - ./public/textures:/code/public/textures
     - ./public/index.html:/code/public/index.html
@@ -9,6 +10,7 @@ app:
     - ./cogs-client.js:/code/cogs-client.js
     - ./cogs-server.js:/code/cogs-server.js
     - ./Makefile:/code/Makefile
+    - ./package.json:/code/package.json
   working_dir: /code
   ports:
     - '80:80'

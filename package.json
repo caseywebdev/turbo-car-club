@@ -18,14 +18,14 @@
     "eslint": "1.6.0",
     "eslint-plugin-react": "3.5.1",
     "express": "4.13.3",
-    "live-socket": "0.9.6",
+    "live-socket": "0.10.1",
     "node-uuid": "1.4.3",
     "orgsync-logger": "1.2.6",
     "react": "0.14.0",
     "react-dom": "0.14.0",
     "three": "0.72.0",
     "underscore": "1.8.3",
-    "wrtc": "0.0.58",
+    "wrtc": "caseywebdev/node-webrtc#node4",
     "ws": "0.8.0"
   },
   "devDependencies": {

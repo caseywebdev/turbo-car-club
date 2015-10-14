@@ -25,8 +25,8 @@ document.addEventListener('keyup',
 export default class extends Component {
   constructor(props) {
     super(props);
-    this.worker = new Worker('worker.js');
-    this.worker.onmessage = ::this.handleMessage;
+    // this.worker = new Worker('worker.js');
+    // this.worker.onmessage = ::this.handleMessage;
     this.cars = {};
     this.peers = {};
     this.scene = new THREE.Scene();
@@ -38,22 +38,7 @@ export default class extends Component {
     this.car = this.getCar('self');
 
     (this.live = new Live())
-      .on('peers', ({self, rest}) => {
-        this.live.id = self;
-        const current = _.keys(this.peers);
-        _.each(_.difference(current, rest), id => {
-          this.getPeer(id).close();
-          delete this.peers[id];
-          const car = this.getCar(id);
-          this.scene.remove(car.chassis.mesh);
-          _.each(car.wheels, wheel => this.scene.remove(wheel.mesh));
-          this.worker.postMessage({name: 'remove-car', data: {id}});
-          delete this.cars[id];
-        });
-        _.each(_.difference(rest, current), id => {
-          if (self > id) this.getPeer(id).call();
-        });
-      })
+      .on('host', id => (this.host = this.getPeer(id)).call())
       .on('signal', ({id, data}) => this.getPeer(id).signal(data));
   }
 
@@ -65,9 +50,8 @@ export default class extends Component {
     peer.id = id;
     return peer
       .on('signal', data => this.live.send('signal', {id, data}))
-      // .on('u', _.bind(this.handleUpdate, this, id))
-      // .on('b', _.bind(this.handleBallUpdate, this))
-      .on('close', () => { if (this.live.id > id) this.getPeer(id).call(); });
+      .on('u', ::this.handleMessage)
+      .on('close', () => this.getPeer(id).call());
   }
 
   getCar(id) {
@@ -75,7 +59,7 @@ export default class extends Component {
     if (car) return car;
     const chassis = ChassisMesh();
     this.scene.add(chassis);
-    this.worker.postMessage({name: 'add-car', data: {id}});
+    // this.worker.postMessage({name: 'add-car', data: {id}});
     return this.cars[id] = {
       id,
       chassis,
@@ -162,60 +146,14 @@ export default class extends Component {
     }
     this.prevPressed = KEYS[89] || (pad && pad.buttons[3].pressed);
 
-    this.worker.postMessage({
-      name: 'update-car',
-      data: _.pick(this.car, 'id', 'gas', 'steering', 'handbrake', 'boost', 'jump')
-    });
+    // this.worker.postMessage({
+    //   name: 'update-car',
+    //   data: _.pick(this.car, 'id', 'gas', 'steering', 'handbrake', 'boost', 'jump')
+    // });
 
     // const shouldSendBall = _.first(_.sortBy(
     //   [this.live.id].concat(_.map(this.peers, 'id'))
     // )) === this.live.id;
-    _.each(this.peers, peer => {
-      const car = this.car.chassis.body;
-      let p = car.getWorldTransform().getOrigin();
-      let r = car.getWorldTransform().getRotation();
-      let l = car.getLinearVelocity();
-      let a = car.getAngularVelocity();
-      peer.send('u', [
-        p.x(),
-        p.y(),
-        p.z(),
-        r.x(),
-        r.y(),
-        r.z(),
-        r.w(),
-        l.x(),
-        l.y(),
-        l.z(),
-        a.x(),
-        a.y(),
-        a.z(),
-        this.car.gas,
-        this.car.steering,
-        this.car.handbrake
-      ]);
-      // if (!shouldSendBall) return;
-      // const ball = this.ball.body;
-      // p = ball.getWorldTransform().getOrigin();
-      // r = ball.getWorldTransform().getRotation();
-      // l = ball.getLinearVelocity();
-      // a = ball.getAngularVelocity();
-      // peer.send('b', [
-      //   p.x(),
-      //   p.y(),
-      //   p.z(),
-      //   r.x(),
-      //   r.y(),
-      //   r.z(),
-      //   r.w(),
-      //   l.x(),
-      //   l.y(),
-      //   l.z(),
-      //   a.x(),
-      //   a.y(),
-      //   a.z()
-      // ]);
-    });
 
     this.updateCamera();
     RENDERER.render(this.scene, CAMERA);
@@ -246,7 +184,7 @@ export default class extends Component {
       const bp = this.ball.position;
       const back = bp.clone().setY(0).sub(cp.clone().setY(0)).setLength(5);
       CAMERA.position.x = cp.x - back.x;
-      CAMERA.position.y = cp.y + 2;
+      CAMERA.position.y = cp.y + 1;
       CAMERA.position.z = cp.z - back.z;
       CAMERA.lookAt(bp);
     } else {
