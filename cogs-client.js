@@ -1,4 +1,4 @@
-var MINIFY = !!process.env.MINIFY;
+var MINIFY = process.env.MINIFY === '1';
 
 module.exports = {
   manifestPath: 'public/manifest.json',

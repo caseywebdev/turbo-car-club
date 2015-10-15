@@ -17,6 +17,8 @@ const live = new Live({WebSocket: ws, url: `ws://0.0.0.0:${config.port}`});
 live.send('host');
 live.on('signal', ({id, data}) => getPeer(id).signal(data));
 
-const messagePeers = message => _.each(PEERS, peer => peer.send('u', message));
+// const messagePeers = message => {
+//   _.each(PEERS, peer => peer.send('u', message));
+// };
 
-export default new Game(messagePeers);
+export default new Game(_.noop);

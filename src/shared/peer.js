@@ -13,14 +13,22 @@ const RTCIceCandidate = resolveKey('RTCIceCandidate');
 const PC_CONFIG = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]};
 const DC_CONFIG = {ordered: false, maxRetransmits: 0};
 
+const DEFAULTS = {
+  timeout: 10000
+};
+
 export default class {
-  constructor() {
+  constructor({timeout} = DEFAULTS) {
     this.listeners = {};
     this.candidates = [];
     this.conn = new RTCPeerConnection(PC_CONFIG);
     this.conn.ondatachannel = ::this.handleDataChannel;
     this.conn.onicecandidate = ::this.handleIceCandidate;
     this.conn.onsignalingstatechange = ::this.handleSignalingStateChange;
+    this.conn.oniceconnectionstatechange =
+      ::this.handleIceConnectionStateChange;
+    this.timeout = timeout;
+    this.startTimeout();
   }
 
   call() {
@@ -30,6 +38,7 @@ export default class {
         this.trigger('signal', {type: 'offer', data})
       , ::this.handleError)
     , ::this.handleError);
+    return this;
   }
 
   signal({type, data}) {
@@ -38,10 +47,12 @@ export default class {
     case 'answer': return this.handleAnswer(new RTCSessionDescription(data));
     case 'stable': return this.handleStable();
     case 'candidates':
-      return data.forEach(candidate =>
+      data.forEach(candidate =>
         this.conn.addIceCandidate(new RTCIceCandidate(candidate))
       );
+      break;
     }
+    return this;
   }
 
   handleOffer(offer) {
@@ -52,6 +63,7 @@ export default class {
         , ::this.handleError)
       , ::this.handleError)
     , ::this.handleError);
+    return this;
   }
 
   handleAnswer(answer) {
@@ -59,11 +71,13 @@ export default class {
       this.trigger('signal', {type: 'stable'});
       this.handleStable();
     }, ::this.handleError);
+    return this;
   }
 
   handleStable() {
     this.sendCandidates(this.candidates);
     delete this.candidates;
+    return this;
   }
 
   handleError(er) {
@@ -71,37 +85,60 @@ export default class {
   }
 
   setDataChannel(channel) {
-    channel.onopen = () => this.channel = channel;
+    this.channel = channel;
     channel.onmessage = ::this.handleMessage;
-    channel.onclose = () => {
-      if (channel === this.channel) delete this.channel;
-    };
+    channel.onclose = () => { delete this.channel; };
+    return this;
   }
 
   handleMessage({data}) {
     const parsed = JSON.parse(data);
-    this.trigger(parsed.n, parsed.d);
+    return this.trigger(parsed.n, parsed.d);
   }
 
   handleDataChannel({channel}) {
-    this.setDataChannel(channel);
+    return this.setDataChannel(channel);
   }
 
   handleIceCandidate({candidate}) {
     if (candidate) this.sendCandidate(candidate);
+    return this;
   }
 
   handleSignalingStateChange() {
-    if (this.conn.signalingState === 'closed') this.trigger('closed');
+    switch (this.conn.signalingState) {
+    case 'stable': return this.cancelTimeout();
+    case 'closed': return this.die();
+    }
+    return this.startTimeout();
+  }
+
+  handleIceConnectionStateChange() {
+    switch (this.conn.iceConnectionState) {
+    case 'connected': case 'completed': return this.cancelTimeout();
+    }
+    return this.startTimeout();
+  }
+
+  startTimeout() {
+    this.cancelTimeout();
+    this.timeoutId = setTimeout(::this.close, this.timeout);
+    return this;
+  }
+
+  cancelTimeout() {
+    clearTimeout(this.timeoutId);
+    return this;
   }
 
   sendCandidates(data) {
-    this.trigger('signal', {type: 'candidates', data});
+    if (data) this.trigger('signal', {type: 'candidates', data});
+    return this;
   }
 
   sendCandidate(candidate) {
     if (this.candidates) return this.candidates.push(candidate);
-    this.sendCandidates([candidate]);
+    return this.sendCandidates([candidate]);
   }
 
   send(n, d) {
@@ -111,6 +148,13 @@ export default class {
 
   close() {
     if (this.conn.signalingState !== 'closed') this.conn.close();
+    return this;
+  }
+
+  die() {
+    this.cancelTimeout();
+    if (this.channel) this.channel.close();
+    this.trigger('close');
   }
 
   on(name, cb) {

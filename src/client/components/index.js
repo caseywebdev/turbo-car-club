@@ -38,20 +38,17 @@ export default class extends Component {
     this.car = this.getCar('self');
 
     (this.live = new Live())
-      .on('host', id => (this.host = this.getPeer(id)).call())
-      .on('signal', ({id, data}) => this.getPeer(id).signal(data));
+      .on('host', ::this.setHost)
+      .on('signal', ({data}) => this.host.signal(data));
   }
 
-  getPeer(id) {
-    const {peers} = this;
-    let peer = peers[id];
-    if (peer) return peer;
-    peer = peers[id] = new Peer();
-    peer.id = id;
-    return peer
+  setHost(id) {
+    if (this.host) this.host.off('close').close();
+    this.host = new Peer()
       .on('signal', data => this.live.send('signal', {id, data}))
       .on('u', ::this.handleMessage)
-      .on('close', () => this.getPeer(id).call());
+      .on('close', () => this.setHost(id))
+      .call();
   }
 
   getCar(id) {
@@ -159,7 +156,7 @@ export default class extends Component {
     RENDERER.render(this.scene, CAMERA);
   }
 
-  handleMessage({data: {name, data}}) {
+  handleMessage({name, data}) {
     switch (name) {
     case 'frame':
       const {ball, cars} = data;

@@ -14,5 +14,6 @@ app:
   ports:
     - '80:80'
   environment:
+    MINIFY: 0
     PORT: 80
   command: make dev
