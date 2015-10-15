@@ -17,7 +17,6 @@ export default class {
   constructor() {
     this.listeners = {};
     this.candidates = [];
-    this.queue = [];
     this.conn = new RTCPeerConnection(PC_CONFIG);
     this.conn.ondatachannel = ::this.handleDataChannel;
     this.conn.onicecandidate = ::this.handleIceCandidate;
@@ -67,20 +66,16 @@ export default class {
     delete this.candidates;
   }
 
-  flushQueue() {
-    var args;
-    while (args = this.queue.shift()) this.send.apply(this, args);
-    return this;
-  }
-
   handleError(er) {
     throw er;
   }
 
   setDataChannel(channel) {
-    this.channel = channel;
-    channel.onopen = ::this.flushQueue;
+    channel.onopen = () => this.channel = channel;
     channel.onmessage = ::this.handleMessage;
+    channel.onclose = () => {
+      if (channel === this.channel) delete this.channel;
+    };
   }
 
   handleMessage({data}) {
@@ -110,11 +105,7 @@ export default class {
   }
 
   send(n, d) {
-    if (!this.channel || this.channel.readyState !== 'open') {
-      this.queue.push(arguments);
-      return this;
-    }
-    this.channel.send(JSON.stringify({n, d}));
+    if (this.channel) this.channel.send(JSON.stringify({n, d}));
     return this;
   }
 

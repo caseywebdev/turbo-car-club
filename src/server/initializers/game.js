@@ -7,15 +7,11 @@ import ws from 'ws';
 
 const PEERS = {};
 
-const getPeer = id => {
-  let peer = PEERS[id];
-  if (peer) return peer;
-  peer = PEERS[id] = new Peer();
-  peer.id = id;
-  return peer
+const getPeer = id =>
+  PEERS[id] ||
+  (PEERS[id] = new Peer())
     .on('signal', data => live.send('signal', {id, data}))
     .on('close', () => { delete PEERS[id]; });
-};
 
 const live = new Live({WebSocket: ws, url: `ws://0.0.0.0:${config.port}`});
 live.send('host');
