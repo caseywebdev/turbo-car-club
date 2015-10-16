@@ -1,7 +1,7 @@
 var MINIFY = process.env.MINIFY === '1';
 
 module.exports = {
-  manifestPath: 'public/manifest.json',
+  manifestPath: 'build/manifest.json',
   in: {
     vert: {out: 'js', transformers: 'text'},
     frag: {out: 'js', transformers: 'text'},
@@ -37,8 +37,8 @@ module.exports = {
     }
   },
   builds: {
-    'src/client/index.js': 'public',
-    'src/client/worker.js': 'public',
-    'src/styles/index.scss': 'public'
+    'src/client/index.js': 'build',
+    'src/client/styles/index.scss': 'build',
+    'src/client/public/**/*': 'build'
   }
 };

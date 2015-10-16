@@ -32,7 +32,9 @@ export default class {
   }
 
   call() {
-    this.setDataChannel(this.conn.createDataChannel('data', DC_CONFIG));
+    this.setDataChannel(
+      this.channel = this.conn.createDataChannel('data', DC_CONFIG)
+    );
     this.conn.createOffer(data =>
       this.conn.setLocalDescription(data, () =>
         this.trigger('signal', {type: 'offer', data})
@@ -85,7 +87,7 @@ export default class {
   }
 
   setDataChannel(channel) {
-    this.channel = channel;
+    channel.onopen = () => this.channel = channel;
     channel.onmessage = ::this.handleMessage;
     channel.onclose = () => { delete this.channel; };
     return this;

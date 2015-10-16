@@ -1,12 +1,11 @@
 import _ from 'underscore';
-import {server} from 'server/initializers/express';
+import config from 'host/config';
+import fs from 'fs';
 import Live from 'live-socket';
+import path from 'path';
 import ws from 'ws';
 
-import fs from 'fs';
-import path from 'path';
-
-const dir = path.resolve(__dirname, path.join('..', 'listeners', 'live'));
+const dir = path.resolve(__dirname, path.join('..', 'listeners'));
 const LISTENERS = _.reduce(fs.readdirSync(dir), (listeners, file) => {
   if (file[0] !== '.') {
     const basename = path.basename(file, path.extname(file));
@@ -15,14 +14,14 @@ const LISTENERS = _.reduce(fs.readdirSync(dir), (listeners, file) => {
   return listeners;
 }, {});
 
-const wss = new ws.Server({server});
+const server = new ws.Server({port: config.port});
 
 const sockets = {};
 
-wss.on('connection', ws => {
+server.on('connection', ws => {
   const socket = new Live({socket: ws});
   _.each(LISTENERS, (cb, name) => socket.on(name, _.partial(cb, socket)));
   socket.trigger('open');
 });
 
-export default {sockets, wss};
+export default {sockets, server};

@@ -1,6 +1,6 @@
 import _ from 'underscore';
-import * as app from 'server';
-import log from 'server/utils/log';
+import * as app from 'host';
+import log from 'host/utils/log';
 import uuid from 'node-uuid';
 
 export default socket => {

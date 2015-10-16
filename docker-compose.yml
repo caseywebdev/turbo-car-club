@@ -1,19 +1,38 @@
-app:
-  image: quay.io/turbocarclub/turbo-car-club:0.0.2
+client:
+  image: quay.io/turbocarclub/client:latest
   volumes:
-    - ./public/textures:/code/public/textures
-    - ./public/index.html:/code/public/index.html
+    - ./tmp/client/build:/code/build
     - ./src:/code/src
-    - ./.eslintrc:/code/.eslintrc
-    - ./.scss-lint.yml:/code/.scss-lint.yml
-    - ./cogs-client.js:/code/cogs-client.js
-    - ./cogs-server.js:/code/cogs-server.js
-    - ./Makefile:/code/Makefile
-    - ./package.json:/code/package.json
-  working_dir: /code
-  ports:
-    - '80:80'
+    - ./src/client/package.json:/code/package.json
   environment:
     MINIFY: 0
-    PORT: 80
-  command: make dev
+  command: make -f src/client/Makefile dev
+
+host:
+  image: quay.io/turbocarclub/host:latest
+  volumes:
+    - ./src:/code/src
+    - ./src/host/package.json:/code/package.json
+  ports:
+    - '1338:80'
+  links:
+    - signal
+  environment:
+    SIGNAL_URL: ws://signal
+  command: make -f src/host/Makefile dev
+
+signal:
+  image: quay.io/turbocarclub/signal:latest
+  volumes:
+    - ./src:/code/src
+    - ./src/signal/package.json:/code/package.json
+  ports:
+    - '1337:80'
+  command: make -f src/signal/Makefile dev
+
+nginx:
+  image: nginx:1.9.5
+  volumes:
+    - ./tmp/client/build:/usr/share/nginx/html
+  ports:
+    - '80:80'

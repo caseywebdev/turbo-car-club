@@ -5,7 +5,7 @@ const {width, height, depth} = config.car.chassis;
 
 const BASE_GEO = new THREE.BoxGeometry(width, height, depth);
 
-const TEXTURE_URL = '/textures/checker.jpg';
+const TEXTURE_URL = 'textures/checker.jpg';
 const DIFFUSE_TEXTURE = THREE.ImageUtils.loadTexture(TEXTURE_URL);
 DIFFUSE_TEXTURE.wrapS = THREE.RepeatWrapping;
 DIFFUSE_TEXTURE.wrapT = THREE.RepeatWrapping;

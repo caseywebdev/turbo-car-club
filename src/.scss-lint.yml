@@ -1,6 +1,3 @@
-exclude:
-  - node_modules
-
 linters:
   BangFormat:
     severity: error

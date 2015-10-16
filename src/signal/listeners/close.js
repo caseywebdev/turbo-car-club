@@ -1,5 +1,5 @@
-import * as app from 'server';
-import log from 'server/utils/log';
+import * as app from 'signal';
+import log from 'signal/utils/log';
 
 export default socket => {
   delete app.live.sockets[socket.id];

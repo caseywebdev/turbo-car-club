@@ -3,6 +3,7 @@ import CAMERA from 'client/camera';
 import ArenaLight from 'client/lights/arena';
 import BallMesh from 'client/meshes/ball';
 import ChassisMesh from 'client/meshes/chassis';
+import config from 'client/config';
 import FloorMesh from 'client/meshes/floor';
 import Live from 'live';
 import Peer from 'shared/peer';
@@ -25,8 +26,6 @@ document.addEventListener('keyup',
 export default class extends Component {
   constructor(props) {
     super(props);
-    // this.worker = new Worker('worker.js');
-    // this.worker.onmessage = ::this.handleMessage;
     this.cars = {};
     this.peers = {};
     this.scene = new THREE.Scene();
@@ -37,7 +36,7 @@ export default class extends Component {
     this.scene.add(this.ball);
     this.car = this.getCar('self');
 
-    (this.live = new Live())
+    (this.live = new Live(config.signal))
       .on('host', ::this.setHost)
       .on('signal', ({data}) => this.host.signal(data));
   }
@@ -56,7 +55,6 @@ export default class extends Component {
     if (car) return car;
     const chassis = ChassisMesh();
     this.scene.add(chassis);
-    // this.worker.postMessage({name: 'add-car', data: {id}});
     return this.cars[id] = {
       id,
       chassis,
@@ -142,15 +140,6 @@ export default class extends Component {
       this.car.ballCam = !this.car.ballCam;
     }
     this.prevPressed = KEYS[89] || (pad && pad.buttons[3].pressed);
-
-    // this.worker.postMessage({
-    //   name: 'update-car',
-    //   data: _.pick(this.car, 'id', 'gas', 'steering', 'handbrake', 'boost', 'jump')
-    // });
-
-    // const shouldSendBall = _.first(_.sortBy(
-    //   [this.live.id].concat(_.map(this.peers, 'id'))
-    // )) === this.live.id;
 
     this.updateCamera();
     RENDERER.render(this.scene, CAMERA);

@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import config from 'server/config';
+import config from 'host/config';
 import Game from 'shared/objects/game';
 import Live from 'live-socket';
 import Peer from 'shared/peer';
@@ -13,8 +13,8 @@ const getPeer = id =>
     .on('signal', data => live.send('signal', {id, data}))
     .on('close', () => { delete PEERS[id]; });
 
-const live = new Live({WebSocket: ws, url: `ws://0.0.0.0:${config.port}`});
-live.send('host');
+const live = new Live({WebSocket: ws, ...config.signal});
+live.send('host', {name: 'TCCHQ', url: 'docker:8080'});
 live.on('signal', ({id, data}) => getPeer(id).signal(data));
 
 // const messagePeers = message => {

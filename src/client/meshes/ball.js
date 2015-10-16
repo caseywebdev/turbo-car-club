@@ -7,7 +7,7 @@ const SUBDIVISIONS = 16;
 
 const GEOMETRY = new THREE.SphereGeometry(radius, SUBDIVISIONS, SUBDIVISIONS);
 
-const TEXTURE_URL = '/textures/checker.jpg';
+const TEXTURE_URL = 'textures/checker.jpg';
 const DIFFUSE_TEXTURE = THREE.ImageUtils.loadTexture(TEXTURE_URL);
 DIFFUSE_TEXTURE.wrapS = THREE.RepeatWrapping;
 DIFFUSE_TEXTURE.wrapT = THREE.RepeatWrapping;

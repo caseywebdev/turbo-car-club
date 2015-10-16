@@ -2,13 +2,14 @@ import _ from 'underscore';
 import Ammo from 'ammo.js';
 
 const LOCAL_INERTIA = new Ammo.btVector3(0, 0, 0);
+const MOTION_STATE = new Ammo.btDefaultMotionState();
 
 export default (options) => {
-  const {mass, props, shape, startTrans} = options;
+  const {mass, props, shape} = options;
   if (mass) shape.calculateLocalInertia(mass, LOCAL_INERTIA);
   const rbci = new Ammo.btRigidBodyConstructionInfo(
     mass || 0,
-    new Ammo.btDefaultMotionState(startTrans),
+    mass && MOTION_STATE,
     shape,
     LOCAL_INERTIA
   );

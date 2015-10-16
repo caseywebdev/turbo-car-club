@@ -4,7 +4,7 @@ const MAP_SIZE = 128;
 
 const GEOMETRY = new THREE.PlaneBufferGeometry(MAP_SIZE, MAP_SIZE);
 
-const TEXTURE_URL = '/textures/checker.jpg';
+const TEXTURE_URL = 'textures/checker.jpg';
 const DIFFUSE_TEXTURE = THREE.ImageUtils.loadTexture(TEXTURE_URL);
 DIFFUSE_TEXTURE.wrapS = THREE.RepeatWrapping;
 DIFFUSE_TEXTURE.wrapT = THREE.RepeatWrapping;

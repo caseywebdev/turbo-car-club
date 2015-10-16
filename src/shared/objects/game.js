@@ -19,12 +19,6 @@ const WALLS = [
 const FIXED_TIME_STEP = config.fixedTimeStep;
 const MAX_SUB_STEPS = config.maxSubSteps;
 
-const serializeBody = trans => {
-  const o = trans.getOrigin();
-  const r = trans.getRotation();
-  return [o.x(), o.y(), o.z(), r.x(), r.y(), r.z(), r.w()];
-};
-
 const defer = typeof setImmediate === 'function' ? setImmediate : _.defer;
 
 export default class {
@@ -71,6 +65,9 @@ export default class {
 
   step() {
     this.tickTimeoutId = defer(::this.step);
+    const now = _.now();
+    const dt = (now - this.lastStep) / 1000;
+    if (dt < FIXED_TIME_STEP) return;
     _.each(this.cars, car => {
       car.vehicle.setSteeringValue(-car.steering * config.car.steering, 0);
       car.vehicle.setSteeringValue(-car.steering * config.car.steering, 1);
@@ -141,25 +138,11 @@ export default class {
         car.jumpState = 4;
       }
     });
-    const now = _.now();
-    const dt = (now - this.lastStep) / 1000;
     this.time += dt;
     this.world.stepSimulation(dt, MAX_SUB_STEPS, FIXED_TIME_STEP);
     this.lastStep = now;
-    this.send({
-      name: 'frame',
-      data: {
-        frame: this.frame,
-        ball: serializeBody(this.ball.getWorldTransform()),
-        cars: _.mapObject(this.cars, car =>
-          serializeBody(car.vehicle.getRigidBody().getWorldTransform()).concat(
-            ..._.times(car.vehicle.getNumWheels(), i =>
-              serializeBody(car.vehicle.getWheelTransformWS(i))
-            )
-          )
-        )
-      }
-    });
+    // let foo = new Ammo.btTransform();
+    // this.ball.getMotionState().getWorldTransform(foo);
   }
 
   handleMessage({name, data, data: {id}}) {

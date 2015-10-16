@@ -15,20 +15,12 @@
     "cogs-transformer-text": "1.0.3",
     "cogs-transformer-uglify-js": "1.0.2",
     "cogs": "1.0.7",
-    "eslint": "1.6.0",
     "eslint-plugin-react": "3.5.1",
-    "express": "4.13.3",
+    "eslint": "1.7.0",
     "live-socket": "0.10.1",
-    "node-uuid": "1.4.3",
-    "orgsync-logger": "1.2.6",
-    "react": "0.14.0",
     "react-dom": "0.14.0",
+    "react": "0.14.0",
     "three": "0.72.0",
-    "underscore": "1.8.3",
-    "wrtc": "caseywebdev/node-webrtc#node4",
-    "ws": "0.8.0"
-  },
-  "devDependencies": {
-    "watchy": "0.6.5"
+    "underscore": "1.8.3"
   }
 }

@@ -1,7 +1,7 @@
 module.exports = {
   in: {js: {transformers: ['eslint', {name: 'babel', options: {stage: 0}}]}},
   builds: {
-    'src/server/**/*': 'build/node_modules/server',
-    'src/shared/**/*': 'build/node_modules/shared'
+    'src/host/**/!(cogs).js': 'build/node_modules/host',
+    'src/shared/**/*.js': 'build/node_modules/shared'
   }
 };
