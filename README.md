@@ -9,10 +9,11 @@ Welcome to The Club.
 Assuming `docker` and `docker-compose` are available...
 
 ```
-dc up -d
+docker-compose up -d
 ```
 
-Should kick the server off on port 80.
+will kick off a signal server on port 1337, a host server on port 1338, and an
+nginx server on port 80 to server the client.
 
 [Turbo Car Club]: http://turbocar.club
 [Quay.io Badge]: https://quay.io/repository/turbocarclub/turbo-car-club/status
