@@ -22,8 +22,7 @@ const MAX_SUB_STEPS = config.maxSubSteps;
 const defer = typeof setImmediate === 'function' ? setImmediate : _.defer;
 
 export default class {
-  constructor(send) {
-    this.send = send;
+  constructor() {
     this.world = WorldObject();
     this.world.addRigidBody(FloorBody());
     this.ball = BallBody();

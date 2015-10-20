@@ -5,4 +5,4 @@ WORKDIR /code
 RUN npm install
 COPY . /code
 RUN MINIFY=1 make
-CMD ["node", "node_modules/build/host"]
+CMD ["make", "host"]

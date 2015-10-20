@@ -14,11 +14,13 @@ const getPeer = id =>
     .on('close', () => { delete PEERS[id]; });
 
 const live = new Live({WebSocket: ws, ...config.signal});
-live.send('host', {name: 'TCCHQ', url: 'docker:8080'});
+live.on('open', () =>
+  live.send('host', _.pick(config, 'region', 'name', 'url'))
+);
 live.on('signal', ({id, data}) => getPeer(id).signal(data));
 
 // const messagePeers = message => {
 //   _.each(PEERS, peer => peer.send('u', message));
 // };
 
-export default new Game(_.noop);
+export default new Game();

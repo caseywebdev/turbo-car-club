@@ -14,7 +14,7 @@ const LISTENERS = _.reduce(fs.readdirSync(dir), (listeners, file) => {
   return listeners;
 }, {});
 
-const server = new ws.Server({port: config.port});
+const server = new ws.Server(_.pick(config, 'port'));
 
 const sockets = {};
 

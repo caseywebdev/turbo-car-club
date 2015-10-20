@@ -24,4 +24,4 @@ server.on('connection', ws => {
   socket.trigger('open');
 });
 
-export default {sockets, server};
+export default {sockets};

@@ -1,7 +1,24 @@
-app:
-  image: quay.io/turbocarclub/turbo-car-club:0.0.3
+postgres:
+  image: postgres:9.4.5
   volumes:
-    - ./tmp/build/client:/code/build/client
+    - ./var/postgres:/var/lib/postgresql/data
+  environment:
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+  ports:
+    - '5432'
+
+nginx:
+  image: nginx:1.9.5
+  volumes:
+    - ./var/build/client:/usr/share/nginx/html
+  ports:
+    - '80:80'
+
+cogs-client: &shared
+  image: quay.io/turbocarclub/turbo-car-club:0.0.4
+  volumes:
+    - ./var/build:/code/build
     - ./src:/code/src
     - ./.eslintrc:/code/.eslintrc
     - ./.scss-lint.yml:/code/.scss-lint.yml
@@ -9,14 +26,36 @@ app:
     - ./cogs-server.js:/code/cogs-server.js
     - ./Makefile:/code/Makefile
     - ./package.json:/code/package.json
+  command: make cogs-client-w
+
+cogs-server:
+  <<: *shared
+  command: make cogs-server-w
+
+signal:
+  <<: *shared
+  links:
+    - postgres
   ports:
     - '1337:80'
-    - '1338:8080'
-  command: make dev
+  environment:
+    KEY: foo
+    MAIL_ENABLED: 0
+    MAIL_FROM_NAME: Turbo Car Club
+    MAIL_FROM_ADDRESS: support@turbocarclub.com
+    PORT: 80
+    POSTGRES_URL: pg://postgres:postgres@postgres/postgres
+  command: make signal-w
 
-nginx:
-  image: nginx:1.9.5
-  volumes:
-    - ./tmp/build/client:/usr/share/nginx/html
+host:
+  <<: *shared
+  links:
+    - signal
   ports:
-    - '80:80'
+    - '1338:80'
+  environment:
+    REGION: Local
+    NAME: Local
+    PORT: 80
+    SIGNAL_URL: ws://signal
+    URL: ws://docker:1338
