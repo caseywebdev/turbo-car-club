@@ -7,16 +7,16 @@ const SEGMENTS = 16;
 
 const GEOMETRY = new THREE.CylinderGeometry(radius, radius, width, SEGMENTS);
 
-const TEXTURE_URL = 'textures/checker.jpg';
-const DIFFUSE_TEXTURE = THREE.ImageUtils.loadTexture(TEXTURE_URL);
-DIFFUSE_TEXTURE.wrapS = THREE.RepeatWrapping;
-DIFFUSE_TEXTURE.wrapT = THREE.RepeatWrapping;
-DIFFUSE_TEXTURE.repeat.set(1, 0);
-DIFFUSE_TEXTURE.magFilter = THREE.NearestFilter;
+const MATERIAL = new THREE.MeshLambertMaterial({color: 0xff0000});
 
-const MATERIAL = new THREE.MeshLambertMaterial({
-  color: 0xff0000,
-  map: DIFFUSE_TEXTURE
+const TEXTURE_URL = 'textures/checker.jpg';
+(new THREE.TextureLoader()).load(TEXTURE_URL, texture => {
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 0);
+  texture.magFilter = THREE.NearestFilter;
+  MATERIAL.map = texture;
+  MATERIAL.needsUpdate = true;
 });
 
 export default () => {

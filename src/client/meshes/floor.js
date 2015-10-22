@@ -4,14 +4,17 @@ const MAP_SIZE = 128;
 
 const GEOMETRY = new THREE.PlaneBufferGeometry(MAP_SIZE, MAP_SIZE);
 
-const TEXTURE_URL = 'textures/checker.jpg';
-const DIFFUSE_TEXTURE = THREE.ImageUtils.loadTexture(TEXTURE_URL);
-DIFFUSE_TEXTURE.wrapS = THREE.RepeatWrapping;
-DIFFUSE_TEXTURE.wrapT = THREE.RepeatWrapping;
-DIFFUSE_TEXTURE.repeat.set(MAP_SIZE / 4, MAP_SIZE / 4);
-DIFFUSE_TEXTURE.magFilter = THREE.NearestFilter;
+const MATERIAL = new THREE.MeshLambertMaterial();
 
-const MATERIAL = new THREE.MeshLambertMaterial({map: DIFFUSE_TEXTURE});
+const TEXTURE_URL = 'textures/checker.jpg';
+(new THREE.TextureLoader()).load(TEXTURE_URL, texture => {
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(MAP_SIZE / 4, MAP_SIZE / 4);
+  texture.magFilter = THREE.NearestFilter;
+  MATERIAL.map = texture;
+  MATERIAL.needsUpdate = true;
+});
 
 export default () => {
   const mesh = new THREE.Mesh(GEOMETRY, MATERIAL);

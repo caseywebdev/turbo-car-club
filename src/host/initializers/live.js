@@ -2,6 +2,7 @@ import _ from 'underscore';
 import config from 'host/config';
 import fs from 'fs';
 import Live from 'live-socket';
+import log from 'host/utils/log';
 import path from 'path';
 import ws from 'ws';
 
@@ -14,7 +15,9 @@ const LISTENERS = _.reduce(fs.readdirSync(dir), (listeners, file) => {
   return listeners;
 }, {});
 
-const server = new ws.Server(_.pick(config, 'port'));
+const {port} = config;
+log.info(`Starting WebSocket server on port ${port}`);
+const server = new ws.Server({port});
 
 const sockets = {};
 
@@ -24,4 +27,13 @@ server.on('connection', ws => {
   socket.trigger('open');
 });
 
-export default {sockets, server};
+const client = new Live({WebSocket: ws, url: config.signal.url});
+client.on('open', () => {
+  log.info('Connected to signal server, registering as a host...');
+  client.send('host', config.key, er => {
+    if (er) return log.error(er);
+    log.info('Successfully registered as a host');
+  });
+});
+
+export default {client, sockets, server};

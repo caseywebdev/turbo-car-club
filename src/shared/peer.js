@@ -65,7 +65,6 @@ export default class {
         , ::this.handleError)
       , ::this.handleError)
     , ::this.handleError);
-    return this;
   }
 
   handleAnswer(answer) {
@@ -73,38 +72,35 @@ export default class {
       this.trigger('signal', {type: 'stable'});
       this.handleStable();
     }, ::this.handleError);
-    return this;
   }
 
   handleStable() {
     this.sendCandidates(this.candidates);
     delete this.candidates;
-    return this;
   }
 
   handleError(er) {
-    throw er;
+    this.trigger('error', er);
   }
 
   setDataChannel(channel) {
     channel.onopen = () => this.channel = channel;
-    channel.onmessage = ::this.handleMessage;
     channel.onclose = () => { delete this.channel; };
+    channel.onmessage = ::this.handleMessage;
     return this;
   }
 
   handleMessage({data}) {
     const parsed = JSON.parse(data);
-    return this.trigger(parsed.n, parsed.d);
+    this.trigger(parsed.n, parsed.d);
   }
 
   handleDataChannel({channel}) {
-    return this.setDataChannel(channel);
+    this.setDataChannel(channel);
   }
 
   handleIceCandidate({candidate}) {
     if (candidate) this.sendCandidate(candidate);
-    return this;
   }
 
   handleSignalingStateChange() {
@@ -112,14 +108,14 @@ export default class {
     case 'stable': return this.cancelTimeout();
     case 'closed': return this.die();
     }
-    return this.startTimeout();
+    this.startTimeout();
   }
 
   handleIceConnectionStateChange() {
     switch (this.conn.iceConnectionState) {
     case 'connected': case 'completed': return this.cancelTimeout();
     }
-    return this.startTimeout();
+    this.startTimeout();
   }
 
   startTimeout() {
@@ -157,6 +153,7 @@ export default class {
     this.cancelTimeout();
     if (this.channel) this.channel.close();
     this.trigger('close');
+    return this;
   }
 
   on(name, cb) {
@@ -171,7 +168,7 @@ export default class {
     if (!cb) delete this.listeners[name];
     let listeners = this.listeners[name];
     if (!listeners) return this;
-    listeners = this.listeners[name] = listeners.reject(_cb => _cb !== cb);
+    listeners = this.listeners[name] = listeners.filter(_cb => _cb !== cb);
     if (!listeners.length) delete this.listeners[name];
     return this;
   }

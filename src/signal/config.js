@@ -3,6 +3,7 @@ import _ from 'underscore';
 const ENV = process.env;
 
 var REQUIRED = [
+  'CLIENT_URL',
   'KEY',
   'PORT',
   'POSTGRES_URL'
@@ -12,9 +13,11 @@ var missing = _.reject(REQUIRED, _.partial(_.has, ENV));
 if (_.any(missing)) throw new Error('Missing env vars: ' + missing.join(', '));
 
 export default {
-  key: ENV.KEY,
   port: ENV.PORT,
   log: {name: 'signal'},
+  client: {
+    url: ENV.CLIENT_URL
+  },
   mail: {
     enabled: ENV.MAIL_ENABLED != '0',
     from: {
@@ -22,10 +25,12 @@ export default {
       address: ENV.MAIL_FROM_ADDRESS
     }
   },
+  key: ENV.KEY,
   knex: {
     client: 'postgresql',
     connection: ENV.POSTGRES_URL,
     pool: {min: 2, max: 10},
     migrations: {tableName: 'migrations'}
-  }
+  },
+  signInTokenDuration: 1000 * 60 * 10
 };

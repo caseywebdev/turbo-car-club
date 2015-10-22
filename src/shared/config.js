@@ -48,5 +48,10 @@ export default {
       friction: 0.6,
       restitution: 0.5
     }
+  },
+  crypto: {
+    encoding: 'base64',
+    hashAlgo: 'sha256',
+    hashSize: 32
   }
 };
