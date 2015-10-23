@@ -3,10 +3,10 @@ import config from 'signal/config';
 import log from 'signal/utils/log';
 import verify from 'shared/utils/verify';
 
-const {invalidKey, unknown} = config.errors;
+const {key, errors: {invalidKey, unknown}} = config;
 
-export default (socket, key, cb) => {
-  const data = verify(config.key, key);
+export default (socket, signed, cb) => {
+  const data = verify(key, signed);
   if (!data || data.type !== 'auth') return cb(invalidKey);
   app.knex.db
     .select('*')

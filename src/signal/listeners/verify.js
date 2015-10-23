@@ -3,10 +3,10 @@
 // import config from 'signal/config';
 // import verify from 'shared/utils/verify';
 //
-// const {invalidKey, keyExpired} = config.errors;
+// const {key, errors: {invalidKey, keyExpired}} = config;
 //
-// export default (socket, key, cb) => {
-//   const data = verify(config.key, key);
+// export default (socket, signed, cb) => {
+//   const data = verify(key, signed);
 //   if (!data || data.type !== 'verify') return cb(invalidKey);
 //
 //   const {emailAddress, expiresAt, type, userId} = token;
