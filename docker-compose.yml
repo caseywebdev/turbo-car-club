@@ -16,7 +16,7 @@ nginx:
     - '80:80'
 
 cogs-client: &shared
-  image: quay.io/turbocarclub/turbo-car-club:0.0.6
+  image: quay.io/turbocarclub/turbo-car-club:0.0.7
   volumes:
     - ./src:/code/src
     - ./var/build:/code/build
