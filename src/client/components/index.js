@@ -39,6 +39,9 @@ export default class extends Component {
     (this.live = new Live(config.signal))
       .on('host', ::this.setHost)
       .on('signal', ({data}) => this.host.signal(data));
+    this.live.send('sign-in', 'c@sey.me', (er) => {
+      console.log(er);
+    });
   }
 
   setHost(id) {

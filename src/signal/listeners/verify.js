@@ -3,12 +3,11 @@ import * as app from 'signal';
 import config from 'signal/config';
 import verify from 'shared/utils/verify';
 
-const INVALID_TOKEN = new Error('Invalid token');
-const TOKEN_EXPIRED = new Error('Token expired');
+const {invalidKey, keyExpired} = config.errors;
 
-export default (socket, token, cb) => {
-  token = verify(config.key, token);
-  if (!token) return cb(INVALID_TOKEN);
+export default (socket, key, cb) => {
+  const data = verify(config.key, key);
+  if (!data || data.type !== 'verify') return cb(invalidKey);
 
   const {emailAddress, expiresAt, type, userId} = token;
   if (!emailAddress || !expiresAt || type !== 'verify' || !userId) {

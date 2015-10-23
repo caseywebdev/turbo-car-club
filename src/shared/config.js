@@ -53,5 +53,9 @@ export default {
     encoding: 'base64',
     hashAlgo: 'sha256',
     hashSize: 32
+  },
+  errors: {
+    invalidKey: new Error('Invalid key'),
+    keyExpired: new Error('Key expired')
   }
 };

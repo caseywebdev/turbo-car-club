@@ -26,6 +26,7 @@
     "nodemailer": "1.8.0",
     "orgsync-logger": "1.2.6",
     "pg": "4.4.3",
+    "qs": "5.2.0",
     "react-dom": "0.14.0",
     "react": "0.14.0",
     "three": "0.73.0",
