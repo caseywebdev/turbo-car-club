@@ -19,8 +19,6 @@ const WALLS = [
 const FIXED_TIME_STEP = config.fixedTimeStep;
 const MAX_SUB_STEPS = config.maxSubSteps;
 
-const defer = typeof setImmediate === 'function' ? setImmediate : _.defer;
-
 export default class {
   constructor() {
     this.world = WorldObject();
@@ -63,7 +61,7 @@ export default class {
   }
 
   step() {
-    this.tickTimeoutId = defer(::this.step);
+    this.tickTimeoutId = _.defer(::this.step);
     const now = _.now();
     const dt = (now - this.lastStep) / 1000;
     if (dt < FIXED_TIME_STEP) return;
