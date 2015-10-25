@@ -5,6 +5,7 @@ import BallMesh from 'client/meshes/ball';
 import ChassisMesh from 'client/meshes/chassis';
 import config from 'client/config';
 import FloorMesh from 'client/meshes/floor';
+import {get, set} from 'client/utils/store';
 import Live from 'live';
 import Peer from 'shared/peer';
 import React, {Component} from 'react';
@@ -40,8 +41,22 @@ export default class extends Component {
       .on('host', ::this.setHost)
       .on('signal', ({data}) => this.host.signal(data));
     this.live.send('sign-in', 'c@sey.me', (er) => {
-      console.log(er);
+      console.log(er || 'Email sent');
     });
+    if (props.verify) {
+      this.live.send('verify', props.verify, (er, auth) => {
+        if (er) return console.error(er);
+        set('auth', auth);
+      });
+    }
+    const auth = get('auth');
+    if (auth) {
+      this.live.send('auth', auth, er => {
+        if (er) return console.error(er);
+        console.log('authorized!');
+      });
+    }
+    this.live.on('auth', auth => console.log('remote auth!') || set('auth', auth));
   }
 
   setHost(id) {

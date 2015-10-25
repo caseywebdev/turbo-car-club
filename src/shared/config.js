@@ -55,7 +55,7 @@ export default {
     hashSize: 32
   },
   errors: {
-    invalidKey: new Error('Invalid key'),
-    keyExpired: new Error('Key expired')
+    invalidKey: new Error('Invalid or expired key'),
+    unknown: new Error('An unknown error occurred')
   }
 };

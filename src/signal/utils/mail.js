@@ -12,6 +12,12 @@ const {enabled, from} = config.mail;
 export default (options, cb) => {
   options = {...options, from};
   if (enabled) return transport.sendMail(options, cb);
-  log.info(`MAIL ${JSON.stringify(options)}`);
+  log.info([
+    `MAIL`,
+    `TO ${JSON.stringify(options.to)}`,
+    `FROM ${JSON.stringify(options.from)}`,
+    `${options.subject}`,
+    `${options.markdown}`
+  ].join('\n'));
   cb();
 };

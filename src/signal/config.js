@@ -34,5 +34,6 @@ export default {
     pool: {min: 2, max: 10},
     migrations: {tableName: 'migrations'}
   },
-  signInTokenDuration: 1000 * 60 * 10
+  verifyKeyTtl: 1000 * 60 * 60,
+  authKeyTtl: 1000 * 60 * 60 * 24 * 60
 };

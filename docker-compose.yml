@@ -56,6 +56,6 @@ host:
     - '1338:80'
   environment:
     PORT: 80
-    KEY: m7oler2NvsPaxyUkKjYX2Li/bzKKdU10FgZKYto4/5R7InR5cGUiOiJob3N0IiwidXNlcklkIjoxLCJyZWdpb24iOiJMb2NhbCIsIm5hbWUiOiJIb3N0IiwidXJsIjoid3M6Ly9kb2NrZXI6MTMzOCJ9
+    KEY: qrzeTOFGCcBcVmbnchSncrHo4sEpDDmVXSOof2WqoaRbWyJob3N0IiwxNDQ1Nzk4OTUzNTAyXSx7InVzZXJJZCI6MSwicmVnaW9uIjoiTG9jYWwiLCJuYW1lIjoiSG9zdCIsInVybCI6IndzOi8vZG9ja2VyOjEzMzgifV0=
     SIGNAL_URL: ws://signal
   command: make host-w

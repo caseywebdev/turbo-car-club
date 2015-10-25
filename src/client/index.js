@@ -5,6 +5,7 @@
 import Index from 'client/components/index';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Qs from 'qs';
 
 if (__DEV__) {
   var script = document.createElement('script');
@@ -13,4 +14,7 @@ if (__DEV__) {
   document.body.appendChild(script);
 }
 
-ReactDOM.render(<Index />, document.getElementById('main'));
+ReactDOM.render(
+  <Index {...Qs.parse(location.search.slice(1))} />,
+  document.getElementById('main')
+);
