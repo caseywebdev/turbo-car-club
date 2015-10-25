@@ -10,7 +10,7 @@ import verify from 'shared/utils/verify';
 
 const {
   key,
-  errors: {invalidKey, keyExpired, unknown},
+  errors: {invalidKey, unknown},
   verifyKeyTtl
 } = config;
 
@@ -21,7 +21,7 @@ export default (socket, signed, cb) => {
     _.partial(findOrCreateUser, {email_address: data.emailAddress}),
     (user, _cb) => {
       if (user.signed_in_at.toISOString() !== data.signedInAt) {
-        return cb(keyExpired);
+        return cb(invalidKey);
       }
       updateSignedInAt(user.id, _cb);
     }
