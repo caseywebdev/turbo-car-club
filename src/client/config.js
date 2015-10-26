@@ -6,6 +6,6 @@ export default {
     prefix: 'tcc'
   },
   signal: {
-    url: 'ws://docker:1337'
+    url: '__SIGNAL_URL__'
   }
 };

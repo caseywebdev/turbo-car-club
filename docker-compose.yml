@@ -26,6 +26,8 @@ cogs-client: &shared
     - ./cogs-server.js:/code/cogs-server.js
     - ./Makefile:/code/Makefile
     - ./package.json:/code/package.json
+  environment:
+    SIGNAL_URL: ws://docker:1337
   command: make cogs-client-w
 
 cogs-server:
