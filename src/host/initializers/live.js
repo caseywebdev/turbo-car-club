@@ -28,10 +28,10 @@ server.on('connection', ws => {
 
 const client = new Live({WebSocket: ws, url: config.signal.url});
 client.on('open', () => {
-  log.info('Connected to signal server, registering as a host...');
-  client.send('host', config.key, er => {
+  log.info('Connected to signal server, signing in as a host...');
+  client.send('sign-in-as-host', config.key, er => {
     if (er) return log.error(er);
-    log.info('Successfully registered as a host');
+    log.info('Successfully signed in as a host');
   });
 });
 

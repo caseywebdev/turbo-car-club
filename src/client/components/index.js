@@ -17,11 +17,11 @@ import WorldLight from 'client/lights/world';
 
 const KEYS = {};
 
-document.addEventListener('keydown',
-  ({key, which}) => KEYS[key || which] = true
+document.addEventListener('keydown', ({key, which}) =>
+  KEYS[key || which] = true
 );
-document.addEventListener('keyup',
-  ({key, which}) => KEYS[key || which] = false
+document.addEventListener('keyup', ({key, which}) =>
+  KEYS[key || which] = false
 );
 
 export default class extends Component {
@@ -37,7 +37,7 @@ export default class extends Component {
     this.scene.add(this.ball);
     this.car = this.getCar('self');
 
-    (this.live = new Live(config.signal))
+    (window.live = this.live = new Live(config.signal))
       .on('host', ::this.setHost)
       .on('signal', ({data}) => this.host.signal(data));
     if (props.verify) {

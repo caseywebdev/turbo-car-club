@@ -15,7 +15,7 @@
     "cogs-transformer-json": "1.0.3",
     "cogs-transformer-local-css": "2.0.7",
     "cogs-transformer-replace": "1.0.1",
-    "cogs-transformer-sass": "1.0.4",
+    "cogs-transformer-sass": "1.0.5",
     "cogs-transformer-scss-lint": "1.0.1",
     "cogs-transformer-text": "1.0.3",
     "cogs-transformer-uglify-js": "1.0.3",
