@@ -19,11 +19,10 @@ export default (socket, signed, cb) => {
   if (!data) return cb(invalidKey);
   async.waterfall([
     _.partial(findOrCreateUser, {email_address: data.emailAddress}),
-    (user, _cb) => {
-      if (user.signed_in_at.toISOString() !== data.signedInAt) {
-        return cb(invalidKey);
-      }
-      updateSignedInAt(user.id, _cb);
+    ({id, signed_in_at: signedInAt}, _cb) => {
+      if (signedInAt) signedInAt = signedInAt.toISOString();
+      if (signedInAt !== data.signedInAt) return cb(invalidKey);
+      updateSignedInAt(id, _cb);
     }
   ], (er, user) => {
     if (er) {

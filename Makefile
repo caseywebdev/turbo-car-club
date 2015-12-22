@@ -9,7 +9,6 @@ HOST=node build/node_modules/host
 SIGNAL=node build/node_modules/signal
 
 all:
-	@rm -fr node_modules
 	@npm install
 	@make -j cogs-client cogs-server
 
@@ -18,8 +17,10 @@ bootstrap:
 	@docker-compose rm -f
 	@docker-compose up -d postgres
 	@sleep 5
+	@docker-compose run cogs-client rm -fr build node_modules
 	@docker-compose run cogs-client make
 	@docker-compose run signal make migrate
+	@docker-compose up -d
 
 class-names:
 	@$(COGS) -c cogs-client.js src/client/styles/index.scss:build/client
