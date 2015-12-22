@@ -5,7 +5,6 @@ const ENV = process.env;
 
 var REQUIRED = [
   'KEY',
-  'PORT',
   'SIGNAL_URL'
 ];
 
@@ -16,7 +15,6 @@ export default {
   ...shared,
   key: ENV.KEY,
   log: {name: 'host'},
-  port: ENV.PORT,
   signal: {
     url: ENV.SIGNAL_URL
   }

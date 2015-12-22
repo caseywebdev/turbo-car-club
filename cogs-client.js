@@ -3,21 +3,22 @@ var MINIFY = process.env.MINIFY === '1';
 module.exports = {
   manifestPath: 'build/client/manifest.json',
   in: {
-    vert: {out: 'js', transformers: 'text'},
-    frag: {out: 'js', transformers: 'text'},
+    vert: {out: 'js', transformers: {name: 'text', options: {modules: 'amd'}}},
+    frag: {out: 'js', transformers: {name: 'text', options: {modules: 'amd'}}},
+    json: {out: 'js', transformers: {name: 'json', options: {modules: 'amd'}}},
     js: {
       transformers: [].concat(
-        'eslint',
+        {name: 'eslint', only: 'src/**/*.js'},
         'directives',
         {
           name: 'babel',
           only: 'src/**/*.js',
-          except: ['src/client/init.js', 'src/client/init-worker.js'],
+          except: 'src/client/init.js',
           options: {modules: 'amd', stage: 0}
         },
         {
           name: 'concat-amd',
-          options: {base: 'src', extensions: ['js', 'vert', 'frag']}
+          options: {base: 'src', extensions: ['js', 'json', 'vert', 'frag']}
         },
         MINIFY ? {
           name: 'uglify-js',
@@ -40,6 +41,16 @@ module.exports = {
         'scss-lint',
         'directives',
         'sass',
+        {
+          name: 'local-css',
+          except: 'node_modules/**/*',
+          options: {
+            base: 'src/client/styles',
+            debug: !MINIFY,
+            target: 'src/client/class-names.json'
+          }
+        },
+        'autoprefixer',
         MINIFY ? 'csso' : []
       )
     }

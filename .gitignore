@@ -1,1 +1,4 @@
-/var
+/build
+/node_modules
+/postgres
+/src/client/class-names.json

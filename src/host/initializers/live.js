@@ -15,9 +15,8 @@ const LISTENERS = _.reduce(fs.readdirSync(dir), (listeners, file) => {
   return listeners;
 }, {});
 
-const {port} = config;
-log.info(`Starting WebSocket server on port ${port}`);
-const server = new ws.Server({port});
+log.info(`Starting WebSocket server on port 80`);
+const server = new ws.Server({port: 80});
 
 const sockets = {};
 

@@ -1,16 +1,16 @@
 import _ from 'underscore';
-import CAMERA from 'client/camera';
 import ArenaLight from 'client/lights/arena';
 import BallMesh from 'client/meshes/ball';
+import CAMERA from 'client/cameras/main';
 import ChassisMesh from 'client/meshes/chassis';
 import config from 'client/config';
 import FloorMesh from 'client/meshes/floor';
-import {get, set} from 'client/utils/store';
+import db from 'client/utils/db';
 import Live from 'live';
 import Peer from 'shared/peer';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import RENDERER from 'client/renderer';
+import RENDERER from 'client/renderers/main';
 import THREE from 'three';
 import WheelMesh from 'client/meshes/wheel';
 import WorldLight from 'client/lights/world';
@@ -43,16 +43,16 @@ export default class extends Component {
     if (props.verify) {
       this.live.send('verify', props.verify, (er, auth) => {
         if (er) return console.error(er);
-        set('auth', auth);
+        db.set('auth', auth);
         console.log('verify authorized!');
       });
-    } else if (get('auth')) {
-      this.live.send('auth', get('auth'), er => {
+    } else if (db.get('auth')) {
+      this.live.send('auth', db.get('auth'), er => {
         if (er) return console.error(er);
         console.log('authorized!');
       });
     }
-    this.live.on('auth', auth => console.log('remote auth!') || set('auth', auth));
+    this.live.on('auth', auth => console.log('remote auth!') || db.set('auth', auth));
     this.live.send('sign-in', 'c@sey.me', (er) => {
       console.log(er || 'Email sent');
     });

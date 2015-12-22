@@ -1,7 +1,7 @@
 import _ from 'underscore';
-import config from 'signal/config';
 import fs from 'fs';
 import Live from 'live-socket';
+import log from 'signal/utils/log';
 import path from 'path';
 import ws from 'ws';
 
@@ -14,7 +14,8 @@ const LISTENERS = _.reduce(fs.readdirSync(dir), (listeners, file) => {
   return listeners;
 }, {});
 
-const server = new ws.Server({port: config.port});
+log.info(`Starting WebSocket server on port 80`);
+const server = new ws.Server({port: 80});
 
 const sockets = {};
 

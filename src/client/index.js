@@ -8,7 +8,7 @@ import ReactDOM from 'react-dom';
 import Qs from 'qs';
 
 if (__DEV__) {
-  var script = document.createElement('script');
+  const script = document.createElement('script');
   script.src = 'http://localhost:35729/livereload.js';
   script.async = true;
   document.body.appendChild(script);
