@@ -11,7 +11,7 @@ postgres:
 nginx:
   image: nginx:1.9.5
   volumes:
-    - ./var/build/client:/usr/share/nginx/html
+    - ./build/client:/usr/share/nginx/html
   ports:
     - '80:80'
 
