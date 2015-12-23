@@ -55,6 +55,7 @@ export default {
     hashSize: 32
   },
   errors: {
+    authRequired: new Error('Authentication required'),
     invalidKey: new Error('Invalid or expired key'),
     unknown: new Error('An unknown error occurred')
   }

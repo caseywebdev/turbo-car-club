@@ -6,7 +6,7 @@ import sign from 'shared/utils/sign';
 import signIn from 'signal/templates/sign-in';
 import mail from 'signal/utils/mail';
 
-const {key, errors: {unknown}} = config;
+const {key} = config;
 
 export default (socket, emailAddress, cb) =>
   async.waterfall([
@@ -23,4 +23,4 @@ export default (socket, emailAddress, cb) =>
           })
         })
       }, cb)
-  ], er => cb(er && unknown));
+  ], cb);
