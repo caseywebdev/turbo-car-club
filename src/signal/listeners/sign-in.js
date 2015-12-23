@@ -8,20 +8,19 @@ import mail from 'signal/utils/mail';
 
 const {key, errors: {unknown}} = config;
 
-export default (socket, emailAddress, cb) => {
+export default (socket, emailAddress, cb) =>
   async.waterfall([
-    _.partial(findUser, {email_address: emailAddress}),
-    (user, cb) =>
+    _.partial(findUser, {emailAddress}),
+    ({signedInAt} = {}, cb) =>
       mail({
         to: emailAddress,
         subject: 'Sign in to Turbo Car Club',
         markdown: signIn({
           key: sign(key, 'verify', {
             emailAddress,
-            socketId: socket.id,
-            signedInAt: user ? user.signed_in_at : null
+            signedInAt,
+            socketId: socket.id
           })
         })
       }, cb)
   ], er => cb(er && unknown));
-};

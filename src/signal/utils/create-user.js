@@ -1,7 +1,7 @@
 import async from 'async';
 import db from 'signal/utils/db';
 
-export default (where, cb) => {
+export default (where, cb) =>
   async.waterfall([
     cb =>
       db.insert(where)
@@ -10,4 +10,3 @@ export default (where, cb) => {
         .asCallback(cb),
     ([user], cb) => cb(null, user)
   ], cb);
-};

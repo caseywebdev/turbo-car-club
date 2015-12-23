@@ -17,9 +17,10 @@ const {
 export default (socket, signed, cb) => {
   const data = verify(key, 'verify', signed, verifyKeyTtl);
   if (!data) return cb(invalidKey);
+  const {emailAddress} = data;
   async.waterfall([
-    _.partial(findOrCreateUser, {email_address: data.emailAddress}),
-    ({id, signed_in_at: signedInAt}, _cb) => {
+    _.partial(findOrCreateUser, {emailAddress}),
+    ({id, signedInAt}, _cb) => {
       if (signedInAt) signedInAt = signedInAt.toISOString();
       if (signedInAt !== data.signedInAt) return cb(invalidKey);
       updateSignedInAt(id, _cb);

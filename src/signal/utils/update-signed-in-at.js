@@ -6,7 +6,7 @@ export default (id, cb) =>
     cb =>
       db.table('users')
         .where({id})
-        .update({signed_in_at: new Date()})
+        .update({signedInAt: new Date()})
         .returning('*')
         .asCallback(cb),
     ([user], cb) => cb(null, user)
