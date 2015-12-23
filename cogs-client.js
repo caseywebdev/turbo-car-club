@@ -9,6 +9,16 @@ module.exports = {
     js: {
       transformers: [].concat(
         {name: 'eslint', only: 'src/**/*.js'},
+        {
+          name: 'replace',
+          options: {
+            patterns: {
+              __DEV__: (!MINIFY).toString(),
+              __MIN__: MINIFY ? '.min' : '',
+              __SIGNAL_URL__: process.env.SIGNAL_URL
+            }
+          }
+        },
         'directives',
         {
           name: 'babel',
@@ -23,16 +33,7 @@ module.exports = {
         MINIFY ? {
           name: 'uglify-js',
           except: ['**/*+(-|_|.)min.js', 'node_modules/ammo.js/ammo.js']
-        } : [],
-        {
-          name: 'replace',
-          options: {
-            patterns: {
-              __DEV__: (!MINIFY).toString(),
-              __SIGNAL_URL__: process.env.SIGNAL_URL
-            }
-          }
-        }
+        } : []
       )
     },
     scss: {

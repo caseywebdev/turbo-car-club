@@ -2,19 +2,11 @@
 // = requireself
 // = require ./init.js
 
-import Index from 'client/components/index';
+import 'client/utils/live-reload';
+import 'client/utils/live';
 import React from 'react';
-import ReactDOM from 'react-dom';
-import Qs from 'qs';
+import {render} from 'react-dom';
+import {Router} from 'react-router';
+import routes from 'client/routes';
 
-if (__DEV__) {
-  const script = document.createElement('script');
-  script.src = 'http://localhost:35729/livereload.js';
-  script.async = true;
-  document.body.appendChild(script);
-}
-
-ReactDOM.render(
-  <Index {...Qs.parse(location.search.slice(1))} />,
-  document.getElementById('main')
-);
+render(<Router {...{routes}} />, document.getElementById('main'));
