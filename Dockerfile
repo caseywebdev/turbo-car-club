@@ -4,4 +4,4 @@ COPY . /code
 WORKDIR /code
 RUN MINIFY=1 make
 EXPOSE 80
-CMD ["make", "host"]
+CMD ["bin/host"]

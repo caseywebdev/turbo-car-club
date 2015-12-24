@@ -1,0 +1,3 @@
+#!/bin/sh -e
+
+exec node build/node_modules/signal

@@ -5,8 +5,6 @@ KNEX=$(BIN)knex \
 	--cwd build/node_modules/signal \
 	--knexfile build/node_modules/signal/config.js \
 	--env knex
-HOST=node build/node_modules/host
-SIGNAL=node build/node_modules/signal
 
 all:
 	@npm install
@@ -37,19 +35,12 @@ cogs-server:
 cogs-server-w:
 	@$(COGS) -c cogs-server.js -pw src/host,src/shared,src/signal
 
-host:
-	@$(HOST)
-
 host-w:
-	@$(WATCHY) -pw build/node_modules/host,build/node_modules/shared -- \
-		$(HOST)
-
-signal:
-	@$(SIGNAL)
+	@$(WATCHY) -pw build/node_modules/host,build/node_modules/shared -- bin/host
 
 signal-w:
 	@$(WATCHY) -pw build/node_modules/shared,build/node_modules/signal -- \
-		$(SIGNAL)
+		bin/signal
 
 migrate:
 	@$(KNEX) migrate:latest
