@@ -1,3 +1,4 @@
+import Meta from 'client/components/meta';
 import React, {Component} from 'react';
 import {Link} from 'react-router';
 
@@ -26,26 +27,29 @@ export default class extends Component {
   }
 
   render() {
+    document.title = 'Home';
     return (
-      <div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <div>Hello World!!!</div>
-        <Link to='/foo'>Foo</Link>
-        <Link to='/'>Root</Link>
-      </div>
+      <Meta title='Home'>
+        <div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <div>Hello World!!!</div>
+          <Link to='/foo'>Foo</Link>
+          <Link to='/'>Root</Link>
+        </div>
+      </Meta>
     );
   }
 }
