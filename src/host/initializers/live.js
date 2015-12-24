@@ -15,7 +15,7 @@ const LISTENERS = _.reduce(fs.readdirSync(dir), (listeners, file) => {
   return listeners;
 }, {});
 
-log.info(`Starting WebSocket server on port 80`);
+log.info(`Starting WebSocket server on port 80...`);
 const server = new ws.Server({port: 80});
 
 const sockets = {};
@@ -26,12 +26,13 @@ server.on('connection', ws => {
   socket.trigger('open');
 });
 
+log.info(`Connecting to signal server at ${config.signal.url}...`);
 const client = new Live({WebSocket: ws, url: config.signal.url});
 client.on('open', () => {
-  log.info('Connected to signal server, signing in as a host...');
+  log.info('Connected to signal server, authorizing as a host...');
   client.send('auth-host', config.key, er => {
     if (er) return log.error(er);
-    log.info('Successfully signed in as a host');
+    log.info('Successfully authorized as a host');
   });
 });
 

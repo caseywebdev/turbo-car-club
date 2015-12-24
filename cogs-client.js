@@ -12,6 +12,7 @@ module.exports = {
         {
           name: 'replace',
           options: {
+            flags: 'g',
             patterns: {
               __DEV__: (!MINIFY).toString(),
               __MIN__: MINIFY ? '.min' : '',
