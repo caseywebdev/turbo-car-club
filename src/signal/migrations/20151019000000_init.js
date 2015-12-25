@@ -1,9 +1,10 @@
 export const up = ({schema}) =>
   schema
+    .raw('CREATE EXTENSION IF NOT EXISTS citext')
     .createTable('users', t => {
       t.increments();
-      t.string('emailAddress').unique().index();
-      t.string('name').unique().index();
+      t.specificType('emailAddress', 'citext').unique().index();
+      t.specificType('name', 'citext').unique().index();
       t.timestamp('signedInAt');
       t.timestamp('createdAt').defaultTo('now()');
     });

@@ -8,8 +8,7 @@ export default class extends Component {
       <Meta title='Not Found'>
         <div>
           <div>Not Found!</div>
-          <Link to='/'>Go Home</Link><br />
-          <Link to={'/' + Math.random().toString()}>RAND</Link>
+          <Link to='/'>Go Home</Link>
         </div>
       </Meta>
     );

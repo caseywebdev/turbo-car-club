@@ -4,7 +4,7 @@ import db from 'signal/utils/db';
 export default (id, cb) =>
   async.waterfall([
     cb =>
-      db.table('users')
+      db('users')
         .where({id})
         .update({signedInAt: new Date()})
         .returning('*')

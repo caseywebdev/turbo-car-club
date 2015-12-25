@@ -33,5 +33,6 @@ export default {
     migrations: {tableName: 'migrations'}
   },
   verifyKeyTtl: 1000 * 60 * 60,
-  authKeyTtl: 1000 * 60 * 60 * 24 * 60
+  authKeyTtl: 1000 * 60 * 60 * 24 * 60,
+  maxUserNameLength: 16
 };

@@ -4,8 +4,8 @@ import db from 'signal/utils/db';
 export default (where, cb) =>
   async.waterfall([
     cb =>
-      db.insert(where)
-        .into('users')
+      db('users')
+        .insert(where)
         .returning('*')
         .asCallback(cb),
     ([user], cb) => cb(null, user)

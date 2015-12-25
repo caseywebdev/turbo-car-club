@@ -5,8 +5,8 @@ import db from 'signal/utils/db';
 export default (socket, __, cb) => {
   const hosts = _.compact(_.map(app.live.sockets, 'host'));
   const userIds = _.unique(_.map(hosts, 'userId'));
-  db.select('*')
-    .from('users')
+  db('users')
+    .select('*')
     .whereIn('id', userIds)
     .asCallback((er, users) => {
       if (er) return cb(er);
