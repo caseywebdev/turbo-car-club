@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import React, {Component} from 'react';
 import live from 'client/utils/live';
-import User from 'shared/entities/user';
+import * as User from 'shared/entities/user';
 
 const renderHost = ({user, region, name}, i) => {
   return (

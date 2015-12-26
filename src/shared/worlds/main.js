@@ -6,7 +6,7 @@ const BROADPHASE_INTERFACE = new Ammo.btDbvtBroadphase();
 const CONSTRAINT_SOLVER = new Ammo.btSequentialImpulseConstraintSolver();
 const GRAVITY = new Ammo.btVector3(0, -9.8, 0);
 
-export default () => {
+export const create = () => {
   const world = new Ammo.btDiscreteDynamicsWorld(
     DISPATCHER,
     BROADPHASE_INTERFACE,

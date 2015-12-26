@@ -1,5 +1,1 @@
-const User = {
-  getDisplayName: ({id, name}) => name || `User ${id}`
-};
-
-export default User;
+export const getDisplayName = ({id, name}) => name || `User ${id}`;

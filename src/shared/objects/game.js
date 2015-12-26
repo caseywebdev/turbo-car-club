@@ -3,7 +3,7 @@ import Ammo from 'ammo.js';
 import CarBody from 'shared/bodies/car';
 import createBody from 'shared/utils/create-body';
 import config from 'shared/config';
-import WorldObject from 'shared/objects/world';
+import * as MainWorld from 'shared/worlds/main';
 import FloorBody from 'shared/bodies/floor';
 import BallBody from 'shared/bodies/ball';
 
@@ -21,7 +21,7 @@ const MAX_SUB_STEPS = config.maxSubSteps;
 
 export default class {
   constructor() {
-    this.world = WorldObject();
+    this.world = MainWorld.create();
     this.world.addRigidBody(FloorBody());
     this.ball = BallBody();
     this.ball.getWorldTransform().getOrigin().setX(-10);
