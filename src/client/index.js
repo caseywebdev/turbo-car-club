@@ -4,6 +4,7 @@
 
 import 'client/utils/live-reload';
 import 'client/utils/live';
+import 'client/utils/fox';
 import React from 'react';
 import {render} from 'react-dom';
 import {Router} from 'react-router';
