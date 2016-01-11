@@ -1,7 +1,8 @@
 import _ from 'underscore';
 import React, {Component} from 'react';
-import live from 'client/utils/live';
-import * as User from 'shared/entities/user';
+import Relay from 'react-relay';
+import live from '../utils/live';
+import * as User from '../../shared/entities/user';
 
 const renderHost = ({user, region, name}, i) => {
   return (
@@ -19,10 +20,10 @@ const renderHosts = hosts =>
     <tbody>{_.map(hosts, renderHost)}</tbody>
   </table>;
 
-export default class extends Component {
+class Hosts extends Component {
   state = {
     hosts: null
-  }
+  };
 
   componentDidMount() {
     live.send('get-hosts', null, ::this.handleGetHosts);
@@ -40,3 +41,11 @@ export default class extends Component {
     );
   }
 }
+
+export default Relay.createContainer(Hosts, {
+  fragments: {
+    foo: () => Relay.QL`
+
+    `
+  }
+});

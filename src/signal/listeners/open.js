@@ -1,4 +1,4 @@
-import * as app from 'signal';
+import app from 'signal';
 import log from 'signal/utils/log';
 import uuid from 'node-uuid';
 

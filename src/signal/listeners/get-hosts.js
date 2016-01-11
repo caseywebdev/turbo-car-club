@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import * as app from 'signal';
+import app from 'signal';
 import db from 'signal/utils/db';
 
 export default (socket, __, cb) => {

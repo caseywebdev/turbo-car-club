@@ -1,19 +1,19 @@
 import _ from 'underscore';
-import ArenaLight from 'client/lights/arena';
-import BallMesh from 'client/meshes/ball';
-import CAMERA from 'client/cameras/main';
-import ChassisMesh from 'client/meshes/chassis';
-import config from 'client/config';
-import FloorMesh from 'client/meshes/floor';
-import db from 'client/utils/db';
+import ArenaLight from '../lights/arena';
+import BallMesh from '../meshes/ball';
+import CAMERA from '../cameras/main';
+import ChassisMesh from '../meshes/chassis';
+import config from '../config';
+import FloorMesh from '../meshes/floor';
+import db from '../utils/db';
 import Live from 'live';
 import Peer from 'shared/peer';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import RENDERER from 'client/renderers/main';
+import RENDERER from '../renderers/main';
 import THREE from 'three';
-import WheelMesh from 'client/meshes/wheel';
-import WorldLight from 'client/lights/world';
+import WheelMesh from '../meshes/wheel';
+import WorldLight from '../lights/world';
 
 const KEYS = {};
 

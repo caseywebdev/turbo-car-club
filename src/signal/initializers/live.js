@@ -9,7 +9,7 @@ const dir = path.resolve(__dirname, path.join('..', 'listeners'));
 const LISTENERS = _.reduce(fs.readdirSync(dir), (listeners, file) => {
   if (file[0] !== '.') {
     const basename = path.basename(file, path.extname(file));
-    listeners[basename] = require(path.join(dir, file));
+    listeners[basename] = require(path.join(dir, file)).default;
   }
   return listeners;
 }, {});

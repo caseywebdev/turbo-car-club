@@ -1,4 +1,4 @@
-import * as app from 'host';
+import app from 'host';
 import Peer from 'shared/peer';
 
 const peers = {};

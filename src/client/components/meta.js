@@ -7,7 +7,7 @@ export default class extends Component {
   static propTypes = {
     children: PropTypes.element,
     title: PropTypes.string
-  }
+  };
 
   constructor(props) {
     super(props);

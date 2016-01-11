@@ -17,8 +17,9 @@
     "worker": true
   },
   "globals": {
-    "__DEV__": true,
-    "__SIGNAL_URL__": true
+    "__LIVE_RELOAD__": true,
+    "__SIGNAL_URL__": true,
+    "__MIN__": true
   },
   "rules": {
     "comma-dangle": [2, "never"],

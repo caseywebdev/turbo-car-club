@@ -1,4 +1,4 @@
-import config from 'client/config';
+import config from '../config';
 
 const {prefix} = config.db;
 

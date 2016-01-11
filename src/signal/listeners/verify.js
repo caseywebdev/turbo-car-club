@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import * as app from 'signal';
+import app from 'signal';
 import async from 'async';
 import config from 'signal/config';
 import findOrCreateUser from 'signal/utils/find-or-create-user';

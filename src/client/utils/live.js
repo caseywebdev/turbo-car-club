@@ -1,6 +1,6 @@
-import config from 'client/config';
-import db from 'client/utils/db';
-import Live from 'live';
+import config from '../config';
+import db from './db';
+import Live from 'live-socket';
 
 const live = (new Live(config.signal))
   .on('auth', auth => db.set('auth', auth))

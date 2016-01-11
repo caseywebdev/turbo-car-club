@@ -1,4 +1,4 @@
-import shared from 'shared/config';
+import shared from '../shared/config';
 
 export default {
   ...shared,

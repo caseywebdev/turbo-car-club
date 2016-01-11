@@ -1,4 +1,4 @@
-import Meta from 'client/components/meta';
+import Meta from './meta';
 import React, {Component} from 'react';
 import {Link} from 'react-router';
 

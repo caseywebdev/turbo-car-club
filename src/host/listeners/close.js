@@ -1,4 +1,4 @@
-import * as app from 'host';
+import app from 'host';
 import log from 'host/utils/log';
 
 export default socket => {

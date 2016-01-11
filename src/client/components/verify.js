@@ -1,7 +1,7 @@
-import db from 'client/utils/db';
-import Meta from 'client/components/meta';
+import db from '../utils/db';
+import Meta from './meta';
 import React, {Component} from 'react';
-import live from 'client/utils/live';
+import live from '../utils/live';
 
 export default class extends Component {
   componentDidMount() {

@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import * as app from 'signal';
+import app from 'signal';
 import config from 'signal/config';
 import log from 'signal/utils/log';
 import verify from 'shared/utils/verify';

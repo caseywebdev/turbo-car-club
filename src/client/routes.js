@@ -1,7 +1,7 @@
-import Layout from 'client/components/layout';
-import Index from 'client/components/index';
-import NotFound from 'client/components/not-found';
-import Verify from 'client/components/verify';
+import Layout from './components/layout';
+import Index from './components/index';
+import NotFound from './components/not-found';
+import Verify from './components/verify';
 
 export default [
   {

@@ -3,9 +3,9 @@ var MINIFY = process.env.MINIFY === '1';
 module.exports = {
   manifestPath: 'build/client/manifest.json',
   in: {
-    vert: {out: 'js', transformers: {name: 'text', options: {modules: 'amd'}}},
-    frag: {out: 'js', transformers: {name: 'text', options: {modules: 'amd'}}},
-    json: {out: 'js', transformers: {name: 'json', options: {modules: 'amd'}}},
+    vert: {out: 'js', transformers: {name: 'text'}},
+    frag: {out: 'js', transformers: {name: 'text'}},
+    json: {out: 'js', transformers: {name: 'json'}},
     js: {
       transformers: [].concat(
         {name: 'eslint', only: 'src/**/*.js'},
@@ -14,22 +14,26 @@ module.exports = {
           options: {
             flags: 'g',
             patterns: {
-              __DEV__: (!MINIFY).toString(),
+              __LIVE_RELOAD__: (!MINIFY).toString(),
               __MIN__: MINIFY ? '.min' : '',
-              __SIGNAL_URL__: process.env.SIGNAL_URL
+              __SIGNAL_URL__: process.env.SIGNAL_URL,
+              'process.env.NODE_ENV': MINIFY ? "'production'" : "'development'"
             }
           }
         },
-        'directives',
         {
           name: 'babel',
           only: 'src/**/*.js',
           except: 'src/client/init.js',
-          options: {modules: 'amd', stage: 0}
+          options: {presets: ['es2015', 'stage-0', 'react']}
         },
         {
-          name: 'concat-amd',
-          options: {base: 'src', extensions: ['js', 'json', 'vert', 'frag']}
+          name: 'concat-commonjs',
+          options: {
+            entrypoint: 'src/client/index.js',
+            extensions: ['js', 'json', 'vert', 'frag'],
+            ignore: ['domain']
+          }
         },
         MINIFY ? {
           name: 'uglify-js',
@@ -41,7 +45,6 @@ module.exports = {
       out: 'css',
       transformers: [].concat(
         'scss-lint',
-        'directives',
         'sass',
         {
           name: 'local-css',
@@ -53,7 +56,7 @@ module.exports = {
           }
         },
         'autoprefixer',
-        MINIFY ? 'csso' : []
+        MINIFY ? {name: 'clean-css', options: {processImport: false}} : []
       )
     }
   },
