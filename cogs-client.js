@@ -25,7 +25,12 @@ module.exports = {
           name: 'babel',
           only: 'src/**/*.js',
           except: 'src/client/init.js',
-          options: {presets: ['es2015', 'stage-0', 'react']}
+          options: {
+            presets: ['es2015', 'stage-0', 'react']
+            // tap: (file, options, cb) => {
+            //   fs.readFile('')
+            // }
+          }
         },
         {
           name: 'concat-commonjs',

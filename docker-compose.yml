@@ -1,7 +1,24 @@
+data:
+  image: &image quay.io/turbocarclub/turbo-car-club:0.0.9
+  volumes:
+    - ./.eslintrc:/code/.eslintrc
+    - ./.scss-lint.yml:/code/.scss-lint.yml
+    - ./bin:/code/bin
+    - ./cogs-client.js:/code/cogs-client.js
+    - ./cogs-server.js:/code/cogs-server.js
+    - ./Makefile:/code/Makefile
+    - ./nginx.conf:/etc/nginx/nginx.conf
+    - ./package.json:/code/package.json
+    - ./src:/code/src
+    - /code/build
+    - /code/node_modules
+    - /var/lib/postgresql/data
+  command: 'true'
+
 postgres:
   image: postgres:9.4.5
-  volumes:
-    - ./postgres:/var/lib/postgresql/data
+  volumes_from:
+    - data
   environment:
     POSTGRES_USER: postgres
     POSTGRES_PASSWORD: postgres
@@ -10,15 +27,15 @@ postgres:
 
 nginx:
   image: nginx:1.9.5
-  volumes:
-    - ./build/client:/usr/share/nginx/html
+  volumes_from:
+    - data
   ports:
     - '80:80'
 
 cogs-client: &shared
-  image: quay.io/turbocarclub/turbo-car-club:0.0.9
-  volumes:
-    - .:/code
+  image: *image
+  volumes_from:
+    - data
   environment:
     SIGNAL_URL: ws://docker:1337
   command: make cogs-client-w

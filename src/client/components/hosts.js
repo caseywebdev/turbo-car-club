@@ -44,8 +44,12 @@ class Hosts extends Component {
 
 export default Relay.createContainer(Hosts, {
   fragments: {
-    foo: () => Relay.QL`
-
+    hosts: () => Relay.QL`
+      fragment on Hosts {
+        user,
+        region,
+        name
+      }
     `
   }
 });
