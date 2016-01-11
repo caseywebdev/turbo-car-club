@@ -1,5 +1,5 @@
-import config from 'shared/config';
-import getHmac from 'shared/utils/get-hmac';
+import config from '../config';
+import getHmac from './get-hmac';
 
 const {encoding, hashSize} = config.crypto;
 

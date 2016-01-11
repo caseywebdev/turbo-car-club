@@ -1,5 +1,5 @@
-import app from 'host';
-import log from 'host/utils/log';
+import app from '..';
+import log from '../utils/log';
 import uuid from 'node-uuid';
 
 export default socket => {

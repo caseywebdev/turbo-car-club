@@ -1,6 +1,6 @@
-import config from 'signal/config';
-import log from 'signal/utils/log';
-import verify from 'shared/utils/verify';
+import config from '../config';
+import log from '../utils/log';
+import verify from '../../shared/utils/verify';
 
 const {key, errors: {invalidKey}, authKeyTtl} = config;
 

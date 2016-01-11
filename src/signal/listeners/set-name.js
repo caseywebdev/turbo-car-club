@@ -1,7 +1,7 @@
 import _str from 'underscore.string';
-import config from 'signal/config';
-import db from 'signal/utils/db';
-import log from 'signal/utils/log';
+import config from '../config';
+import db from '../utils/db';
+import log from '../utils/log';
 
 const {errors: {authRequired, unknown}} = config;
 

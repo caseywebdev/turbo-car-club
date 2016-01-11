@@ -1,6 +1,6 @@
 import _str from 'underscore.string';
-import config from 'signal/config';
-import sign from 'shared/utils/sign';
+import config from '../config';
+import sign from '../../shared/utils/sign';
 
 const {key, errors: {authRequired}} = config;
 

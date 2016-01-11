@@ -1,4 +1,4 @@
-import config from 'signal/config';
+import config from '../config';
 import Qs from 'qs';
 
 const {url} = config.client;

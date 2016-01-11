@@ -1,5 +1,5 @@
-import app from 'signal';
-import log from 'signal/utils/log';
+import app from '..';
+import log from '../utils/log';
 
 export default (socket, {id, data}, cb) => {
   log.info(`${socket.id} signaled ${id}: ${data.type}`);

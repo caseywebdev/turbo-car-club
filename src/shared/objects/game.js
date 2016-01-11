@@ -1,11 +1,11 @@
 import _ from 'underscore';
 import Ammo from 'ammo.js';
-import CarBody from 'shared/bodies/car';
-import createBody from 'shared/utils/create-body';
-import config from 'shared/config';
-import * as MainWorld from 'shared/worlds/main';
-import FloorBody from 'shared/bodies/floor';
-import BallBody from 'shared/bodies/ball';
+import CarBody from '../bodies/car';
+import createBody from '../utils/create-body';
+import config from '../config';
+import * as MainWorld from '../worlds/main';
+import FloorBody from '../bodies/floor';
+import BallBody from '../bodies/ball';
 
 const WALLS = [
   [48, 1, 4],

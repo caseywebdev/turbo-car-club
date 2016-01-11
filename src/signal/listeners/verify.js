@@ -1,12 +1,12 @@
 import _ from 'underscore';
-import app from 'signal';
+import app from '..';
 import async from 'async';
-import config from 'signal/config';
-import findOrCreateUser from 'signal/utils/find-or-create-user';
-import log from 'signal/utils/log';
-import sign from 'shared/utils/sign';
-import updateSignedInAt from 'signal/utils/update-signed-in-at';
-import verify from 'shared/utils/verify';
+import config from '../config';
+import findOrCreateUser from '../utils/find-or-create-user';
+import log from '../utils/log';
+import sign from '../../shared/utils/sign';
+import updateSignedInAt from '../utils/update-signed-in-at';
+import verify from '../../shared/utils/verify';
 
 const {
   key,

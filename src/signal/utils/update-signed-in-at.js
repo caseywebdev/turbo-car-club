@@ -1,5 +1,5 @@
 import async from 'async';
-import db from 'signal/utils/db';
+import db from './db';
 
 export default (id, cb) =>
   async.waterfall([

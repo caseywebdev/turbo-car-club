@@ -1,8 +1,8 @@
 import _ from 'underscore';
-import app from 'signal';
-import config from 'signal/config';
-import log from 'signal/utils/log';
-import verify from 'shared/utils/verify';
+import app from '..';
+import config from '../config';
+import log from '../utils/log';
+import verify from '../../shared/utils/verify';
 
 const {key, errors: {invalidKey}} = config;
 

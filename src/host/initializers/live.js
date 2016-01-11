@@ -1,8 +1,8 @@
 import _ from 'underscore';
-import config from 'host/config';
+import config from '../config';
 import fs from 'fs';
 import Live from 'live-socket';
-import log from 'host/utils/log';
+import log from '../utils/log';
 import path from 'path';
 import ws from 'ws';
 

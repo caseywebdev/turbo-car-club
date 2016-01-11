@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import Ammo from 'ammo.js';
-import ChassisBody from 'shared/bodies/chassis';
-import config from 'shared/config';
+import ChassisBody from '../bodies/chassis';
+import config from '../config';
 
 const {
   chassis: {width, height, depth},

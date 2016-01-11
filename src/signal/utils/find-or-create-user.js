@@ -1,6 +1,6 @@
 import async from 'async';
-import createUser from 'signal/utils/create-user';
-import findUser from 'signal/utils/find-user';
+import createUser from './create-user';
+import findUser from './find-user';
 
 export default (where, cb) =>
   async.waterfall([

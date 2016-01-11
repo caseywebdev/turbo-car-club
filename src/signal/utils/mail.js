@@ -1,5 +1,5 @@
-import config from 'signal/config';
-import log from 'signal/utils/log';
+import config from '../config';
+import log from './log';
 import nodemailer from 'nodemailer';
 import {markdown} from 'nodemailer-markdown';
 import nodemailerSesTransport from 'nodemailer-ses-transport';

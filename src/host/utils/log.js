@@ -1,4 +1,4 @@
-import config from 'host/config';
+import config from '../config';
 import log from 'orgsync-logger';
 
 log.config = config.log;

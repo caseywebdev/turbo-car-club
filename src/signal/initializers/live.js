@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import fs from 'fs';
 import Live from 'live-socket';
-import log from 'signal/utils/log';
+import log from '../utils/log';
 import path from 'path';
 import ws from 'ws';
 

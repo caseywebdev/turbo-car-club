@@ -1,5 +1,5 @@
-import app from 'host';
-import log from 'host/utils/log';
+import app from '..';
+import log from '../utils/log';
 
 export default socket => {
   delete app.live.sockets[socket.id];

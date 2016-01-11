@@ -1,10 +1,10 @@
 import _ from 'underscore';
 import async from 'async';
-import config from 'signal/config';
-import findUser from 'signal/utils/find-user';
-import sign from 'shared/utils/sign';
-import signIn from 'signal/templates/sign-in';
-import mail from 'signal/utils/mail';
+import config from '../config';
+import findUser from '../utils/find-user';
+import sign from '../../shared/utils/sign';
+import signIn from '../templates/sign-in';
+import mail from '../utils/mail';
 
 const {key} = config;
 

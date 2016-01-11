@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import shared from 'shared/config';
+import shared from '../shared/config';
 
 const ENV = process.env;
 

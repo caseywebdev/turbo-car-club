@@ -1,6 +1,6 @@
 import Ammo from 'ammo.js';
-import createBody from 'shared/utils/create-body';
-import config from 'shared/config';
+import createBody from '../utils/create-body';
+import config from '../config';
 
 const {width, height, depth} = config.car.chassis;
 

@@ -1,6 +1,6 @@
 import _ from 'underscore';
-import app from 'signal';
-import db from 'signal/utils/db';
+import app from '..';
+import db from '../utils/db';
 
 export default (socket, __, cb) => {
   const hosts = _.compact(_.map(app.live.sockets, 'host'));

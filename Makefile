@@ -2,8 +2,8 @@ BIN=node_modules/.bin/
 COGS=$(BIN)cogs
 WATCHY=$(BIN)watchy
 KNEX=$(BIN)knex \
-	--cwd build/node_modules/signal \
-	--knexfile build/node_modules/signal/config.js \
+	--cwd build/signal \
+	--knexfile build/signal/config.js \
 	--env knex
 
 all:
@@ -36,11 +36,10 @@ cogs-server-w:
 	@$(COGS) -c cogs-server.js -pw src/host,src/shared,src/signal
 
 host-w:
-	@$(WATCHY) -pw build/node_modules/host,build/node_modules/shared -- bin/host
+	@$(WATCHY) -pw build/host,build/shared -- bin/host
 
 signal-w:
-	@$(WATCHY) -pw build/node_modules/shared,build/node_modules/signal -- \
-		bin/signal
+	@$(WATCHY) -pw build/shared,build/signal -- bin/signal
 
 migrate:
 	@$(KNEX) migrate:latest

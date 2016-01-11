@@ -1,4 +1,4 @@
-import live from 'host/initializers/live';
-import game from 'host/initializers/game';
+import live from './initializers/live';
+import game from './initializers/game';
 
 export default {live, game};

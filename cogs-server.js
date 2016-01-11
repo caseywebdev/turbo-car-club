@@ -1,5 +1,5 @@
 module.exports = {
-  manifestPath: 'build/node_modules/manifest.json',
+  manifestPath: 'build/manifest-server.json',
   in: {
     js: {
       transformers: [
@@ -8,5 +8,5 @@ module.exports = {
       ]
     }
   },
-  builds: {'src/+(host|signal|shared)/**/*.js': 'build/node_modules'}
+  builds: {'src/+(host|signal|shared)/**/*.js': 'build'}
 };

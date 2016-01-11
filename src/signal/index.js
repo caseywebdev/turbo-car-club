@@ -1,3 +1,3 @@
-import live from 'signal/initializers/live';
+import live from './initializers/live';
 
 export default {live};
