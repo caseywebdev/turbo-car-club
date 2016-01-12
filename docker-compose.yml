@@ -32,6 +32,19 @@ nginx:
   ports:
     - '80:80'
 
+livereload:
+  image: node:5.4.0
+  volumes_from:
+    - data
+  ports:
+    - '35729:35729'
+  command: >
+    bash -c '
+      echo Installing livereload... &&
+      npm install -g livereload@0.4.0 --loglevel error &&
+      exec livereload /code/build/client --debug
+    '
+
 cogs-client: &shared
   image: *image
   volumes_from:
@@ -43,6 +56,10 @@ cogs-client: &shared
 cogs-server:
   <<: *shared
   command: make cogs-server-w
+
+schema:
+  <<: *shared
+  command: make schema-w
 
 signal:
   <<: *shared

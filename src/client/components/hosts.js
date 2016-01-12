@@ -1,3 +1,5 @@
+// = link build/shared/data/schema.json
+
 import _ from 'underscore';
 import React, {Component} from 'react';
 import Relay from 'react-relay';
@@ -45,9 +47,7 @@ class Hosts extends Component {
 export default Relay.createContainer(Hosts, {
   fragments: {
     hosts: () => Relay.QL`
-      fragment on Hosts {
-        user,
-        region,
+      fragment on User {
         name
       }
     `

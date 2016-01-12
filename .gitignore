@@ -2,3 +2,4 @@
 /node_modules
 /postgres
 /src/client/class-names.json
+/src/shared/data/schema.graphql

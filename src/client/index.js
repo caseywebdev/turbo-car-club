@@ -1,5 +1,5 @@
 import './utils/set-global';
-import './utils/live-reload';
+import './utils/livereload';
 import './utils/live';
 import React from 'react';
 import {render} from 'react-dom';

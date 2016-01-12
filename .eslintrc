@@ -17,7 +17,7 @@
     "worker": true
   },
   "globals": {
-    "__LIVE_RELOAD__": true,
+    "__LIVERELOAD__": true,
     "__SIGNAL_URL__": true,
     "__MIN__": true
   },

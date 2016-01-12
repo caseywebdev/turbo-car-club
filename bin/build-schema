@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+'use strict';
+
+const fs = require('fs');
+const schema = require('../build/shared/data/schema.js').default;
+const graphql = require('graphql').graphql;
+const graphqlUtilities = require('graphql/utilities');
+
+const introspectionQuery = graphqlUtilities.introspectionQuery;
+const printSchema = graphqlUtilities.printSchema;
+
+graphql(schema, introspectionQuery).then(result => {
+  if (result.errors) {
+    console.error(result.errors);
+    process.exit(1);
+  }
+  fs.writeFileSync(
+    'build/shared/data/schema.json',
+    JSON.stringify(result.data)
+  );
+  fs.writeFileSync('src/shared/data/schema.graphql', printSchema(schema));
+});

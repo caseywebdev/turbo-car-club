@@ -5,33 +5,34 @@ KNEX=$(BIN)knex \
 	--knexfile build/signal/config.js \
 	--env knex
 
-all:
-	@npm install
-	@make -j cogs-client cogs-server
+all: npm-install cogs-server cogs-client
 
 npm-install:
-	@docker-compose run cogs-client npm install
+	@echo 'Installing node modules...'
+	@npm install --loglevel error
 
-bootstrap:
-	@docker-compose stop
-	@docker-compose rm -f
-	@docker-compose up -d postgres
-	@sleep 5
-	@docker-compose run cogs-client make
-	@docker-compose run signal make migrate
-	@docker-compose up -d
+schema: cogs-server
+	@echo 'Building schema...'
+	@bin/build-schema
+
+schema-w: cogs-server
+	@$(WATCHY) -w build/shared/data -i 'schema.json$$' -- bin/build-schema
 
 class-names:
-	@$(COGS) -c cogs-client.js src/client/styles/index.scss:build/client
+	@echo 'Building class names...'
+	@$(COGS) -sc cogs-client.js src/client/styles/index.scss:build/client
 
-cogs-client: class-names
-	@$(COGS) -c cogs-client.js
+cogs-client: schema class-names
+	@echo 'Building client...'
+	@$(COGS) -sc cogs-client.js
 
-cogs-client-w: class-names
-	@$(COGS) -c cogs-client.js -pw src
+cogs-client-w: schema class-names
+	@$(WATCHY) -pw build/shared/data/schema.json -- \
+		$(COGS) -c cogs-client.js -pw src
 
 cogs-server:
-	@$(COGS) -c cogs-server.js
+	@echo 'Building server...'
+	@$(COGS) -sc cogs-server.js
 
 cogs-server-w:
 	@$(COGS) -c cogs-server.js -pw src/host,src/shared,src/signal
@@ -47,3 +48,12 @@ migrate:
 
 migrate-rollback:
 	@$(KNEX) migrate:rollback
+
+bootstrap:
+	@docker-compose stop
+	@docker-compose rm -f
+	@docker-compose up -d postgres
+	@sleep 5
+	@docker-compose run cogs-client make
+	@docker-compose run signal make migrate
+	@docker-compose up -d
