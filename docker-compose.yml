@@ -40,8 +40,12 @@ livereload:
     - '35729:35729'
   command: >
     bash -c '
-      echo Installing livereload... &&
-      npm install -g livereload@0.4.0 --loglevel error &&
+      (
+        [ `which livereload` ] || (
+          echo Installing livereload... &&
+          npm install -g livereload@0.4.0 --loglevel error
+        )
+      ) &&
       exec livereload /code/build/client --debug
     '
 
