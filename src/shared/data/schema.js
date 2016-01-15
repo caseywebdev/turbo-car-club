@@ -75,6 +75,9 @@ var userType = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('User'),
     name: {type: GraphQLString},
+    emailAddress: {type: GraphQLString},
+    signedInAt: {type: GraphQLString},
+    createdAt: {type: GraphQLString},
     widgets: {
       type: widgetConnection,
       description: 'A person\'s collection of widgets',

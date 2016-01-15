@@ -5,11 +5,13 @@ KNEX=$(BIN)knex \
 	--knexfile build/signal/config.js \
 	--env knex
 
-all: npm-install cogs-server cogs-client
+all: dependencies cogs-server cogs-client
 
-npm-install:
-	@echo 'Installing node modules...'
+dependencies:
+	@echo 'Installing dependencies...'
 	@npm install --loglevel error
+	@echo 'Deduping dependencies...'
+	@npm dedupe --loglevel error
 
 schema: cogs-server
 	@echo 'Building schema...'
@@ -20,7 +22,7 @@ schema-w: cogs-server
 
 class-names:
 	@echo 'Building class names...'
-	@$(COGS) -sc cogs-client.js src/client/styles/index.scss:build/client
+	@ONLY_CLASS_NAMES=1 $(COGS) -sc cogs-client.js
 
 cogs-client: schema class-names
 	@echo 'Building client...'
@@ -51,7 +53,6 @@ migrate-rollback:
 
 bootstrap:
 	@docker-compose stop
-	@docker-compose rm -f
 	@docker-compose up -d postgres
 	@sleep 5
 	@docker-compose run cogs-client make

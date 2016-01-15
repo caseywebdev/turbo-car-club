@@ -14,9 +14,11 @@ graphql(schema, introspectionQuery).then(result => {
     console.error(result.errors);
     process.exit(1);
   }
-  fs.writeFileSync(
-    'build/shared/data/schema.json',
-    JSON.stringify(result.data)
-  );
+  const target = 'build/shared/data/schema.json';
+  const data = JSON.stringify(result.data);
+  let existing;
+  try { existing = fs.readFileSync(target, 'utf8'); } catch (er) {}
+  if (data === existing) return;
+  fs.writeFileSync(target, data);
   fs.writeFileSync('src/shared/data/schema.graphql', printSchema(schema));
 });

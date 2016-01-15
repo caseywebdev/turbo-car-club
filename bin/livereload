@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+while [ ! -f node_modules/.bin/livereload ]; do sleep 1; done
+exec livereload /code/build/client --debug
