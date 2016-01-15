@@ -22,7 +22,7 @@
     "cogs-transformer-scss-lint": "1.0.1",
     "cogs-transformer-text": "2.0.0",
     "cogs-transformer-uglify-js": "1.0.3",
-    "cogs": "2.0.4",
+    "cogs": "2.0.5",
     "eslint-plugin-react": "3.15.0",
     "eslint": "1.10.3",
     "graphql": "0.4.14",
