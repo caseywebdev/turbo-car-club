@@ -4,7 +4,7 @@ COPY \
   bin \
   src \
   .eslintrc \
-  scss-lint.yml \
+  .scss-lint.yml \
   cogs-client.js \
   cogs-server.js \
   Makefile \
