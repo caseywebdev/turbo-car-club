@@ -18,7 +18,7 @@ schema: cogs-server
 	@bin/build-schema
 
 schema-w: cogs-server
-	@$(WATCHY) -w build/shared/data -i 'schema.json$$' -- bin/build-schema
+	@$(WATCHY) -w build/shared/data -- bin/build-schema
 
 class-names:
 	@echo 'Building class names...'
@@ -29,8 +29,8 @@ cogs-client: schema class-names
 	@$(COGS) -sc cogs-client.js
 
 cogs-client-w: schema class-names
-	@$(WATCHY) -pw build/shared/data/schema.json -- \
-		$(COGS) -c cogs-client.js -pw src
+	@$(WATCHY) -pw src/shared/data/schema.json -- \
+		$(COGS) -c cogs-client.js -pw src/client,src/shared
 
 cogs-server:
 	@echo 'Building server...'

@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import _str from 'underscore.string';
-import classNames from '../node_modules/classnames/bind';
+import classNames from 'classnames/bind';
 import localizedClassNames from 'client/class-names';
 
 const cx = classNames.bind({});

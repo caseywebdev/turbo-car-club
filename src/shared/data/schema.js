@@ -39,6 +39,8 @@ import {
   getWidgets
 } from './database';
 
+import {Host} from './host';
+
 /**
  * We get the node interface and field from the Relay library.
  *
@@ -48,19 +50,15 @@ import {
 var {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     var {type, id} = fromGlobalId(globalId);
-    if (type === 'User') {
-      return getUser(id);
-    } else if (type === 'Widget') {
-      return getWidget(id);
-    }
+    if (type === 'User') return getUser(id);
+    if (type === 'Widget') return getWidget(id);
+    if (type === 'Host') return new Host();
     return null;
   },
   (obj) => {
-    if (obj instanceof User) {
-      return userType;
-    } else if (obj instanceof Widget) {
-      return widgetType;
-    }
+    if (obj instanceof User) return userType;
+    if (obj instanceof Widget) return widgetType;
+    if (obj instanceof Host) return hostType;
     return null;
   }
 );
@@ -83,6 +81,20 @@ var userType = new GraphQLObjectType({
       description: 'A person\'s collection of widgets',
       args: connectionArgs,
       resolve: (_, args) => connectionFromArray(getWidgets(), args)
+    }
+  }),
+  interfaces: [nodeInterface]
+});
+
+var hostType = new GraphQLObjectType({
+  name: 'Host',
+  description: 'A person who uses our app',
+  fields: () => ({
+    id: globalIdField('Host'),
+    name: {type: GraphQLString},
+    region: {type: GraphQLString},
+    user: {
+      type: userType
     }
   }),
   interfaces: [nodeInterface]
@@ -119,6 +131,9 @@ var queryType = new GraphQLObjectType({
     viewer: {
       type: userType,
       resolve: () => getViewer()
+    },
+    hosts: {
+      type: hostType
     }
   })
 });

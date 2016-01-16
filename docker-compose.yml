@@ -52,6 +52,10 @@ livereload:
 
 schema:
   <<: *shared
+  environment:
+    SOURCE: build/shared/data/schema.js
+    TARGET_JSON: src/shared/data/schema.json
+    TARGET_GRAPHQL: src/shared/data/schema.graphql
   command: make schema-w
 
 signal:

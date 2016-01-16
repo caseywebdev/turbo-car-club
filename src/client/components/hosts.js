@@ -1,20 +1,16 @@
-// = link build/shared/data/schema.json
+// = link src/shared/data/schema.json
 
 import _ from 'underscore';
-import React, {Component} from 'react';
+import React from 'react';
 import Relay from 'react-relay';
-import live from '../utils/live';
-import * as User from '../../shared/entities/user';
+import User from './user';
 
-const renderHost = ({user, region, name}, i) => {
-  return (
-    <tr key={i}>
-      <td>{User.getDisplayName(user)}</td>
-      <td>{region}</td>
-      <td>{name}</td>
-    </tr>
-  );
-};
+const renderHost = ({user, region, name}, i) =>
+  <tr key={i}>
+    <td>{User.getDisplayName(user)}</td>
+    <td>{region}</td>
+    <td>{name}</td>
+  </tr>;
 
 const renderHosts = hosts =>
   <table>
@@ -22,33 +18,15 @@ const renderHosts = hosts =>
     <tbody>{_.map(hosts, renderHost)}</tbody>
   </table>;
 
-class Hosts extends Component {
-  state = {
-    hosts: null
-  };
-
-  componentDidMount() {
-    live.send('get-hosts', null, ::this.handleGetHosts);
-  }
-
-  handleGetHosts(er, hosts) {
-    if (er) return console.error(er);
-    this.setState({hosts});
-  }
-
-  render() {
-    const {hosts} = this.state;
-    return (
-      <div>{hosts ? renderHosts(hosts) : 'Loading...'}</div>
-    );
-  }
-}
+const Hosts = ({hosts}) => <div>{renderHosts(hosts)}</div>;
 
 export default Relay.createContainer(Hosts, {
   fragments: {
     hosts: () => Relay.QL`
-      fragment on User {
-        name
+      fragment on Host {
+        ${User.getFragment()},
+        name,
+        region
       }
     `
   }

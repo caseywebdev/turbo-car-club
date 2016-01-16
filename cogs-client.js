@@ -57,7 +57,7 @@ module.exports = {
         presets: ['es2015', 'stage-0', 'react'],
         plugins: [
           require('babel-relay-plugin')(
-            require('./build/shared/data/schema.json'),
+            require('./src/shared/data/schema.json'),
             {abortOnError: true}
           )
         ]
