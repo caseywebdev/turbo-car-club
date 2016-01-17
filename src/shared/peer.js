@@ -1,10 +1,10 @@
+import wrtc from 'wrtc';
+
 const resolveKey = key =>
-  typeof window === 'undefined' ? require('wrtc')[key] : (
-    window[key] ||
-    window[`moz${key}`] ||
-    window[`ms${key}`] ||
-    window[`webkit${key}`]
-  );
+  wrtc[key] ||
+  wrtc[`moz${key}`] ||
+  wrtc[`ms${key}`] ||
+  wrtc[`webkit${key}`];
 
 const RTCPeerConnection = resolveKey('RTCPeerConnection');
 const RTCSessionDescription = resolveKey('RTCSessionDescription');

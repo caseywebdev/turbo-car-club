@@ -17,6 +17,6 @@ export default (socket, token, cb) => {
   }
 
   socket.host = {key: token, ...data};
-  log.info(`${socket.id} sign in as host ${id} at ${data.url}`);
+  log.info(`${socket.id} signed in as host ${id} at ${data.url}`);
   cb();
 };

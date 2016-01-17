@@ -6,10 +6,9 @@ const fs = require('fs');
 const graphql = require('graphql').graphql;
 const graphqlUtilities = require('graphql/utilities');
 
-const ENV = process.env;
-const SOURCE = path.resolve(ENV.SOURCE);
-const TARGET_JSON = path.resolve(ENV.TARGET_JSON);
-const TARGET_GRAPHQL = path.resolve(ENV.TARGET_GRAPHQL);
+const SOURCE = path.resolve('build/shared/data/schema.js');
+const TARGET_JSON = path.resolve('src/shared/data/schema.json');
+const TARGET_GRAPHQL = path.resolve('src/shared/data/schema.graphql');
 
 let schema = require(SOURCE);
 if (schema.default) schema = schema.default;

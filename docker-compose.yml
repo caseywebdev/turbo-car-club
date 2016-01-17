@@ -1,5 +1,5 @@
 data:
-  image: &image quay.io/turbocarclub/turbo-car-club:0.0.12
+  image: &image quay.io/turbocarclub/turbo-car-club:0.0.11
   volumes:
     - ./.eslintrc:/code/.eslintrc
     - ./.scss-lint.yml:/code/.scss-lint.yml
@@ -52,10 +52,6 @@ livereload:
 
 schema:
   <<: *shared
-  environment:
-    SOURCE: build/shared/data/schema.js
-    TARGET_JSON: src/shared/data/schema.json
-    TARGET_GRAPHQL: src/shared/data/schema.graphql
   command: make schema-w
 
 signal:
@@ -80,6 +76,6 @@ host:
   ports:
     - '1338:80'
   environment:
-    KEY: qrzeTOFGCcBcVmbnchSncrHo4sEpDDmVXSOof2WqoaRbWyJob3N0IiwxNDQ1Nzk4OTUzNTAyXSx7InVzZXJJZCI6MSwicmVnaW9uIjoiTG9jYWwiLCJuYW1lIjoiSG9zdCIsInVybCI6IndzOi8vZG9ja2VyOjEzMzgifV0=
+    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInJlZ2lvbiI6IkxvY2FsIiwibmFtZSI6Ikhvc3QiLCJ1cmwiOiJ3czovL2RvY2tlcjoxMzM4IiwiaWF0IjoxNDUzMDQ1MTUyLCJzdWIiOiJrZXkifQ.FUB1-Z2yZZ6o3vCeS5fyAbtxciyj3cJkVDmWhpHCVfc
     SIGNAL_URL: ws://signal
   command: make host-w

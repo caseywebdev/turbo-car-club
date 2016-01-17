@@ -49,5 +49,8 @@
     "watchy": "0.6.5",
     "wrtc": "0.0.59",
     "ws": "1.0.1"
+  },
+  "browser": {
+    "wrtc": "./src/client/utils/window.js"
   }
 }
