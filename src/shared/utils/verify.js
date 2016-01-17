@@ -1,18 +1,10 @@
 import config from '../config';
-import getHmac from './get-hmac';
+import jwt from 'jsonwebtoken';
 
-const {encoding, hashSize} = config.crypto;
+const {verifyAlgorithms: algorithms} = config.jwt;
 
-export default (key, type, str, ttl) => {
+export default (key, subject, token, maxAge) => {
   try {
-    const buffer = new Buffer(str, encoding);
-    const hmac = buffer.slice(0, hashSize);
-    let data = buffer.slice(hashSize);
-    if (hmac.compare(getHmac(key, data)) !== 0) return null;
-    data = JSON.parse(data.toString());
-    if (data[0][0] !== type) return null;
-    if (ttl && Date.now() > data[0][1] + ttl) return null;
-    return data[1];
+    return jwt.verify(token, key, {algorithms, subject, maxAge});
   } catch (er) {}
-  return null;
 };

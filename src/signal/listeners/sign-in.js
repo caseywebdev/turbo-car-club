@@ -16,7 +16,7 @@ export default (socket, emailAddress, cb) =>
         to: emailAddress,
         subject: 'Sign in to Turbo Car Club',
         markdown: signIn({
-          key: sign(key, 'verify', {
+          token: sign(key, 'verify', {
             emailAddress,
             signedInAt,
             socketId: socket.id

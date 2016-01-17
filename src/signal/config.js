@@ -36,7 +36,7 @@ export default {
   },
   key: ENV.KEY,
   knex,
-  verifyKeyTtl: 1000 * 60 * 60,
-  authKeyTtl: 1000 * 60 * 60 * 24 * 60,
+  verifyKeyMaxAge: '1 hour',
+  authKeyMaxAge: '60 days',
   maxUserNameLength: 16
 };

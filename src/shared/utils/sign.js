@@ -1,9 +1,6 @@
 import config from '../config';
-import getHmac from './get-hmac';
+import jwt from 'jsonwebtoken';
 
-const {encoding} = config.crypto;
+const {signAlgorithm: algorithm} = config.jwt;
 
-export default (key, type, obj) => {
-  const data = new Buffer(JSON.stringify([[type, Date.now()], obj]));
-  return Buffer.concat([getHmac(key, data), data]).toString(encoding);
-};
+export default (key, subject, obj) => jwt.sign(obj, key, {algorithm, subject});

@@ -20,26 +20,17 @@ import {
 } from 'graphql';
 
 import {
-  connectionArgs,
-  connectionDefinitions,
-  connectionFromArray,
+  // connectionArgs,
+  // connectionDefinitions,
+  // connectionFromArray,
   fromGlobalId,
   globalIdField,
   // mutationWithClientMutationId,
   nodeDefinitions
 } from 'graphql-relay';
 
-import {
-  // Import methods that your schema can use to interact with your database
-  User,
-  Widget,
-  getUser,
-  getViewer,
-  getWidget,
-  getWidgets
-} from './database';
-
-import {Host} from './host';
+import Host from './host';
+import User from './host';
 
 /**
  * We get the node interface and field from the Relay library.
@@ -49,15 +40,13 @@ import {Host} from './host';
  */
 var {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
-    var {type, id} = fromGlobalId(globalId);
-    if (type === 'User') return getUser(id);
-    if (type === 'Widget') return getWidget(id);
+    var {type} = fromGlobalId(globalId);
+    if (type === 'User') return new User();
     if (type === 'Host') return new Host();
     return null;
   },
   (obj) => {
     if (obj instanceof User) return userType;
-    if (obj instanceof Widget) return widgetType;
     if (obj instanceof Host) return hostType;
     return null;
   }
@@ -75,13 +64,7 @@ var userType = new GraphQLObjectType({
     name: {type: GraphQLString},
     emailAddress: {type: GraphQLString},
     signedInAt: {type: GraphQLString},
-    createdAt: {type: GraphQLString},
-    widgets: {
-      type: widgetConnection,
-      description: 'A person\'s collection of widgets',
-      args: connectionArgs,
-      resolve: (_, args) => connectionFromArray(getWidgets(), args)
-    }
+    createdAt: {type: GraphQLString}
   }),
   interfaces: [nodeInterface]
 });
@@ -100,44 +83,6 @@ var hostType = new GraphQLObjectType({
   interfaces: [nodeInterface]
 });
 
-var widgetType = new GraphQLObjectType({
-  name: 'Widget',
-  description: 'A shiny widget',
-  fields: () => ({
-    id: globalIdField('Widget'),
-    name: {
-      type: GraphQLString,
-      description: 'The name of the widget'
-    }
-  }),
-  interfaces: [nodeInterface]
-});
-
-/**
- * Define your own connection types here
- */
-var {connectionType: widgetConnection} =
-  connectionDefinitions({name: 'Widget', nodeType: widgetType});
-
-/**
- * This is the type that will be the root of our query,
- * and the entry point into our schema.
- */
-var queryType = new GraphQLObjectType({
-  name: 'Query',
-  fields: () => ({
-    node: nodeField,
-    // Add your own root fields here
-    viewer: {
-      type: userType,
-      resolve: () => getViewer()
-    },
-    hosts: {
-      type: hostType
-    }
-  })
-});
-
 /**
  * This is the type that will be the root of our mutations,
  * and the entry point into performing writes in our schema.
@@ -154,7 +99,19 @@ var queryType = new GraphQLObjectType({
  * type we defined above) and export it.
  */
 export default new GraphQLSchema({
-  query: queryType
+  query: new GraphQLObjectType({
+    name: 'Query',
+    fields: () => ({
+      node: nodeField,
+      // Add your own root fields here
+      viewer: {
+        type: userType
+      },
+      hosts: {
+        type: hostType
+      }
+    })
+  })
   // Uncomment the following after adding some mutation fields:
   // mutation: mutationType
 });

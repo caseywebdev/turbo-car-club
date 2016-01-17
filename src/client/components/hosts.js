@@ -2,12 +2,11 @@
 
 import _ from 'underscore';
 import React from 'react';
-import Relay from 'react-relay';
-import User from './user';
+import getUserDisplayName from '../../shared/utils/get-user-display-name';
 
 const renderHost = ({user, region, name}, i) =>
   <tr key={i}>
-    <td>{User.getDisplayName(user)}</td>
+    <td>{getUserDisplayName(user)}</td>
     <td>{region}</td>
     <td>{name}</td>
   </tr>;
@@ -18,16 +17,4 @@ const renderHosts = hosts =>
     <tbody>{_.map(hosts, renderHost)}</tbody>
   </table>;
 
-const Hosts = ({hosts}) => <div>{renderHosts(hosts)}</div>;
-
-export default Relay.createContainer(Hosts, {
-  fragments: {
-    hosts: () => Relay.QL`
-      fragment on Host {
-        ${User.getFragment()},
-        name,
-        region
-      }
-    `
-  }
-});
+export default ({hosts}) => <div>{renderHosts(hosts)}</div>;

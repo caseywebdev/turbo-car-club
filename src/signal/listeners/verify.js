@@ -11,11 +11,11 @@ import verify from '../../shared/utils/verify';
 const {
   key,
   errors: {invalidKey, unknown},
-  verifyKeyTtl
+  verifyKeyMaxAge
 } = config;
 
-export default (socket, signed, cb) => {
-  const data = verify(key, 'verify', signed, verifyKeyTtl);
+export default (socket, token, cb) => {
+  const data = verify(key, 'verify', token, verifyKeyMaxAge);
   if (!data) return cb(invalidKey);
   const {emailAddress} = data;
   async.waterfall([
@@ -30,9 +30,9 @@ export default (socket, signed, cb) => {
       log.error(er);
       return cb(unknown);
     }
-    const auth = sign(key, 'auth', {userId: user.id});
+    const authToken = sign(key, 'auth', {userId: user.id});
     const origin = app.live.sockets[data.socketId];
-    if (origin && origin !== socket) origin.send('auth', auth);
-    cb(null, auth);
+    if (origin && origin !== socket) origin.send('auth', authToken);
+    cb(null, authToken);
   });
 };

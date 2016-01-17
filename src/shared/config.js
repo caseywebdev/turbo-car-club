@@ -49,10 +49,13 @@ export default {
       restitution: 0.5
     }
   },
-  crypto: {
-    encoding: 'base64',
-    hashAlgo: 'sha256',
-    hashSize: 32
+  jwt: {
+
+    // What to sign new tokens with.
+    signAlgorithm: 'HS256',
+
+    // Permissible algorithms to verify signed tokens with.
+    verifyAlgorithms: ['HS256']
   },
   errors: {
     authRequired: new Error('Authentication required'),

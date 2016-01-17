@@ -67,7 +67,7 @@ module.exports = {
       name: 'concat-commonjs',
       only: '**/*.+(js|json|vert|frag)',
       options: {
-        entrypoint: 'src/client/index.js',
+        entry: 'src/client/index.js',
         extensions: ['.js', '.json', '.vert', '.frag'],
         ignore: ['domain']
       }

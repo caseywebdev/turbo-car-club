@@ -6,8 +6,8 @@ import verify from '../../shared/utils/verify';
 
 const {key, errors: {invalidKey}} = config;
 
-export default (socket, signed, cb) => {
-  const data = verify(key, 'host', signed);
+export default (socket, token, cb) => {
+  const data = verify(key, 'host', token);
   if (!data) return cb(invalidKey);
 
   const {userId, region, name} = data;
@@ -16,7 +16,7 @@ export default (socket, signed, cb) => {
     return cb(new Error(`Host ${id} is already online`));
   }
 
-  socket.host = {key: signed, ...data};
+  socket.host = {key: token, ...data};
   log.info(`${socket.id} sign in as host ${id} at ${data.url}`);
   cb();
 };
