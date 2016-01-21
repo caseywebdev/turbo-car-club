@@ -7,6 +7,7 @@ import {
 } from 'graphql';
 
 import getHosts from '../utils/get-hosts';
+import findUser from '../utils/find-user';
 
 var userType = new GraphQLObjectType({
   name: 'User',
@@ -15,7 +16,14 @@ var userType = new GraphQLObjectType({
     name: {type: GraphQLString},
     emailAddress: {type: GraphQLString},
     signedInAt: {type: GraphQLString},
-    createdAt: {type: GraphQLString}
+    createdAt: {type: GraphQLString},
+    availableHosts: {
+      type: new GraphQLList(hostType),
+      resolve: () =>
+        new Promise((resolve, reject) =>
+          getHosts((er, hosts) => er ? reject(er) : resolve(hosts))
+        )
+    }
   })
 });
 
@@ -32,19 +40,21 @@ var hostType = new GraphQLObjectType({
   })
 });
 
+const ANONYMOUS_USER = {id: 0};
+
 export default new GraphQLSchema({
   query: new GraphQLObjectType({
     name: 'Query',
     fields: () => ({
       viewer: {
-        type: userType
-      },
-      hosts: {
-        type: new GraphQLList(hostType),
+        type: userType,
         resolve: ({socket}) =>
+          socket.userId ?
           new Promise((resolve, reject) =>
-            getHosts(socket, (er, hosts) => er ? reject(er) : resolve(hosts))
-          )
+            findUser({id: socket.userId}, (er, user) =>
+              er ? reject(er) : resolve(user)
+            )
+          ) : ANONYMOUS_USER
       }
     })
   })

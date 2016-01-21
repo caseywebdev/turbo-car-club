@@ -1,6 +1,6 @@
 // = link src/signal/data/schema.json
 
-import React, {Component} from 'react';
+import React from 'react';
 import Relay from 'react-relay';
 import Hosts from './hosts';
 // import live from '../utils/live';
@@ -10,26 +10,14 @@ import Hosts from './hosts';
 // });
 
 export default Relay.createContainer(
-  class extends Component {
-    render() {
-      return (
-        <div>
-          <Hosts />
-        </div>
-      );
-    }
-  },
+  ({viewer: {availableHosts}}) => <Hosts hosts={availableHosts} />,
   {
     fragments: {
-      hosts: () => Relay.QL`
-        fragment on Host {
-          user {
-            id,
-            name,
-            emailAddress
-          },
-          name,
-          region
+      viewer: () => Relay.QL`
+        fragment on User {
+          availableHosts {
+            ${Hosts.getFragment('hosts')}
+          }
         }
       `
     }

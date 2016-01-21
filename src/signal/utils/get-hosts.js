@@ -2,7 +2,7 @@ import _ from 'underscore';
 import app from '..';
 import db from '../utils/db';
 
-export default (socket, cb) => {
+export default cb => {
   const hosts = _.compact(_.map(app.live.sockets, 'host'));
   const userIds = _.unique(_.map(hosts, 'userId'));
   db('users')

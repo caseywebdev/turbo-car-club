@@ -1,1 +1,1 @@
-export const getDisplayName = ({id, name}) => name || `User ${id}`;
+export default ({id, name}) => name || `User ${id}`;

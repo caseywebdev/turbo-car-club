@@ -1,3 +1,5 @@
+// = link src/signal/data/schema.json
+
 import Layout from './components/layout';
 import Index from './components/index';
 import NotFound from './components/not-found';
@@ -11,7 +13,7 @@ export default [
     indexRoute: {
       component: Index,
       queries: {
-        hosts: () => Relay.QL`query { hosts }`
+        viewer: () => Relay.QL`query Query { viewer }`
       }
     },
     childRoutes: [

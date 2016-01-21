@@ -1,34 +1,23 @@
 // = link src/signal/data/schema.json
 
 import _ from 'underscore';
-import getUserDisplayName from '../../shared/utils/get-user-display-name';
+import Host from './host';
 import React from 'react';
 import Relay from 'react-relay';
 
-const renderHost = ({user, region, name}, i) =>
-  <tr key={i}>
-    <td>{getUserDisplayName(user)}</td>
-    <td>{region}</td>
-    <td>{name}</td>
-  </tr>;
-
-const renderHosts = hosts =>
-  <table>
-    <thead><tr><th>Owner</th><th>Region</th><th>Name</th></tr></thead>
-    <tbody>{_.map(hosts, renderHost)}</tbody>
-  </table>;
+const renderHost = (host, key) => <Host {...{host, key}} />;
 
 export default Relay.createContainer(
-  ({hosts}) => <div>{renderHosts(hosts)}</div>,
+  ({hosts}) =>
+    <table>
+      <thead><tr><th>Owner</th><th>Region</th><th>Name</th></tr></thead>
+      <tbody>{_.map(hosts, renderHost)}</tbody>
+    </table>,
   {
     fragments: {
       hosts: () => Relay.QL`
-        fragment on Host {
-          user {
-            emailAddress
-          },
-          name,
-          region
+        fragment on Host @relay(plural: true) {
+          ${Host.getFragment('host')}
         }
       `
     }
