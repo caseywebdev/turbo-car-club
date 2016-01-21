@@ -38,5 +38,6 @@ export default {
   knex,
   verifyKeyMaxAge: '1 hour',
   authKeyMaxAge: '60 days',
-  maxUserNameLength: 16
+  maxUserNameLength: 16,
+  buildSchema: ENV.BUILD_SCHEMA === '1'
 };

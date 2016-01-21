@@ -50,10 +50,6 @@ livereload:
     - '35729:35729'
   command: bin/livereload
 
-schema:
-  <<: *shared
-  command: make schema-w
-
 signal:
   <<: *shared
   links:
@@ -61,6 +57,7 @@ signal:
   ports:
     - '1337:80'
   environment:
+    BUILD_SCHEMA: 1
     KEY: foo
     MAIL_ENABLED: 0
     MAIL_FROM_NAME: Turbo Car Club

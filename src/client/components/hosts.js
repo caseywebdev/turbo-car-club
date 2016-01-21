@@ -1,8 +1,9 @@
-// = link src/shared/data/schema.json
+// = link src/signal/data/schema.json
 
 import _ from 'underscore';
-import React from 'react';
 import getUserDisplayName from '../../shared/utils/get-user-display-name';
+import React from 'react';
+import Relay from 'react-relay';
 
 const renderHost = ({user, region, name}, i) =>
   <tr key={i}>
@@ -17,4 +18,19 @@ const renderHosts = hosts =>
     <tbody>{_.map(hosts, renderHost)}</tbody>
   </table>;
 
-export default ({hosts}) => <div>{renderHosts(hosts)}</div>;
+export default Relay.createContainer(
+  ({hosts}) => <div>{renderHosts(hosts)}</div>,
+  {
+    fragments: {
+      hosts: () => Relay.QL`
+        fragment on Host {
+          user {
+            emailAddress
+          },
+          name,
+          region
+        }
+      `
+    }
+  }
+);

@@ -7,10 +7,10 @@ const ONLY_CLASS_NAMES = ENV.ONLY_CLASS_NAMES === '1';
 const TARGET = {
   dir: 'build/client',
   ext: {
-    json: 'js',
-    frag: 'js',
-    vert: 'js',
-    scss: 'css'
+    '.json': '.js',
+    '.frag': '.js',
+    '.vert': '.js',
+    '.scss': '.css'
   }
 };
 
@@ -57,7 +57,7 @@ module.exports = {
         presets: ['es2015', 'stage-0', 'react'],
         plugins: [
           require('babel-relay-plugin')(
-            require('./src/shared/data/schema.json'),
+            require('./src/signal/data/schema.json'),
             {abortOnError: true}
           )
         ]

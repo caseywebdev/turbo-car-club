@@ -13,23 +13,16 @@ dependencies:
 	@echo 'Deduping dependencies...'
 	@npm dedupe --loglevel error
 
-schema: cogs-server
-	@echo 'Building schema...'
-	@bin/build-schema
-
-schema-w: cogs-server
-	@$(WATCHY) -w build/shared/data -- bin/build-schema
-
 class-names:
 	@echo 'Building class names...'
 	@ONLY_CLASS_NAMES=1 $(COGS) -sc cogs-client.js
 
-cogs-client: schema class-names
+cogs-client: class-names
 	@echo 'Building client...'
 	@$(COGS) -sc cogs-client.js
 
-cogs-client-w: schema class-names
-	@$(WATCHY) -pw src/shared/data/schema.json -- \
+cogs-client-w: class-names
+	@$(WATCHY) -pw src/signal/data/schema.json -- \
 		$(COGS) -c cogs-client.js -pw src/client,src/shared
 
 cogs-server:
