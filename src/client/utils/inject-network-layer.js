@@ -6,7 +6,7 @@ const sendReq = req =>
   live.send('graphql', {
     query: req.getQueryString(),
     variables: req.getVariables()
-  }, (er, res) => er ? req.reject(er) : req.resolve({response: res.data}));
+  }, (er, response) => er ? req.reject(er) : req.resolve({response}));
 
 Relay.injectNetworkLayer({
   sendMutation: sendReq,

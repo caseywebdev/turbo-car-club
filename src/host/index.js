@@ -1,4 +1,5 @@
-import live from './initializers/live';
+import './utils/live';
 import game from './initializers/game';
+import peers from './initializers/peers';
 
-export default {live, game};
+export default {game, peers};

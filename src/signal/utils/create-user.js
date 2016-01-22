@@ -1,12 +1,5 @@
-import async from 'async';
+import _ from 'underscore';
 import db from './db';
 
-export default (where, cb) =>
-  async.waterfall([
-    cb =>
-      db('users')
-        .insert(where)
-        .returning('*')
-        .asCallback(cb),
-    ([user], cb) => cb(null, user)
-  ], cb);
+export default where =>
+  db('users').insert(where).returning('*').then(_.first);

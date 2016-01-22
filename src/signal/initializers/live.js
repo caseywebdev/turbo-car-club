@@ -21,7 +21,15 @@ const sockets = {};
 
 server.on('connection', ws => {
   const socket = new Live({socket: ws});
-  _.each(LISTENERS, (cb, name) => socket.on(name, _.partial(cb, socket)));
+  _.each(LISTENERS, (cb, name) =>
+    socket.on(name, (params, done) =>
+      Promise
+        .resolve({socket, params})
+        .then(cb)
+        .then(res => res === undefined || done(null, res))
+        .catch(done)
+    )
+  );
   socket.trigger('open');
 });
 

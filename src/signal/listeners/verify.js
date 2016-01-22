@@ -1,6 +1,4 @@
-import _ from 'underscore';
 import app from '..';
-import async from 'async';
 import config from '../config';
 import findOrCreateUser from '../utils/find-or-create-user';
 import log from '../utils/log';
@@ -14,25 +12,24 @@ const {
   verifyKeyMaxAge
 } = config;
 
-export default (socket, token, cb) => {
+export default ({socket, params: token}) => {
   const data = verify(key, 'verify', token, verifyKeyMaxAge);
-  if (!data) return cb(invalidKey);
+  if (!data) throw invalidKey;
   const {emailAddress} = data;
-  async.waterfall([
-    _.partial(findOrCreateUser, {emailAddress}),
-    ({id, signedInAt}, _cb) => {
+  return findOrCreateUser({emailAddress})
+    .then(({id, signedInAt}) => {
       if (signedInAt) signedInAt = signedInAt.toISOString();
-      if (signedInAt !== data.signedInAt) return cb(invalidKey);
-      updateSignedInAt(id, _cb);
-    }
-  ], (er, user) => {
-    if (er) {
-      log.error(er);
-      return cb(unknown);
-    }
-    const authToken = sign(key, 'auth', {userId: user.id});
-    const origin = app.live.sockets[data.socketId];
-    if (origin && origin !== socket) origin.send('auth', authToken);
-    cb(null, authToken);
-  });
+      if (signedInAt !== data.signedInAt) throw invalidKey;
+      return updateSignedInAt(id)
+        .then(user => {
+          const authToken = sign(key, 'auth', {userId: user.id});
+          const origin = app.live.sockets[data.socketId];
+          if (origin && origin !== socket) origin.send('auth', authToken);
+          return authToken;
+        })
+        .catch(er => {
+          log.error(er);
+          throw unknown;
+        });
+    });
 };

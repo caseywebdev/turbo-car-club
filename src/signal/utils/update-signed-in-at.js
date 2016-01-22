@@ -1,13 +1,9 @@
-import async from 'async';
+import _ from 'underscore';
 import db from './db';
 
-export default (id, cb) =>
-  async.waterfall([
-    cb =>
-      db('users')
-        .where({id})
-        .update({signedInAt: new Date()})
-        .returning('*')
-        .asCallback(cb),
-    ([user], cb) => cb(null, user)
-  ], cb);
+export default id =>
+  db('users')
+    .where({id})
+    .update({signedInAt: new Date()})
+    .returning('*')
+    .then(_.first);

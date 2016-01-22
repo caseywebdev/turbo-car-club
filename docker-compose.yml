@@ -70,8 +70,6 @@ host:
   <<: *shared
   links:
     - signal
-  ports:
-    - '1338:80'
   environment:
     KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInJlZ2lvbiI6IkxvY2FsIiwibmFtZSI6Ikhvc3QiLCJ1cmwiOiJ3czovL2RvY2tlcjoxMzM4IiwiaWF0IjoxNDUzMDQ1MTUyLCJzdWIiOiJrZXkifQ.FUB1-Z2yZZ6o3vCeS5fyAbtxciyj3cJkVDmWhpHCVfc
     SIGNAL_URL: ws://signal

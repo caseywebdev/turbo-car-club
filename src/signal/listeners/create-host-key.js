@@ -8,11 +8,10 @@ const REGION_REQUIRED = new Error('Region is required');
 const NAME_REQUIRED = new Error('Name is required');
 const URL_REQUIRED = new Error('URL is required');
 
-export default ({userId}, options, cb) => {
-  let {region, name, url} = options || {};
-  if (!userId) return cb(authRequired);
-  if (!(region = _str.clean(region))) return cb(REGION_REQUIRED);
-  if (!(name = _str.clean(name))) return cb(NAME_REQUIRED);
-  if (!(url = _str.clean(url))) return cb(URL_REQUIRED);
-  cb(null, sign(key, 'key', {userId, region, name, url}));
+export default ({socket: {userId}, params: {region, name, url} = {}}) => {
+  if (!userId) throw authRequired;
+  if (!(region = _str.clean(region))) throw REGION_REQUIRED;
+  if (!(name = _str.clean(name))) throw NAME_REQUIRED;
+  if (!(url = _str.clean(url))) throw URL_REQUIRED;
+  return sign(key, 'key', {userId, region, name, url});
 };

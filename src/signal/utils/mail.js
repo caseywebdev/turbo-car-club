@@ -9,14 +9,15 @@ transport.use('compile', markdown());
 
 const {enabled, from} = config.mail;
 
-export default (options, cb) => {
+export default options => {
   options = {...options, from};
-  if (enabled) return transport.sendMail(options, cb);
+  const {to, subject, markdown} = options;
+  if (enabled) return transport.sendMail(options);
   log.info(`
 MAIL
-TO ${JSON.stringify(options.to)}
-FROM ${JSON.stringify(options.from)}
-${options.subject}
-${options.markdown}`);
-  cb();
+TO ${JSON.stringify(to)}
+FROM ${JSON.stringify(from)}
+${subject}
+${markdown}`);
+  return Promise.resolve();
 };

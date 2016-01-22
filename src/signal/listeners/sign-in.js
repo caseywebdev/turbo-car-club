@@ -1,5 +1,3 @@
-import _ from 'underscore';
-import async from 'async';
 import config from '../config';
 import findUser from '../utils/find-user';
 import sign from '../../shared/utils/sign';
@@ -8,10 +6,9 @@ import mail from '../utils/mail';
 
 const {key} = config;
 
-export default (socket, emailAddress, cb) =>
-  async.waterfall([
-    _.partial(findUser, {emailAddress}),
-    ({signedInAt} = {}, cb) =>
+export default ({socket, params: emailAddress}) =>
+  findUser({emailAddress})
+    .then(({signedInAt} = {}) =>
       mail({
         to: emailAddress,
         subject: 'Sign in to Turbo Car Club',
@@ -22,5 +19,5 @@ export default (socket, emailAddress, cb) =>
             socketId: socket.id
           })
         })
-      }, cb)
-  ], cb);
+      })
+    );

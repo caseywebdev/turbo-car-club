@@ -9,7 +9,7 @@ import {
 import getHosts from '../utils/get-hosts';
 import findUser from '../utils/find-user';
 
-var userType = new GraphQLObjectType({
+const User = new GraphQLObjectType({
   name: 'User',
   fields: () => ({
     id: {type: GraphQLID},
@@ -18,25 +18,22 @@ var userType = new GraphQLObjectType({
     signedInAt: {type: GraphQLString},
     createdAt: {type: GraphQLString},
     availableHosts: {
-      type: new GraphQLList(hostType),
-      resolve: () =>
-        new Promise((resolve, reject) =>
-          getHosts((er, hosts) => er ? reject(er) : resolve(hosts))
-        )
+      type: new GraphQLList(Host),
+      resolve: getHosts
     }
   })
 });
 
-var hostType = new GraphQLObjectType({
+const Host = new GraphQLObjectType({
   name: 'Host',
   fields: () => ({
-    id: {
-      type: GraphQLID,
-      resolve: ({user: {id}, region, name}) => `${id}/${region}/${name}`
-    },
+    id: {type: GraphQLID},
     name: {type: GraphQLString},
     region: {type: GraphQLString},
-    user: {type: userType}
+    user: {
+      type: User,
+      resolve: ({userId: id}) => findUser({id})
+    }
   })
 });
 
@@ -47,14 +44,9 @@ export default new GraphQLSchema({
     name: 'Query',
     fields: () => ({
       viewer: {
-        type: userType,
-        resolve: ({socket}) =>
-          socket.userId ?
-          new Promise((resolve, reject) =>
-            findUser({id: socket.userId}, (er, user) =>
-              er ? reject(er) : resolve(user)
-            )
-          ) : ANONYMOUS_USER
+        type: User,
+        resolve: ({socket: {userId: id}}) =>
+          id ? findUser({id}) : ANONYMOUS_USER
       }
     })
   })
