@@ -21,10 +21,10 @@ linters:
     severity: error
 
   DeclarationOrder:
-    severity: warn
+    severity: warning
 
   DuplicateProperty:
-    severity: warn
+    severity: warning
 
   ElsePlacement:
     enabled: false
@@ -50,10 +50,10 @@ linters:
     severity: error
 
   IdSelector:
-    severity: warn
+    severity: warning
 
   ImportantRule:
-    severity: warn
+    severity: warning
 
   ImportPath:
     severity: error
@@ -71,7 +71,7 @@ linters:
     style: exclude_zero
 
   MergeableSelector:
-    severity: warn
+    severity: warning
     force_nesting: false
 
   NameFormat:
@@ -80,11 +80,11 @@ linters:
     convention: hyphenated_lowercase
 
   NestingDepth:
-    severity: warn
+    severity: warning
     max_depth: 3
 
   PlaceholderInExtend:
-    severity: warn
+    severity: warning
 
   PropertyCount:
     enabled: false
@@ -111,13 +111,13 @@ linters:
     extra_properties: []
 
   QualifyingElement:
-    severity: warn
+    severity: warning
     allow_element_with_attribute: false
     allow_element_with_class: false
     allow_element_with_id: false
 
   SelectorDepth:
-    severity: warn
+    severity: warning
     max_depth: 3
 
   SelectorFormat:
