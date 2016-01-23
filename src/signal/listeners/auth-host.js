@@ -14,7 +14,7 @@ export default ({socket, params: token}) => {
   if (app.live.sockets[id]) throw new Error(`Host ${id} is already online`);
 
   socket.host = {id, key: token, ...data};
-  log.info(`${socket.id} signed in as host ${id} at ${data.url}`);
+  log.info(`${socket.id} signed in as host ${id}`);
   delete app.live.sockets[socket.id];
   app.live.sockets[socket.id = id] = socket;
   return true;
