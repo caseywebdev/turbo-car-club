@@ -29,15 +29,15 @@ const Host = new GraphQLObjectType({
   fields: () => ({
     id: {type: GraphQLID},
     name: {type: GraphQLString},
-    region: {type: GraphQLString},
-    user: {
+    owner: {
       type: User,
-      resolve: ({userId: id}) => findUser({id})
+      resolve: ({ownerId: id}) =>
+        findUser({id}).then(user => user || ANONYMOUS_USER)
     }
   })
 });
 
-const ANONYMOUS_USER = {id: 0};
+const ANONYMOUS_USER = {id: 0, name: 'Anonymous'};
 
 export default new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -46,7 +46,9 @@ export default new GraphQLSchema({
       viewer: {
         type: User,
         resolve: ({socket: {userId: id}}) =>
-          id ? findUser({id}) : ANONYMOUS_USER
+          id ?
+          findUser({id}).then(user => user || ANONYMOUS_USER) :
+          ANONYMOUS_USER
       }
     })
   })

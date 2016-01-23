@@ -2,7 +2,7 @@
 !bin
 !src
 !.eslintrc
-!.scss-lint.yml
+!.sass-lint.yml
 !cogs-client.js
 !cogs-server.js
 !Dockerfile

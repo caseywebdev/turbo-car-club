@@ -10,7 +10,7 @@ const renderHost = (host, key) => <Host {...{host, key}} />;
 export default Relay.createContainer(
   ({hosts}) =>
     <table>
-      <thead><tr><th>Owner</th><th>Region</th><th>Name</th></tr></thead>
+      <thead><tr><th>Owner</th><th>Name</th></tr></thead>
       <tbody>{_.map(hosts, renderHost)}</tbody>
     </table>,
   {

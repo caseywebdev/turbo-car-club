@@ -1,8 +1,8 @@
 data:
-  image: &image quay.io/turbocarclub/turbo-car-club:0.0.14
+  image: &image quay.io/turbocarclub/turbo-car-club:0.0.15
   volumes:
     - ./.eslintrc:/code/.eslintrc
-    - ./.scss-lint.yml:/code/.scss-lint.yml
+    - ./.sass-lint.yml:/code/.sass-lint.yml
     - ./bin:/code/bin
     - ./cogs-client.js:/code/cogs-client.js
     - ./cogs-server.js:/code/cogs-server.js
@@ -71,6 +71,6 @@ host:
   links:
     - signal
   environment:
-    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInJlZ2lvbiI6IkxvY2FsIiwibmFtZSI6Ikhvc3QiLCJ1cmwiOiJ3czovL2RvY2tlcjoxMzM4IiwiaWF0IjoxNDUzMDQ1MTUyLCJzdWIiOiJrZXkifQ.FUB1-Z2yZZ6o3vCeS5fyAbtxciyj3cJkVDmWhpHCVfc
+    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvd25lcklkIjoxLCJuYW1lIjoiRG9ja2VyIiwiaWF0IjoxNDUzNTEwMjM0LCJzdWIiOiJrZXkifQ.ikszUv9LNMr2E56xbksZPVFwYz1UnEjSYVwRGhu2xo8
     SIGNAL_URL: ws://signal
   command: make host-w

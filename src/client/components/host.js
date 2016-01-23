@@ -16,12 +16,10 @@ const setHost = id => {
 };
 
 export default Relay.createContainer(
-  ({host: {id, user, region, name}}) =>
+  ({host: {id, owner, name}}) =>
     setHost(id) ||
     <tr>
-      <td>{id}</td>
-      <td>{getUserDisplayName(user)}</td>
-      <td>{region}</td>
+      <td>{getUserDisplayName(owner)}</td>
       <td>{name}</td>
     </tr>,
   {
@@ -29,12 +27,11 @@ export default Relay.createContainer(
       host: () => Relay.QL`
         fragment on Host {
           id,
-          user {
+          name,
+          owner {
             id,
             name
-          },
-          name,
-          region
+          }
         }
       `
     }

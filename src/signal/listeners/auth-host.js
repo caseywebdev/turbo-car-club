@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import app from '..';
 import config from '../config';
 import log from '../utils/log';
@@ -10,13 +9,13 @@ export default ({socket, params: token}) => {
   const data = verify(key, 'host', token);
   if (!data) throw invalidKey;
 
-  const {userId, region, name} = data;
-  const unique = `${userId}/${region}/${name}`;
-  if (_.any(_.map(app.live.sockets, 'host'), {userId, region, name})) {
-    throw new Error(`Host ${unique} is already online`);
-  }
+  const {ownerId, name} = data;
+  const id = `${ownerId}/${name}`;
+  if (app.live.sockets[id]) throw new Error(`Host ${id} is already online`);
 
-  socket.host = {id: socket.id, key: token, ...data};
-  log.info(`${socket.id} signed in as host ${unique} at ${data.url}`);
+  socket.host = {id, key: token, ...data};
+  log.info(`${socket.id} signed in as host ${id} at ${data.url}`);
+  delete app.live.sockets[socket.id];
+  app.live.sockets[socket.id = id] = socket;
   return true;
 };
