@@ -9,10 +9,10 @@ const renderHost = (host, key) => <Host {...{host, key}} />;
 
 export default Relay.createContainer(
   ({hosts}) =>
-    <table>
-      <thead><tr><th>Owner</th><th>Name</th></tr></thead>
-      <tbody>{_.map(hosts, renderHost)}</tbody>
-    </table>,
+    <div>
+      <div>Hosts</div>
+      {_.map(hosts, renderHost)}
+    </div>,
   {
     fragments: {
       hosts: () => Relay.QL`

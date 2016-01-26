@@ -3,6 +3,7 @@
   "dependencies": {
     "ammo.js": "0.0.9",
     "graphql": "0.4.14",
+    "graphql-relay": "0.3.6",
     "jsonwebtoken": "5.5.4",
     "knex": "0.9.0",
     "live-socket": "0.10.5",

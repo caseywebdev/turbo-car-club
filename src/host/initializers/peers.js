@@ -1,4 +1,4 @@
-import _ from 'underscore';
+// import _ from 'underscore';
 import live from '../utils/live';
 import Peer from '../../shared/peer';
 
@@ -18,4 +18,4 @@ live.on('signal', ({id, data}) => getPeer(id).signal(data));
 
 export default {peers};
 
-setInterval(() => _.invoke(peers, 'send', 'u', Date.now()), 1000);
+// setInterval(() => _.invoke(peers, 'send', 'u', Date.now()), 1000);

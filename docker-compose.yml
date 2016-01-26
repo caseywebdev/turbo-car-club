@@ -63,11 +63,29 @@ signal:
     CLIENT_URL: http://docker
   command: make signal-w
 
-host:
+larry:
   <<: *shared
   links:
     - signal
   environment:
-    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvd25lcklkIjoxLCJuYW1lIjoiRG9ja2VyIiwiaWF0IjoxNDUzNTEwMjM0LCJzdWIiOiJrZXkifQ.ikszUv9LNMr2E56xbksZPVFwYz1UnEjSYVwRGhu2xo8
+    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvd25lcklkIjoxLCJuYW1lIjoiTGFycnkiLCJpYXQiOjE0NTM2MDAzNjgsInN1YiI6ImtleSJ9.xG2GFwbE6jgyjOmMYMd733cjAorzBr-1i1e2JlHIqGc
+    SIGNAL_URL: ws://signal
+  command: make host-w
+
+curly:
+  <<: *shared
+  links:
+    - signal
+  environment:
+    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvd25lcklkIjoxLCJuYW1lIjoiQ3VybHkiLCJpYXQiOjE0NTM2MDAzODUsInN1YiI6ImtleSJ9.FuhNt3a12hfCmcMlaI6X7z0CPDSqLN3MCwGhJHpZY4c
+    SIGNAL_URL: ws://signal
+  command: make host-w
+
+mo:
+  <<: *shared
+  links:
+    - signal
+  environment:
+    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvd25lcklkIjoxLCJuYW1lIjoiTW8iLCJpYXQiOjE0NTM2MDA0MDEsInN1YiI6ImtleSJ9.i-Rb6RxSylQpXOqyf7uGyE5LmzMiXU6gPDsm6pjP4K8
     SIGNAL_URL: ws://signal
   command: make host-w
