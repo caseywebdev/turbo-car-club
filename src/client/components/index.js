@@ -1,5 +1,3 @@
-// = link src/signal/data/schema.json
-
 import React from 'react';
 import Relay from 'react-relay';
 import Hosts from './hosts';

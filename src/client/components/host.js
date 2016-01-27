@@ -1,5 +1,3 @@
-// = link src/signal/data/schema.json
-
 import cx from '../utils/cx';
 import getUserDisplayName from '../../shared/utils/get-user-display-name';
 import React from 'react';

@@ -53,15 +53,7 @@ module.exports = {
     {
       name: 'babel',
       only: 'src/**/*.+(js|json|frag|vert)',
-      options: {
-        presets: ['es2015', 'stage-0', 'react'],
-        plugins: [
-          require('babel-relay-plugin')(
-            require('./src/signal/data/schema.json'),
-            {abortOnError: true}
-          )
-        ]
-      }
+      options: {presets: ['es2015', 'stage-0', 'react']}
     },
     {
       name: 'concat-commonjs',

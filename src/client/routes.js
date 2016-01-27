@@ -1,5 +1,3 @@
-// = link src/signal/data/schema.json
-
 import CreateHostKey from './components/sign-host';
 import Layout from './components/layout';
 import Index from './components/index';

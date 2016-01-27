@@ -1,5 +1,3 @@
-// = link src/signal/data/schema.json
-
 import _ from 'underscore';
 import Host from './host';
 import React from 'react';
