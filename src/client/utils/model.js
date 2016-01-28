@@ -14,9 +14,16 @@ const req = (method, ...args) =>
   });
 
 export default new falcor.Model({
+  errorSelector: (__, error) => ({
+    ...error,
+    value:
+      _.isObject(error.value) ?
+      _.extend(new Error(), error.value) :
+      new Error(error.value)
+  }),
   source: _.reduce(
     ['get', 'set', 'call'],
     (obj, method) => (obj[method] = _.partial(req, method)) && obj,
     {}
   )
-});
+}).treatErrorsAsValues();

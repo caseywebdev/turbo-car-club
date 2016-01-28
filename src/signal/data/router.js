@@ -33,14 +33,16 @@ const routes = _.map([{
 }, {
   route: 'usersById[{integers}]["id","name"]',
   get: (__, {1: ids, 2: keys}) =>
-    db('users').select('id', 'name').whereIn('id', ids).then(users =>
-      _.flatten(users, user =>
-        _.map(keys, key => ({
-          path: ['usersById', user.id, key],
-          value: user[key]
-        }))
-      )
-    )
+    db('users').select('id', 'name').whereIn('id', ids).then(users => {
+      if (Math.random()) throw new Error('random error!');
+      return _.flatten(
+        _.map(users, user =>
+          _.map(keys, key =>
+            ({path: ['usersById', user.id, key], value: user[key]})
+          )
+        )
+      );
+    })
 }], ({route, ...rest}) => ({route, ..._.mapObject(rest, purify)}));
 
 export default class extends Router.createClass(routes) {

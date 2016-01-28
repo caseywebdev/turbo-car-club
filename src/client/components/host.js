@@ -1,7 +1,6 @@
 import cx from '../utils/cx';
 import getUserDisplayName from '../../shared/utils/get-user-display-name';
 import React from 'react';
-import Relay from 'react-relay';
 // import Peer from '../../shared/peer';
 // import live from '../utils/live';
 
@@ -16,23 +15,42 @@ import Relay from 'react-relay';
 
 const {host: cxl} = cx;
 
-export default Relay.createContainer(
-  ({host: {owner, name}}) =>
-    <div className={cxl.root}>
-      <div className={cxl.name}>{name}</div>
-      <div className={cxl.owner}>{getUserDisplayName(owner)}</div>
-    </div>,
-  {
-    fragments: {
-      host: () => Relay.QL`
-        fragment on Host {
-          name,
-          owner {
-            id,
-            name
-          }
-        }
-      `
-    }
+export default ({host: {owner, name}}) =>
+  <div className={cxl.root}>
+    <div className={cxl.name}>{name}</div>
+    <div className={cxl.owner}>{getUserDisplayName(owner)}</div>
+  </div>;
+
+// class FalcorComponent extends Component {
+//   constructor(props) {
+//     super(props);
+//     const {root} = this.construtor;
+//     root;
+//   }
+// }
+
+class User {
+  static fragment = () => ['id', 'name'];
+}
+
+class Host {
+  static fragment = () =>
+    ['name', {$type: 'join', value: {owner: [User.fragment()]}}];
+}
+
+class Hosts {
+  static fragment = () => ['hosts', {from: 0, length: 10}, Host.fragment()];
+}
+
+class Main {
+  static fragment = () => ['id', 'name'];
+
+  static root = ({id}) => ({
+    user: ['usersById', id, [User.fragment()]],
+    hosts: Hosts.fragment()
+  });
+
+  constructor() {
+
   }
-);
+}

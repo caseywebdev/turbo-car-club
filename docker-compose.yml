@@ -14,8 +14,16 @@ data:
     - /code/node_modules
   command: 'true'
 
+dbdata:
+  image: busybox:1.24.1
+  volumes:
+    - /var/lib/postgresql/data
+  command: 'true'
+
 postgres:
   image: postgres:9.4.5
+  volumes_from:
+    - dbdata
   environment:
     POSTGRES_USER: postgres
     POSTGRES_PASSWORD: postgres
