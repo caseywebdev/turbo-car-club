@@ -1,28 +1,25 @@
 import './utils/set-global';
 import './utils/livereload';
-// import React from 'react';
-// import {render} from 'react-dom';
-// import {Router, hashHistory as history} from 'react-router';
-// import routes from './routes';
-//
-// render(<Router {...{history, routes}} />, document.getElementById('main'));
+import React from 'react';
+import {render} from 'react-dom';
+import {Router, hashHistory as history} from 'react-router';
+import routes from './routes';
 
-import model from './utils/model';
-window.model = model;
+render(<Router {...{history, routes}} />, document.getElementById('main'));
+
 // import live from './utils/live';
 //
 // live.send('sign-in', 'c@sey.me', (er) => {
 //   console.log(er || 'Email sent');
 // });
 
-import resolvePath from './utils/resolve-path';
+// import Peer from '../../shared/peer';
 
-model.get(...resolvePath([
-  'hosts',
-  [{from: 0, to: 9}, 'length'],
-  [
-    'id',
-    'name',
-    {$type: 'join', value: {owner: [['id', 'name']]}}
-  ]
-])).then(console.log.bind(console));
+// live.on('signal', ({data}) => window.host.signal(data));
+// const setHost = id => {
+//   window.host = new Peer()
+//     .on('signal', data => live.send('signal', {id, data}))
+//     .on('u', t => console.log(Date.now(), t))
+//     .on('close', () => setHost(id))
+//     .call();
+// };

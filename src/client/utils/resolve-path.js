@@ -1,5 +1,4 @@
 import _ from 'underscore';
-import stringify from '../../shared/utils/stringify';
 
 const resolvePath = (path, prefix = []) => {
   if (!path.length) return [prefix];
@@ -20,9 +19,7 @@ const resolvePath = (path, prefix = []) => {
     , []);
   }
 
-  if ($type === 'params') first = stringify(first.value);
-
   return resolvePath(rest, prefix.concat(first));
 };
 
-export default resolvePath;
+export default path => resolvePath(path);

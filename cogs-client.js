@@ -60,8 +60,7 @@ module.exports = {
       only: '**/*.+(js|json|vert|frag)',
       options: {
         entry: 'src/client/index.js',
-        extensions: ['.js', '.json', '.vert', '.frag'],
-        ignore: ['domain']
+        extensions: ['.js', '.json', '.vert', '.frag']
       }
     },
     MINIFY ? {

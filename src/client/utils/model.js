@@ -26,4 +26,4 @@ export default new falcor.Model({
     (obj, method) => (obj[method] = _.partial(req, method)) && obj,
     {}
   )
-}).treatErrorsAsValues();
+}).batch().treatErrorsAsValues();

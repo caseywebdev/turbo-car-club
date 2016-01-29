@@ -1,23 +1,28 @@
 import _ from 'underscore';
+import createContainer from '../utils/create-container';
 import Host from './host';
 import React from 'react';
-import Relay from 'react-relay';
 
 const renderHost = (host, key) => <Host {...{host, key}} />;
 
-export default Relay.createContainer(
-  ({hosts}) =>
+export default createContainer(
+  ({isLoading, hosts}) =>
     <div>
       <div>Hosts</div>
-      {_.map(hosts, renderHost)}
+      {_.map(_.compact(hosts), renderHost)}
+      {isLoading ? 'Loading...' : null}
     </div>,
   {
-    fragments: {
-      hosts: () => Relay.QL`
-        fragment on Host @relay(plural: true) {
-          ${Host.getFragment('host')}
-        }
-      `
-    }
+    defaultParams: {
+      range: {
+        length: 10
+      }
+    },
+
+    queries: ({range}) => ({
+      hosts: [
+        ['hosts', range, Host.fragments().host]
+      ]
+    })
   }
 );
