@@ -1,10 +1,11 @@
-import app from '..';
+import authSocket from '../utils/auth-socket';
 import Router from '../data/router';
 
-export default ({socket, params: {method, args}}) =>
-  new Promise(resolve =>
+export default ({socket, params: {auth, method, args}}) => {
+  authSocket({socket, auth});
+  return new Promise(resolve =>
     (new Router({
-      socket,
-      sockets: app.live.sockets
+      userId: socket.userId
     }))[method](...args).subscribe(resolve)
   );
+};

@@ -1,4 +1,9 @@
 import React from 'react';
 import Hosts from './hosts';
+import User from './user';
 
-export default () => <div><Hosts /></div>;
+export default () =>
+  <div>
+    <User />
+    <Hosts />
+  </div>;

@@ -1,16 +1,18 @@
 import _ from 'underscore';
+import db from './db';
 import falcor from 'falcor';
 import live from './live';
-import Observable from '../../shared/utils/observable';
+import {Observable} from 'rx';
 
 const req = (method, ...args) =>
   Observable.create(observer => {
-    live.send('jsong', {method, args}, (er, res) => {
+    const auth = db.get('auth');
+    live.send('jsong', {auth, method, args}, (er, res) => {
       if (er) return observer.onError(er);
       observer.onNext(res);
       observer.onCompleted();
     });
-    return _.noop();
+    return _.noop;
   });
 
 export default new falcor.Model({

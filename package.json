@@ -50,6 +50,7 @@
     "watchy": "0.6.5"
   },
   "browser": {
+    "rx": "./node_modules/rx/dist/rx.js",
     "wrtc": "./src/client/utils/window.js"
   }
 }

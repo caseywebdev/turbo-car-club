@@ -10,7 +10,7 @@ export default ({socket, params: token}) => {
   if (!data) throw invalidKey;
 
   const {ownerId, name} = data;
-  const id = `${ownerId}/${name}`;
+  const id = `${ownerId}-${name}`;
   if (app.live.sockets[id]) throw new Error(`Host ${id} is already online`);
 
   socket.host = {id, key: token, ...data};
