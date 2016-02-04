@@ -2,8 +2,6 @@
   "private": true,
   "dependencies": {
     "ammo.js": "0.0.9",
-    "falcor-router": "0.2.12",
-    "falcor-json-graph": "1.1.7",
     "jsonwebtoken": "5.5.4",
     "knex": "0.9.0",
     "live-socket": "0.10.5",
@@ -41,7 +39,6 @@
     "cogs": "2.0.7",
     "eslint-plugin-react": "3.16.1",
     "eslint": "1.10.3",
-    "falcor": "0.1.15",
     "livereload": "0.4.1",
     "react-dom": "0.14.7",
     "react-router": "2.0.0-rc5",
@@ -50,7 +47,6 @@
     "watchy": "0.6.5"
   },
   "browser": {
-    "rx": "./node_modules/rx/dist/rx.js",
     "wrtc": "./src/client/utils/window.js"
   }
 }

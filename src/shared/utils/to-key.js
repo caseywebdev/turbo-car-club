@@ -5,9 +5,4 @@ const sortObj = obj =>
   _.isObject(obj) ? _.sortBy(_.map(obj, (val, key) => [key, sortObj(val)]), 0) :
   obj;
 
-const stringifyParams = obj =>
-  _.isArray(obj) ? _.map(obj, stringifyParams) :
-  _.isObject(obj) ? JSON.stringify(sortObj(obj)) :
-  obj;
-
-export default stringifyParams;
+export default obj => _.isObject(obj) ? JSON.stringify(sortObj(obj)) : obj;

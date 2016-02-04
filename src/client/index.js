@@ -26,102 +26,151 @@ import './utils/livereload';
 
 import _ from 'underscore';
 
-const _flattenPath = (path, prefix = []) => {
+const queryToPaths = (query, path = []) => {
   let i = 0;
-  const l = path.length;
-  while (i < l && !_.isArray(path[i])) ++i;
+  const l = query.length;
+  while (i < l && !_.isArray(query[i])) ++i;
 
-  if (i === l) return [prefix.concat(path)];
+  if (i === l) return [path.concat(query)];
 
   const paths = [];
-  prefix = prefix.concat(path.slice(0, i));
-  const first = path[i];
-  const rest = path.slice(i + 1);
+  path = path.concat(query.slice(0, i));
+  const first = query[i];
+  const rest = query.slice(i + 1);
   for (let i = 0, l = first.length; i < l; ++i) {
-    paths.push.apply(paths, _flattenPath([].concat(first[i], rest), prefix));
+    paths.push.apply(paths, queryToPaths([].concat(first[i], rest), path));
   }
   return paths;
 };
 
-const flattenPath = path => _flattenPath(path);
-
-const flattenPaths = paths => {
-  const flattened = [];
-  for (let i = 0, l = paths.length; i < l; ++i) {
-    flattened.push.apply(flattened, flattenPath(paths[i]));
+const queriesToPaths = queries => {
+  const paths = [];
+  for (let i = 0, l = queries.length; i < l; ++i) {
+    paths.push.apply(paths, queryToPaths(queries[i]));
   }
-  return flattened;
+  return paths;
 };
 
-const stringToPath = path => _.invoke(path.split('.'), 'split', '|');
+const routeToQuery = path => _.invoke(path.split('.'), 'split', '|');
 
-const pathToString = path => path.join('.');
+const pathToRoute = path => path.join('.');
 
-const querySegmentToRouteSegment = segment =>
+const pathSegmentToRouteQuerySegment = segment =>
   _.isObject(segment) ? '$params' : [segment, '$key'];
 
-const queryToRoutes = query => {
-  const {length} = query;
-  const flattened = flattenPath(_.map(query, querySegmentToRouteSegment));
-  return _.unique(_.reduce(_.range(length), (routes, n) => routes.concat(
-    _.map(flattened, route => pathToString(route.slice(0, length - n)))
-  ), [])).concat('$fallback');
+const getRouteForPath = (router, path) => {
+  for (let i = path.length; i > 0; --i) {
+    const paths =
+      queryToPaths(_.map(path.slice(0, i), pathSegmentToRouteQuerySegment));
+    for (let j = 0, l = paths.length; j < l; ++j) {
+      const route = router[pathToRoute(paths[j])];
+      if (route) return route;
+    }
+  }
+  return router.$fallback;
 };
-
-const addRoute = (router, fn, path) =>
-  _.reduce(
-    flattenPath(stringToPath(path)),
-    (router, path) => ({...router, [pathToString(path)]: fn}),
-    router
-  );
 
 const ROUTE_NOT_FOUND_ERROR = new Error('No matching route found');
 const EXPENSIVE_QUERY_ERROR = new Error('Query is too expensive');
 const DEFAULT_FALLBACK = () => { throw ROUTE_NOT_FOUND_ERROR; };
 
-const createRouter = routes =>
-  _.reduce(_.extend({$fallback: DEFAULT_FALLBACK}, routes), addRoute, {});
+const createRouter = routes => {
+  routes = _.extend({$fallback: DEFAULT_FALLBACK}, routes);
+  const router = {};
+  for (let route in routes) {
+    const fn = routes[route];
+    const paths = queryToPaths(routeToQuery(route));
+    for (let i = 0, l = paths.length; i < l; ++i) {
+      const path = paths[i];
+      const route = pathToRoute(path);
+      const arity = route === '$fallback' ? 0 : path.length;
+      router[route] = {fn, arity};
+    }
+  }
+  return router;
+};
 
-const run = ({maxCost, router, queries, context}) =>
+const run = ({maxCost, router, queries, context, data = {}}) =>
   Promise
     .resolve()
     .then(() => limitQueriesCost(queries, maxCost))
-    .then(() =>
-      _.reduce(flattenPaths(queries), ({runs, queries}, query) => {
-        const route = _.find(queryToRoutes(query), _.partial(_.has, router));
-        const routePath = stringToPath(route);
-        const arity = route === '$fallback' ? 0 : routePath.length;
-        if (arity && query.length > arity) queries.push(query);
-        const fn = router[route];
-        let run = _.find(runs, {fn});
-        if (!run) runs.push(run = {fn, args: {context, queries: []}});
-        const args = run.args;
-        args.queries.push(query);
-        _.times(arity, n => {
-          if (!args[n]) args[n] = [];
-          const arg = query[n];
-          args[n] = _.unique(_.sortBy(args[n].concat(
-            _.any(args[n], _.partial(_.isEqual, arg)) ? [] : arg
-          )), true);
+    .then(() => {
+      const tasks = [];
+      const incompletePaths = [];
+      const paths = queriesToPaths(queries);
+      for (let i = 0, l = paths.length; i < l; ++i) {
+        const path = paths[i];
+        const {fn, arity} = getRouteForPath(router, path);
+
+        if (path.length > arity && arity > 0) incompletePaths.push(path);
+
+        let task = _.find(tasks, {fn});
+        if (!task) {
+          task = {fn, arity, options: {context, data, paths: []}};
+          tasks.push(task);
+        }
+
+        const {options} = task;
+        options.paths.push(path);
+
+        for (let i = 0; i < arity; ++i) {
+          if (!options[i]) options[i] = [];
+          const arg = path[i];
+          if (_.any(options[i], _.partial(_.isEqual, arg))) continue;
+          options[i].push(arg);
+        }
+      }
+
+      return Promise.all(_.map(tasks, ({fn, arity, options}) => {
+        Promise.resolve(options).then(fn).then(updates => {
+          _.each(_.flatten([updates]), ({path, value}) =>
+            set(data, path, value)
+          );
+        }).catch(er => {
+          const {name, message} = er;
+          er = {$error: {name, message, ...er}};
+          _.each(options.paths, path => set(data, path.slice(0, arity), er));
         });
-        return {runs, queries};
-      }, {runs: [], queries: []})
-    );
+      })).then(() => {
+        const queries = _.reduce(incompletePaths, (queries, path) => {
+          const followed = followPath(data, path);
+          if (!_.isEqual(path, followed)) queries.push(followed);
+          return queries;
+        }, []);
+        if (!queries.length) return data;
+        return run({maxCost, router, queries, context, data});
+      });
+    });
 
 const router = createRouter({
   'hosts.$params.$key':
-    ({1: params}) => ({path: ['hosts', params, 0], value: 'Foo!'}),
+    ({1: params, 2: indices}) =>
+      _.map(params, params =>
+        _.map(indices, index => ({
+          path: ['hosts', params, index],
+          value: {$ref: ['hostsById', '1-Larry']}
+        }))
+      ),
   'hostsById.$key.id|name|owner':
-    ({context, 1: ids, 2: keys}) =>
-      context && ids && keys,
+    ({1: ids, 2: keys}) =>
+      _.map(ids, id =>
+        _.map(keys, key => ({
+          path: ['hostsById', id, key],
+          value: `Some value for ${id}-${key}`
+        }))
+      ),
   user:
     ({context: {userId}}) => {
       if (!userId) throw new Error('Auth required');
       return {path: ['user'], value: {$ref: ['usersById', userId]}};
     },
-  'usersByid.$key.id|name|emailAddress':
-    ({context, 1: ids, 2: keys}) =>
-      context && ids && keys
+  'usersById.$key.id|name|emailAddress':
+    ({1: ids, 2: keys}) =>
+      _.map(ids, id =>
+        _.map(keys, key =>
+          ({path: ['usersById', id, key], value: Math.random()})
+        )
+      )
 });
 
 const queries = [
@@ -217,74 +266,53 @@ const data = {
   }
 };
 
-import stringifyParams from '../shared/utils/stringify-params';
+import toKey from '../shared/utils/to-key';
 
-const resolveRefs = (obj, maxDepth, depth = 0) =>
-  !_.isObject(obj) ? obj :
-  _.isArray(obj) ? _.map(obj, _.partial(resolveRefs, _, maxDepth, depth)) :
-  obj.$ref ? get(obj.$ref, maxDepth, depth + 1) :
-  _.mapObject(obj, _.partial(resolveRefs, _, maxDepth, depth));
+const resolveRefs = (data, obj, maxDepth, depth = 0) => {
+  if (!_.isObject(obj)) return obj;
+
+  const iterator = _.partial(resolveRefs, data, _, maxDepth, depth);
+  if (_.isArray(obj)) return _.map(obj, iterator);
+
+  const {$error, $ref} = obj;
+  if ($error) return _.extend(new Error(), $error);
+  if ($ref) return get(data, $ref, maxDepth, depth + 1);
+
+  return _.mapObject(obj, iterator);
+};
 
 const walk = (data, path) => {
   let val = data;
   for (let i = 0, l = path.length; i < l && val != null; ++i) {
-    val = val[path[i]];
-    if (val && val.$ref) val = walk(data, val.$ref);
+    if (val = val[toKey(path[i])]) {
+      const {$ref} = val;
+      if ($ref) val = walk(data, $ref);
+    }
   }
   return val;
 };
 
-const get = (path, maxDepth = 3, depth = 0) => {
-  path = _.map(path, stringifyParams);
+const get = (data, path, maxDepth = 3, depth = 0) => {
   if (depth > maxDepth) return {$ref: path};
-  return resolveRefs(walk(data, path), maxDepth, depth);
+  return resolveRefs(data, walk(data, path), maxDepth, depth);
 };
-
-// const getBranch = path => {
-//   const root = {};
-//   for (let i = 0, l = path.length, cursor = root; i < l; ++i) {
-//     const val = getValue(path.slice(0, i + 1));
-//     if (val == null) break;
-//     cursor = cursor[path[i]] = i < l - 1 ? {} : val;
-//   }
-//   return root;
-// };
-//
-// const get = queries => {
-//   const obj = {};
-//   const paths = flattenPaths(stringifyParams(queries));
-//   for (let i = 0, l = paths.length; i < l; ++i) merge(obj, getBranch(paths[i]));
-//   return obj;
-// };
-//
-// const merge = (a, b) => {
-//   if (_.isObject(a) && _.isObject(b)) {
-//     for (let key in b) {
-//       if (key in a) merge(a[key], b[key]);
-//       else a[key] = b[key];
-//     }
-//   }
-//   return a;
-// };
 
 const followPath = (data, path) => {
   let val = data;
   for (let i = 0, l = path.length; i < l && val != null; ++i) {
-    val = val[path[i]];
-    if (val && val.$ref) {
-      return followPath(data, val.$ref.concat(path.slice(i + 1)));
+    if (val = val[toKey(path[i])]) {
+      const {$ref} = val;
+      if ($ref) return followPath(data, $ref.concat(path.slice(i + 1)));
     }
   }
   return path;
 };
 
-console.log(followPath(data, ['hosts', 0, 'id']));
-
 const set = (data, path, value) => {
-  path = followPath(data, _.map(path, stringifyParams));
+  path = followPath(data, path);
   let cursor = data;
   for (var i = 0, l = path.length; i < l; ++i) {
-    const key = path[i];
+    const key = toKey(path[i]);
     if (i === l - 1) return cursor[key] = value;
     if (cursor[key] == null) cursor[key] = {};
     cursor = cursor[key];
@@ -292,9 +320,7 @@ const set = (data, path, value) => {
 };
 
 set(data, ['foo', 'bar'], {$ref: ['you']});
-set(data, ['foo', 'baz'], {$ref: ['you']});
+set(data, ['foo', 'baz'], {$ref: ['hosts', {foo: 'bar'}, 0, 'owner']});
 set(data, ['foo', 'bar', 'name'], 'Casey');
-console.log(get(['foo']));
-console.log(data);
 
-console.log(get(['hosts', {foo: 'bar'}, 0]));
+console.log(get(data, ['hosts', {foo: 'bar'}, 0]));
