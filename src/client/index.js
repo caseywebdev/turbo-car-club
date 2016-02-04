@@ -26,10 +26,15 @@ import './utils/livereload';
 
 import _ from 'underscore';
 
+// const objToString = Object.prototype.toString;
+const isObject = obj => typeof obj === 'object' && obj !== null;
+// const isPojo = obj => objToString.apply(obj) === '[object Object]';
+const isArray = Array.isArray;
+
 const queryToPaths = (query, path = []) => {
   let i = 0;
   const l = query.length;
-  while (i < l && !_.isArray(query[i])) ++i;
+  while (i < l && !isArray(query[i])) ++i;
 
   if (i === l) return [path.concat(query)];
 
@@ -56,7 +61,7 @@ const routeToQuery = path => _.invoke(path.split('.'), 'split', '|');
 const pathToRoute = path => path.join('.');
 
 const pathSegmentToRouteQuerySegment = segment =>
-  _.isObject(segment) ? '$params' : [segment, '$key'];
+  isObject(segment) ? '$params' : [segment, '$key'];
 
 const getRouteForPath = (router, path) => {
   for (let i = path.length; i > 0; --i) {
@@ -90,7 +95,7 @@ const createRouter = routes => {
   return router;
 };
 
-const run = ({maxCost, router, queries, context, data = {}}) =>
+const run = ({maxCost, router, queries, context, pathValues = [], data = {}}) =>
   Promise
     .resolve()
     .then(() => limitQueriesCost(queries, maxCost))
@@ -121,25 +126,36 @@ const run = ({maxCost, router, queries, context, data = {}}) =>
         }
       }
 
-      return Promise.all(_.map(tasks, ({fn, arity, options}) => {
-        Promise.resolve(options).then(fn).then(updates => {
-          _.each(_.flatten([updates]), ({path, value}) =>
-            set(data, path, value)
-          );
-        }).catch(er => {
-          const {name, message} = er;
-          er = {$error: {name, message, ...er}};
-          _.each(options.paths, path => set(data, path.slice(0, arity), er));
+      return Promise
+        .all(_.map(tasks, ({fn, arity, options}) =>
+          Promise
+            .resolve(options)
+            .then(fn)
+            .catch(er => {
+              const {name, message} = er;
+              const value = {$error: {name, message, ...er}};
+              return _.map(options.paths, path => ({
+                path: path.slice(0, arity),
+                value
+              }));
+            })
+            .then(_pathValues => {
+              _pathValues = _.flatten([_pathValues]);
+              applyPathValues(data, _pathValues);
+              pathValues.push.apply(pathValues, _pathValues);
+            })
+        ))
+        .then(() => {
+          const queries = _.reduce(incompletePaths, (queries, path) => {
+            const resolved = resolvePath(data, path);
+            if (path !== resolved && get(data, resolved) === undefined) {
+              queries.push(resolved);
+            }
+            return queries;
+          }, []);
+          if (!queries.length) return pathValues;
+          return run({maxCost, router, queries, context, pathValues, data});
         });
-      })).then(() => {
-        const queries = _.reduce(incompletePaths, (queries, path) => {
-          const followed = followPath(data, path);
-          if (!_.isEqual(path, followed)) queries.push(followed);
-          return queries;
-        }, []);
-        if (!queries.length) return data;
-        return run({maxCost, router, queries, context, data});
-      });
     });
 
 const router = createRouter({
@@ -184,7 +200,7 @@ const router = createRouter({
 const limitQueryCost = (path, max, precost = 0) => {
   let i = 0;
   const l = path.length;
-  while (i < l && !_.isArray(path[i])) ++i;
+  while (i < l && !isArray(path[i])) ++i;
 
   if ((precost += i) > max) throw EXPENSIVE_QUERY_ERROR;
 
@@ -217,7 +233,7 @@ run({
     [
       'hosts',
       {online: true},
-      _.range(100),
+      _.range(10),
       [
         'id',
         ['name', ['first', 'last']],
@@ -228,8 +244,10 @@ run({
   ],
   context: {userId: 1}
 })
-  .then(res => {
-    console.log(merge(data, res));
+  .then(pathValues => {
+    console.log(pathValues);
+    applyPathValues(data, pathValues);
+    console.log(data);
     return run({
       maxCost: 10000,
       router,
@@ -237,7 +255,11 @@ run({
         ['user!', {name: 'Silly', id: 'bunny'}]
       ],
       context: {userId: 2}
-    }).then(res => console.log(res) || console.log(merge(data, res)));
+    }).then(pathValues => {
+      console.log(pathValues);
+      applyPathValues(data, pathValues);
+      console.log(data);
+    });
   })
   .catch(er => { console.error(er); });
 
@@ -285,10 +307,10 @@ const data = {
 import toKey from '../shared/utils/to-key';
 
 const resolveRefs = (data, obj, maxDepth, depth = 0) => {
-  if (!_.isObject(obj)) return obj;
+  if (!isObject(obj)) return obj;
 
   const iterator = _.partial(resolveRefs, data, _, maxDepth, depth);
-  if (_.isArray(obj)) return _.map(obj, iterator);
+  if (isArray(obj)) return _.map(obj, iterator);
 
   const {$error, $ref} = obj;
   if ($error) return _.extend(new Error(), $error);
@@ -301,7 +323,8 @@ const walk = (data, path) => {
   let val = data;
   for (let i = 0, l = path.length; i < l && val != null; ++i) {
     if (val = val[toKey(path[i])]) {
-      const {$ref} = val;
+      const {$error, $ref} = val;
+      if ($error) return _.extend(new Error(), $error);
       if ($ref) val = walk(data, $ref);
     }
   }
@@ -313,19 +336,19 @@ const get = (data, path, maxDepth = 3, depth = 0) => {
   return resolveRefs(data, walk(data, path), maxDepth, depth);
 };
 
-const followPath = (data, path) => {
+const resolvePath = (data, path) => {
   let val = data;
   for (let i = 0, l = path.length; i < l && val != null; ++i) {
     if (val = val[toKey(path[i])]) {
       const {$ref} = val;
-      if ($ref) return followPath(data, $ref.concat(path.slice(i + 1)));
+      if ($ref) return resolvePath(data, $ref.concat(path.slice(i + 1)));
     }
   }
   return path;
 };
 
 const set = (data, path, value) => {
-  path = followPath(data, path);
+  path = resolvePath(data, path.slice(0, -1)).concat(path.slice(-1));
   let cursor = data;
   for (var i = 0, l = path.length; i < l; ++i) {
     const key = toKey(path[i]);
@@ -335,14 +358,15 @@ const set = (data, path, value) => {
   }
 };
 
-const merge = (a, b) => {
-  if (_.isObject(a) && _.isObject(b)) {
-    for (let key in b) {
-      if (_.isObject(a[key]) && _.isObject(b[key])) merge(a[key], b[key]);
-      else a[key] = b[key];
-    }
+const applyPathValues = (data, pathValues) => {
+  for (let i = 0, l = pathValues.length; i < l; ++i) {
+    const {path, value} = pathValues[i];
+    set(data, path, value);
   }
-  return a;
 };
 
-console.log(merge({foo: {$ref: ['bar']}}, {foo: {$ref: ['baz']}}));
+// const merge = (a, b) => {
+//   if (!isPojo(a) || !isPojo(b)) return b;
+//   for (let key in b) a[key] = merge(a[key], b[key]);
+//   return a;
+// };
