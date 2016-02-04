@@ -170,22 +170,16 @@ const router = createRouter({
         _.map(keys, key =>
           ({path: ['usersById', id, key], value: Math.random()})
         )
+      ),
+  'user!.$params': ({context: {userId}, 1: params}) => {
+    if (!userId) throw new Error('Auth required');
+    return _.map(params, params =>
+      _.map(params, (val, key) =>
+        ({path: ['usersById', userId, key], value: val})
       )
+    ).concat({path: ['user'], value: {$ref: ['usersById', userId]}});
+  }
 });
-
-const queries = [
-  [
-    'hosts',
-    {online: true},
-    _.range(100),
-    [
-      'id',
-      ['name', ['first', 'last']],
-      ['owner', ['id', 'name']]
-    ]
-  ],
-  ['user', ['id', 'name']]
-];
 
 const limitQueryCost = (path, max, precost = 0) => {
   let i = 0;
@@ -219,10 +213,32 @@ const limitQueriesCost = (queries, max) => {
 run({
   maxCost: 10000,
   router,
-  queries,
+  queries: [
+    [
+      'hosts',
+      {online: true},
+      _.range(100),
+      [
+        'id',
+        ['name', ['first', 'last']],
+        ['owner', ['id', 'name']]
+      ]
+    ],
+    ['user', ['id', 'name']]
+  ],
   context: {userId: 1}
 })
-  .then(console.log.bind(console))
+  .then(res => {
+    console.log(merge(data, res));
+    return run({
+      maxCost: 10000,
+      router,
+      queries: [
+        ['user!', {name: 'Silly', id: 'bunny'}]
+      ],
+      context: {userId: 2}
+    }).then(res => console.log(res) || console.log(merge(data, res)));
+  })
   .catch(er => { console.error(er); });
 
 const data = {
@@ -319,8 +335,14 @@ const set = (data, path, value) => {
   }
 };
 
-set(data, ['foo', 'bar'], {$ref: ['you']});
-set(data, ['foo', 'baz'], {$ref: ['hosts', {foo: 'bar'}, 0, 'owner']});
-set(data, ['foo', 'bar', 'name'], 'Casey');
+const merge = (a, b) => {
+  if (_.isObject(a) && _.isObject(b)) {
+    for (let key in b) {
+      if (_.isObject(a[key]) && _.isObject(b[key])) merge(a[key], b[key]);
+      else a[key] = b[key];
+    }
+  }
+  return a;
+};
 
-console.log(get(data, ['hosts', {foo: 'bar'}, 0]));
+console.log(merge({foo: {$ref: ['bar']}}, {foo: {$ref: ['baz']}}));
