@@ -1,18 +1,18 @@
 import _ from 'underscore';
-import fs from 'fs';
 import Live from 'live-socket';
 import log from '../utils/log';
-import path from 'path';
 import ws from 'ws';
 
-const dir = path.resolve(__dirname, path.join('..', 'listeners'));
-const LISTENERS = _.reduce(fs.readdirSync(dir), (listeners, file) => {
-  if (file[0] !== '.') {
-    const basename = path.basename(file, path.extname(file));
-    listeners[basename] = require(path.join(dir, file)).default;
-  }
-  return listeners;
-}, {});
+import open from '../listeners/open';
+import close from '../listeners/close';
+import auth from '../listeners/auth';
+import authHost from '../listeners/auth-host';
+const LISTENERS = {
+  open,
+  close,
+  auth,
+  'auth-host': authHost
+};
 
 log.info(`Starting WebSocket server on port 80`);
 const server = new ws.Server({port: 80});
