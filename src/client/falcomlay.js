@@ -18,11 +18,11 @@ const flatten = arr => {
 };
 
 const extend = (a, b) => {
-  for (let key in b) a[key] = b[key];
+  for (const key in b) try { a[key] = b[key]; } catch (er) {}
   return a;
 };
 
-const queryToPaths = (query, path = []) => {
+export const queryToPaths = (query, path = []) => {
   let i = 0;
   const l = query.length;
   while (i < l && !isArray(query[i])) ++i;
@@ -39,14 +39,6 @@ const queryToPaths = (query, path = []) => {
   return paths;
 };
 
-const queriesToPaths = queries => {
-  const paths = [];
-  for (let i = 0, l = queries.length; i < l; ++i) {
-    paths.push.apply(paths, queryToPaths(queries[i]));
-  }
-  return paths;
-};
-
 const routeToQuery = route => {
   const path = route.split('.');
   for (let i = 0, l = path.length; i < l; ++i) path[i] = path[i].split('|');
@@ -58,7 +50,7 @@ const pathToRoute = path => path.join('.');
 const pathSegmentToRouteQuerySegment = segment =>
   isObject(segment) ? '$params' : [segment, '$key'];
 
-const getRouteForPath = (router, path) => {
+export const getRouteForPath = (router, path) => {
   const query = [];
   for (let i = 0, l = path.length; i < l; ++i) {
     query[i] = pathSegmentToRouteQuerySegment(path[i]);
@@ -72,13 +64,10 @@ const getRouteForPath = (router, path) => {
     }
   }
 
-  return router.$fallback;
+  return router['*'];
 };
 
-const EXPENSIVE_QUERY_ERROR = new Error('Query is too expensive');
-
 export const createRouter = routes => {
-  if (!routes.$fallback) throw new Error('A $fallback route is required');
   const router = {};
   for (let route in routes) {
     const fn = routes[route];
@@ -86,34 +75,55 @@ export const createRouter = routes => {
     for (let i = 0, l = paths.length; i < l; ++i) {
       const path = paths[i];
       const route = pathToRoute(path);
-      const arity = route === '$fallback' ? 0 : path.length;
-      router[route] = {fn, arity};
+      router[route] = {fn, arity: route === '*' ? 0 : path.length};
     }
   }
   return router;
 };
 
-export const run = ({maxCost, router, queries, context, pathValues = [], data = {}}) =>
+export const run = ({
+  router = {},
+  query = [],
+  context,
+  force = false,
+  change = [],
+  db = {},
+  onlyUnresolved = false
+}) =>
   Promise
     .resolve()
-    .then(() => limitQueriesCost(queries, maxCost))
     .then(() => {
-      const tasks = new Map();
-      const incompletePaths = [];
-      const paths = queriesToPaths(queries);
+      let paths = queryToPaths(query);
+      if (!force) {
+        const undefPaths = [];
+        for (let i = 0, l = paths.length; i < l; ++i) {
+          const path = paths[i];
+          const resolved = resolvePath(db, path);
+          if (onlyUnresolved && path === resolved) continue;
+          if (get(db, resolved) === undefined) undefPaths.push(resolved);
+        }
+        paths = undefPaths;
+      }
+
+      if (!paths.length) return change;
+
+      const jobs = new Map();
+      const unresolvedPaths = [];
       for (let i = 0, l = paths.length; i < l; ++i) {
         const path = paths[i];
-        const {fn, arity} = getRouteForPath(router, path);
+        let route = getRouteForPath(router, path);
+        if (!route) continue;
+        const {fn, arity} = route;
 
-        if (path.length > arity && arity > 0) incompletePaths.push(path);
+        if (path.length > arity && arity > 0) unresolvedPaths.push(path);
 
-        let task = tasks.get(fn);
-        if (!task) {
-          task = {arity, options: {context, data, paths: []}, keys: []};
-          tasks.set(fn, task);
+        let job = jobs.get(fn);
+        if (!job) {
+          job = {arity, options: {context, db, paths: []}, keys: []};
+          jobs.set(fn, job);
         }
 
-        const {keys, options} = task;
+        const {keys, options} = job;
         options.paths.push(path);
 
         for (let i = 0; i < arity; ++i) {
@@ -129,68 +139,60 @@ export const run = ({maxCost, router, queries, context, pathValues = [], data = 
         }
       }
 
-      const taskPromises = [];
-      for (const [fn, {arity, options}] of tasks) {
-        taskPromises.push(Promise
+      const work = [];
+      for (const [fn, {arity, options}] of jobs) {
+        work.push(Promise
           .resolve(options)
           .then(fn)
           .catch(er => {
-            const {name, message} = er;
-            const value = {$error: {name, message, ...er}};
-            const pathValues = [];
+            let $error = er;
+            if (er instanceof Error) {
+              $error = {name: er.name, message: er.message, ...er};
+            }
+            const value = {$error};
+            const change = [];
             const {paths} = options;
             for (let i = 0, l = paths.length; i < l; ++i) {
-              pathValues.push({path: paths[i].slice(0, arity), value});
+              const path = arity > 0 ? paths[i].slice(0, arity) : paths[i];
+              change.push({path, value});
             }
+            return change;
           })
-          .then(_pathValues => {
-            _pathValues = flatten([_pathValues]);
-            applyPathValues(data, _pathValues);
-            pathValues.push.apply(pathValues, _pathValues);
+          .then(newChange => {
+            applyChange(db, newChange);
+            change.push(newChange);
           })
         );
       }
 
-      return Promise.all(taskPromises).then(() => {
-        const queries = [];
-        for (let i = 0, l = incompletePaths.length; i < l; ++i) {
-          const path = incompletePaths[i];
-          const resolved = resolvePath(data, path);
-          if (path !== resolved && get(data, resolved) === undefined) {
-            queries.push(resolved);
-          }
-        }
-        if (!queries.length) return pathValues;
-        return run({maxCost, router, queries, context, pathValues, data});
-      });
+      const recurse = () =>
+        run({
+          router,
+          query: [unresolvedPaths],
+          context,
+          change,
+          db,
+          onlyUnresolved: true
+        });
+
+      return Promise.all(work).then(recurse);
     });
 
-const limitQueryCost = (path, max, precost = 0) => {
+export const getQueryCost = (path, max = Infinity, precost = 0) => {
   let i = 0;
   const l = path.length;
   while (i < l && !isArray(path[i])) ++i;
 
-  if ((precost += i) > max) throw EXPENSIVE_QUERY_ERROR;
-
-  if (i === l) return precost;
+  if ((precost += i) > max || i === l) return precost;
 
   let cost = 0;
   const first = path[i];
   const rest = path.slice(i + 1);
   for (let i = 0, l = first.length; i < l; ++i) {
-    cost += limitQueryCost([].concat(first[i], rest), max, precost);
-    if (cost > max) throw EXPENSIVE_QUERY_ERROR;
+    cost += getQueryCost([].concat(first[i], rest), max, precost);
+    if (cost > max) break;
   }
 
-  return cost;
-};
-
-const limitQueriesCost = (queries, max) => {
-  let cost = 0;
-  for (let i = 0, l = queries.length; i < l; ++i) {
-    cost += limitQueryCost(queries[i], max);
-    if (cost > max) throw EXPENSIVE_QUERY_ERROR;
-  }
   return cost;
 };
 
@@ -211,62 +213,60 @@ const orderObj = obj => {
   return val;
 };
 
-const toKey = obj => isObject(obj) ? JSON.stringify(orderObj(obj)) : obj;
+export const toKey = obj => isObject(obj) ? JSON.stringify(orderObj(obj)) : obj;
 
-const resolveRefs = (data, obj, maxDepth, depth = 0) => {
+export const resolveRefs = (db, obj, maxDepth = 3, depth = 0) => {
   if (!isObject(obj)) return obj;
 
   if (isArray(obj)) {
     const arr = [];
     for (let i = 0, l = obj.length; i < l; ++i) {
-      arr[i] = resolveRefs(data, obj[i], maxDepth, depth);
+      arr[i] = resolveRefs(db, obj[i], maxDepth, depth);
     }
     return arr;
   }
 
   const {$error, $ref} = obj;
-  if ($error) return extend(new Error(), $error);
-  if ($ref) return get(data, $ref, maxDepth, depth + 1);
+  if ($error) return toError($error);
+  if ($ref) return get(db, $ref, maxDepth, depth + 1);
 
   const newObj = {};
-  for (let key in obj) {
-    newObj[key] = resolveRefs(data, obj[key], maxDepth, depth);
-  }
+  for (let key in obj) newObj[key] = resolveRefs(db, obj[key], maxDepth, depth);
   return newObj;
 };
 
-const walk = (data, path) => {
-  let val = data;
+export const walk = (db, path) => {
+  let val = db;
   for (let i = 0, l = path.length; i < l && val != null; ++i) {
     if (val = val[toKey(path[i])]) {
       const {$error, $ref} = val;
-      if ($error) return extend(new Error(), $error);
-      if ($ref) val = walk(data, $ref);
+      if ($error) return val;
+      if ($ref) val = walk(db, $ref);
     }
   }
   return val;
 };
 
-export const get = (data, path, maxDepth = 3, depth = 0) => {
+export const get = (db, path, maxDepth = 3, depth = 0) => {
   if (depth > maxDepth) return {$ref: path};
-  return resolveRefs(data, walk(data, path), maxDepth, depth);
+  return resolveRefs(db, walk(db, path), maxDepth, depth);
 };
 
-const resolvePath = (data, path) => {
-  let val = data;
+export const resolvePath = (db, path) => {
+  let val = db;
   for (let i = 0, l = path.length; i < l && val != null; ++i) {
     if (val = val[toKey(path[i])]) {
       const {$ref} = val;
-      if ($ref) return resolvePath(data, $ref.concat(path.slice(i + 1)));
+      if ($ref) return resolvePath(db, $ref.concat(path.slice(i + 1)));
     }
   }
   return path;
 };
 
-export const set = (data, path, value) => {
-  path = resolvePath(data, path.slice(0, -1)).concat(path.slice(-1));
-  let cursor = data;
-  for (var i = 0, l = path.length; i < l; ++i) {
+export const set = (db, path, value) => {
+  path = resolvePath(db, path.slice(0, -1)).concat(path.slice(-1));
+  let cursor = db;
+  for (let i = 0, l = path.length; i < l; ++i) {
     const key = toKey(path[i]);
     if (i === l - 1) return cursor[key] = value;
     if (cursor[key] == null) cursor[key] = {};
@@ -274,9 +274,9 @@ export const set = (data, path, value) => {
   }
 };
 
-export const applyPathValues = (data, pathValues) => {
-  for (let i = 0, l = pathValues.length; i < l; ++i) {
-    const {path, value} = pathValues[i];
-    set(data, path, value);
-  }
+export const applyChange = (db, change) => {
+  if (!isArray(change)) return set(db, change.path, change.value);
+  for (let i = 0, l = change.length; i < l; ++i) applyChange(db, change[i]);
 };
+
+const toError = er => extend(new Error(), er);

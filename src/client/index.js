@@ -3,7 +3,7 @@ import './utils/livereload';
 // import React from 'react';
 // import {render} from 'react-dom';
 // import {Router, hashHistory as history} from 'react-router';
-// import routes from './routes';
+// import router from './routes';
 //
 // render(<Router {...{history, routes}} />, document.getElementById('main'));
 
@@ -25,7 +25,11 @@ import './utils/livereload';
 // };
 
 import _ from 'underscore';
-import {createRouter, run, applyPathValues} from './falcomlay';
+import {
+  createRouter,
+  run,
+  applyChange
+} from './falcomlay';
 
 const ROUTE_NOT_FOUND_ERROR = new Error('No matching route found');
 
@@ -35,7 +39,7 @@ const router = createRouter({
       _.map(params, params =>
         _.map(indices, index => ({
           path: ['hosts', params, index],
-          value: {$ref: ['hostsById', '1-Larry']}
+          value: index === 'length' ? 10 : {$ref: ['hostsById', '1-Larry']}
         }))
       ),
   'hostsById.$key.id|name|owner':
@@ -66,80 +70,42 @@ const router = createRouter({
       )
     ).concat({path: ['user'], value: {$ref: ['usersById', userId]}});
   },
-  $fallback: () => { throw ROUTE_NOT_FOUND_ERROR; }
+  '*': () => { throw ROUTE_NOT_FOUND_ERROR; }
 });
-
+const start = Date.now();
 run({
-  maxCost: 10000,
   router,
-  queries: [
+  query: [[
     [
       'hosts',
       {online: true},
-      _.range(10),
       [
-        'id',
-        ['name', ['first', 'last']],
-        ['owner', ['id', 'name']]
+        'length',
+        [
+          _.range(10),
+          [
+            'id',
+            ['name', ['first', 'last']],
+            ['owner', ['id', 'name']]
+          ]
+        ]
       ]
     ],
     ['user', ['id', 'name']]
-  ],
+  ]],
   context: {userId: 1}
 })
-  .then(pathValues => {
-    applyPathValues(data, pathValues);
+  .then(change => {
+    applyChange(db, change);
     return run({
-      maxCost: 10000,
       router,
-      queries: [
-        ['user!', {name: 'Silly', id: 'bunny'}]
-      ],
+      query: ['user!', {name: 'Silly'}],
       context: {userId: 2}
-    }).then(pathValues => {
-      applyPathValues(data, pathValues);
-      console.log(data);
+    }).then(change => {
+      applyChange(db, change);
+      console.log(Date.now() - start);
     });
   })
-  .catch(er => setTimeout(() => { throw er; }));
+  .catch(::console.error);
 
-const data = {
-  hosts: {
-    0: {$ref: ['hostsById', '1-Larry']},
-    1: {$ref: ['hostsById', '1-Curly']},
-    2: {$ref: ['hostsById', '1-Mo']},
-    '[["foo","bar"]]': {
-      0: {$ref: ['hostsById', '1-Curly']}
-    }
-  },
-  hostsById: {
-    '1-Larry': {
-      id: '1-Larry',
-      name: 'Larry',
-      owner: {$ref: ['usersById', 1]}
-    },
-    '1-Curly': {
-      id: '1-Curly',
-      name: 'Curly',
-      owner: {$ref: ['you']}
-    },
-    '1-Mo': {
-      id: '1-Mo',
-      name: 'Mo',
-      owner: {$ref: ['usersById', 1]}
-    }
-  },
-  user: {$ref: ['usersById', 1]},
-  you: {$ref: ['usersById', 1]},
-  usersById: {
-    1: {
-      id: 1,
-      name: 'THE NEWBY',
-      hosts: [
-        {$ref: ['hostsById', '1-Larry']},
-        {$ref: ['hostsById', '1-Curly']},
-        {$ref: ['hostsById', '1-Mo']}
-      ]
-    }
-  }
-};
+const db = {};

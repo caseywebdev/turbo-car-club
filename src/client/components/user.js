@@ -10,9 +10,7 @@ export default createContainer(
     </div>,
   {
     queries: () => ({
-      user: [
-        ['user', ['id', 'name', 'emailAddress']]
-      ]
+      user: ['user', ['id', 'name', 'emailAddress']]
     })
   }
 );

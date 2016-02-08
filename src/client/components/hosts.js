@@ -14,14 +14,17 @@ export default createContainer(
     </div>,
   {
     defaultParams: {
-      range: {
-        length: 10
-      }
+      range: _.range(10)
     },
 
     queries: ({range}) => ({
       hosts: [
-        ['hosts', range, Host.fragments().host]
+        'hosts',
+        {foo: 'bar'},
+        [
+          'length',
+          [range, Host.fragments().host]
+        ]
       ]
     })
   }

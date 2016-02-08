@@ -1,12 +1,10 @@
 import _ from 'underscore';
-import {Component, PropTypes} from 'react';
+import React, {Component, PropTypes} from 'react';
 import model from '../utils/model';
-import React from 'react';
-import resolvePath from '../utils/resolve-path';
 
 export default (ContainedComponent, {
   defaultParams = {},
-  queries = _.noop,
+  queries = _.constant([]),
   remap = _.identity,
   ...statics
 } = {}) => {
@@ -27,21 +25,18 @@ export default (ContainedComponent, {
 
     setParams = params => {
       this.params = _.extend({}, this.params, params);
-      this.fetch();
+      this.run();
     };
 
-    fetch() {
-      const paths = _.chain(queries(this.params))
-        .reject((__, key) => this.props[key])
-        .map(query => _.flatten(_.map(query, resolvePath), true))
-        .flatten(true)
-        .value();
-      if (!paths.length) return;
+    run() {
       ++this.loading;
-      model.get(...paths).then(this.handleFetch);
+      run({
+        router,
+        queries: queries(this.params)
+      }).then(this.handleRun);
     }
 
-    handleFetch = ({json}) => {
+    handleRun = changes => {
       --this.loading;
       this.setState(remap(json));
     };
