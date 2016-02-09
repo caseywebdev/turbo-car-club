@@ -7,8 +7,8 @@ import './utils/livereload';
 //
 // render(<Router {...{history, routes}} />, document.getElementById('main'));
 
-// import live from './utils/live';
-//
+import live from './utils/live';
+
 // live.send('sign-in', 'c@sey.me', (er) => {
 //   console.log(er || 'Email sent');
 // });
@@ -28,84 +28,53 @@ import _ from 'underscore';
 import {
   createRouter,
   run,
-  applyChange
-} from './falcomlay';
+  applyChange,
+  get
+} from '../shared/utils/falcomlay';
 
-const ROUTE_NOT_FOUND_ERROR = new Error('No matching route found');
+import db from './utils/db';
 
 const router = createRouter({
-  'hosts.$params.$key':
-    ({1: params, 2: indices}) =>
-      _.map(params, params =>
-        _.map(indices, index => ({
-          path: ['hosts', params, index],
-          value: index === 'length' ? 10 : {$ref: ['hostsById', '1-Larry']}
-        }))
-      ),
-  'hostsById.$key.id|name|owner':
-    ({1: ids, 2: keys}) =>
-      _.map(ids, id =>
-        _.map(keys, key => ({
-          path: ['hostsById', id, key],
-          value: `Some value for ${id}-${key}`
-        }))
-      ),
-  user:
-    ({context: {userId}}) => {
-      if (!userId) throw new Error('Auth required');
-      return {path: ['user'], value: {$ref: ['usersById', userId]}};
-    },
-  'usersById.$key.id|name|emailAddress':
-    ({1: ids, 2: keys}) =>
-      _.map(ids, id =>
-        _.map(keys, key =>
-          ({path: ['usersById', id, key], value: Math.random()})
-        )
-      ),
-  'user!.$params': ({context: {userId}, 1: params}) => {
-    if (!userId) throw new Error('Auth required');
-    return _.map(params, params =>
-      _.map(params, (val, key) =>
-        ({path: ['usersById', userId, key], value: val})
-      )
-    ).concat({path: ['user'], value: {$ref: ['usersById', userId]}});
-  },
-  '*': () => { throw ROUTE_NOT_FOUND_ERROR; }
+  '*': ({paths}) =>
+    new Promise((resolve, reject) =>
+      live.send('falcomlay', {query: [paths]}, (er, change) => {
+        if (er) return reject(er);
+        resolve(change);
+      })
+    )
 });
-const start = Date.now();
+
+// run({
+//   router,
+//   query: ['sign-in!', {emailAddress: 'c@sey.me'}]
+// }).then(::console.log);
+run({
+  router,
+  query: ['auth!', {token: get(db, ['auth'])}]
+}).then(::console.log);
+
 run({
   router,
   query: [[
     [
       'hosts',
-      {online: true},
       [
         'length',
         [
           _.range(10),
           [
             'id',
-            ['name', ['first', 'last']],
+            'name',
             ['owner', ['id', 'name']]
           ]
         ]
       ]
     ],
     ['user', ['id', 'name']]
-  ]],
-  context: {userId: 1}
+  ]]
 })
   .then(change => {
     applyChange(db, change);
-    return run({
-      router,
-      query: ['user!', {name: 'Silly'}],
-      context: {userId: 2}
-    }).then(change => {
-      applyChange(db, change);
-      console.log(Date.now() - start);
-    });
+    console.log(db);
   })
   .catch(::console.error);
-
-const db = {};

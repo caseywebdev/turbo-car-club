@@ -1,8 +1,5 @@
-import config from '../config';
-
-const {prefix} = config.db;
+import store from './store';
 
 export default {
-  get: key => JSON.parse(localStorage[[prefix, key].join(':')] || null),
-  set: (key, val) => localStorage[[prefix, key].join(':')] = JSON.stringify(val)
+  auth: store.get('auth')
 };
