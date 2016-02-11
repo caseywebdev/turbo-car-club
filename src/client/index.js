@@ -3,7 +3,7 @@ import './utils/livereload';
 // import React from 'react';
 // import {render} from 'react-dom';
 // import {Router, hashHistory as history} from 'react-router';
-// import router from './routes';
+// import routes from './utils/routes';
 //
 // render(<Router {...{history, routes}} />, document.getElementById('main'));
 
@@ -28,7 +28,7 @@ import _ from 'underscore';
 import {
   createRouter,
   run,
-  applyChange,
+  // applyChange,
   get
 } from '../shared/utils/falcomlay';
 
@@ -44,17 +44,19 @@ const router = createRouter({
     )
 });
 
-// run({
-//   router,
-//   query: ['sign-in!', {emailAddress: 'c@sey.me'}]
-// }).then(::console.log);
 run({
   router,
+  query: ['sign-in!', {emailAddress: 'c@sey.me'}]
+}).then(::console.log);
+run({
+  router,
+  db,
   query: ['auth!', {token: get(db, ['auth'])}]
 }).then(::console.log);
 
 run({
   router,
+  db,
   query: [[
     [
       'hosts',
@@ -73,8 +75,7 @@ run({
     ['user', ['id', 'name']]
   ]]
 })
-  .then(change => {
-    applyChange(db, change);
+  .then(() => {
     console.log(db);
   })
   .catch(::console.error);

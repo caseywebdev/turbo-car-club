@@ -22,7 +22,8 @@ cogs-client: class-names
 	@$(COGS) -sc cogs-client.js
 
 cogs-client-w: class-names
-	@$(COGS) -c cogs-client.js -pw src/client,src/shared
+	@$(COGS) -c cogs-client.js \
+		-pw build/client/class-names.json,src/client,src/shared
 
 cogs-server:
 	@echo 'Building server...'

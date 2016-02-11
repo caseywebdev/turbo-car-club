@@ -190,7 +190,16 @@ const orderObj = obj => {
   return val;
 };
 
-export const toKey = obj => isObject(obj) ? JSON.stringify(orderObj(obj)) : obj;
+export const toKey = obj =>
+  isArray(obj) ? JSON.stringify(toKeys(obj)) :
+  isObject(obj) ? JSON.stringify(orderObj(obj)) :
+  String(obj);
+
+export const toKeys = arr => {
+  const keys = [];
+  for (let i = 0, l = arr.length; i < l; ++i) keys.push(toKey(arr[i]));
+  return keys;
+};
 
 export const get = (db, path, cursor) => {
   let val = cursor || db;
@@ -237,3 +246,59 @@ const toError = attrs => {
   for (const key in attrs) try { er[key] = attrs[key]; } catch (er) {}
   return er;
 };
+
+let nextSid = 1;
+export const sub = (subs, path, cb) => {
+  const key = toKey(path);
+  let {__SID__: sid} = cb;
+  if (!sid) sid = cb.__SID__ = nextSid++;
+  if (!subs[key]) subs[key] = {};
+  if (!subs[key][sid]) subs[key][sid] = cb;
+  if (!subs[sid]) subs[sid] = {};
+  if (!subs[sid][key]) subs[sid][key] = true;
+};
+
+export const unsub = (subs, path, cb) => {
+  if (typeof path === 'function') {
+    const {__SID__: sid} = path;
+    for (const key in subs[sid]) unsub(subs, key, path);
+    return;
+  }
+  const key = toKey(path);
+  const {__SID__: sid} = cb;
+  if (subs[key]) {
+    delete subs[key][sid];
+    if (!Object.keys(subs[key]).length) delete subs[key];
+  }
+  if (subs[sid]) {
+    delete subs[sid][key];
+    if (!Object.keys(subs[sid]).length) delete subs[sid];
+  }
+};
+
+export const pub = (subs, paths) => {
+  const called = {};
+  for (let i = 0, l = paths.length; i < l; ++i) {
+    const path = paths[i];
+    for (let j = 0, m = path.length; j < m; ++j) {
+      const key = toKey(path.slice(0, j + 1));
+      if (called[key]) continue;
+      called[key] = true;
+      for (const sid in subs[key]) {
+        if (called[sid]) continue;
+        called[sid] = true;
+        subs[key][sid]();
+      }
+    }
+  }
+};
+
+const subs = {};
+const fn = console.log.bind(console, 'called!');
+sub(subs, ['foo'], fn);
+sub(subs, ['foo', 'bar'], fn);
+pub(subs, [['foo', 'bar', 'baz']]);
+pub(subs, ['foo']);
+unsub(subs, fn);
+pub(subs, ['foo', 'bar', 'baz']);
+pub(subs, ['foo', 'bar', 'baz']);

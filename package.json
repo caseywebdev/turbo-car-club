@@ -26,7 +26,7 @@
     "cogs-transformer-autoprefixer": "1.0.0",
     "cogs-transformer-babel": "2.0.4",
     "cogs-transformer-clean-css": "1.0.0",
-    "cogs-transformer-concat-commonjs": "1.0.16",
+    "cogs-transformer-concat-commonjs": "1.0.17",
     "cogs-transformer-directives": "1.0.4",
     "cogs-transformer-eslint": "1.0.12",
     "cogs-transformer-json": "2.0.1",

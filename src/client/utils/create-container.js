@@ -1,6 +1,8 @@
 import _ from 'underscore';
 import React, {Component, PropTypes} from 'react';
-import model from '../utils/model';
+import db from '../utils/db';
+import router from '../utils/router';
+import {run} from '../../shared/utils/falcomlay';
 
 export default (ContainedComponent, {
   defaultParams = {},
@@ -30,10 +32,7 @@ export default (ContainedComponent, {
 
     run() {
       ++this.loading;
-      run({
-        router,
-        queries: queries(this.params)
-      }).then(this.handleRun);
+      run({router, db, queries: queries(this.params)}).then(this.handleRun);
     }
 
     handleRun = changes => {

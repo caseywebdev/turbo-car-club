@@ -75,7 +75,7 @@ module.exports = {
       options: {
         base: 'src/client/styles',
         debug: !MINIFY,
-        target: 'src/client/class-names.json'
+        target: 'build/client/class-names.json'
       }
     },
     {name: 'autoprefixer', only: '**/*.+(scss|css)'},
