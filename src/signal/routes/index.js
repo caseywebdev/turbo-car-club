@@ -8,6 +8,7 @@ import notFound from './not-found';
 import signIn from './sign-in';
 import user from './user';
 import usersById from './users-by-id';
+import verify from './verify';
 
 export default createRouter({
   ...auth,
@@ -17,5 +18,6 @@ export default createRouter({
   ...notFound,
   ...signIn,
   ...user,
-  ...usersById
+  ...usersById,
+  ...verify
 });

@@ -29,34 +29,52 @@ import {
   createRouter,
   run,
   // applyChange,
-  get
+  get,
+  watch
 } from '../shared/utils/falcomlay';
 
 import db from './utils/db';
 
 const router = createRouter({
-  '*': ({paths}) =>
+  '*': ({paths, context: {failOnError}}) =>
     new Promise((resolve, reject) =>
-      live.send('falcomlay', {query: [paths]}, (er, change) => {
+      console.log(paths) ||
+      live.send('falcomlay', {
+        query: [paths],
+        failOnError
+      }, (er, change) => {
         if (er) return reject(er);
         resolve(change);
       })
     )
 });
 
-run({
-  router,
-  query: ['sign-in!', {emailAddress: 'c@sey.me'}]
-}).then(::console.log);
-run({
-  router,
-  db,
-  query: ['auth!', {token: get(db, ['auth'])}]
-}).then(::console.log);
+const watchers = {};
+watch(watchers, ['hosts'], () => {
+  console.log('hosts triggered!');
+});
 
 run({
   router,
   db,
+  context: {},
+  query: ['verify!', {token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbEFkZHJlc3MiOiJjQHNleS5tZSIsInNpZ25lZEluQXQiOm51bGwsInNvY2tldElkIjoiNjM5NzdjYWItYzQ3Yy00ZmZiLTg0YTctMjdkY2Q0YzVlOTIzIiwiaWF0IjoxNDU1MjMxMTc2LCJzdWIiOiJ2ZXJpZnkifQ.zS4ZczoNeD6374zRLfaxS4RMR5_Q2iCXXnyzWqEtlIY'}]
+}).then(::console.log);
+// run({
+//   router,
+//   query: ['sign-in!', {emailAddress: 'c@sey.me'}]
+// }).then(::console.log);
+// run({
+//   router,
+//   db,
+//   query: ['auth!', {token: get(db, ['authToken'])}]
+// }).then(::console.log);
+
+run({
+  router,
+  db,
+  watchers,
+  context: {},
   query: [[
     [
       'hosts',
@@ -77,5 +95,6 @@ run({
 })
   .then(() => {
     console.log(db);
+    console.log(get(db, ['hosts', 0, 'owner']));
   })
   .catch(::console.error);

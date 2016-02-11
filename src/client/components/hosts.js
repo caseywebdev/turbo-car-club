@@ -17,15 +17,17 @@ export default createContainer(
       range: _.range(10)
     },
 
-    queries: ({range}) => ({
-      hosts: [
-        'hosts',
-        {foo: 'bar'},
-        [
-          'length',
-          [range, Host.fragments().host]
-        ]
+    queries: ({range}) => [
+      'hosts',
+      {foo: 'bar'},
+      [
+        'length',
+        [range, Host.fragments().host]
       ]
+    ],
+
+    remap: ({range}) => ({
+      hosts: get(db, ['hosts', {foo: 'bar'}])
     })
   }
 );

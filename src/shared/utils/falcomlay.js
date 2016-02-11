@@ -62,10 +62,12 @@ export const createRouter = routes => {
 export const run = ({
   router = {},
   query = [],
-  context,
+  context = {},
   force = false,
   change = [],
   db = {},
+  watchers,
+  bailOnError = false,
   onlyUnresolved = false
 }) =>
   Promise
@@ -76,7 +78,7 @@ export const run = ({
         const undefPaths = [];
         for (let i = 0, l = paths.length; i < l; ++i) {
           const path = paths[i];
-          const resolved = resolvePath(db, path);
+          const [resolved] = resolvePath(db, path);
           if (onlyUnresolved && path === resolved) continue;
           if (get(db, resolved) === undefined) undefPaths.push(resolved);
         }
@@ -118,11 +120,12 @@ export const run = ({
       }
 
       const work = [];
-      for (const [fn, {arity, options}] of jobs) {
+      for (let [fn, {arity, options}] of jobs) {
         work.push(Promise
           .resolve(options)
           .then(fn)
           .catch(er => {
+            if (bailOnError) throw er;
             let $error = er;
             if (er instanceof Error) {
               $error = {name: er.name, message: er.message, ...er};
@@ -137,7 +140,7 @@ export const run = ({
             return change;
           })
           .then(newChange => {
-            applyChange(db, newChange);
+            applyChange(db, newChange, watchers);
             change.push(newChange);
           })
         );
@@ -190,115 +193,290 @@ const orderObj = obj => {
   return val;
 };
 
-export const toKey = obj =>
-  isArray(obj) ? JSON.stringify(toKeys(obj)) :
-  isObject(obj) ? JSON.stringify(orderObj(obj)) :
-  String(obj);
-
 export const toKeys = arr => {
   const keys = [];
   for (let i = 0, l = arr.length; i < l; ++i) keys.push(toKey(arr[i]));
   return keys;
 };
 
-export const get = (db, path, cursor) => {
-  let val = cursor || db;
-  for (let i = 0, l = path.length; i < l && val != null; ++i) {
-    if (val = val[toKey(path[i])]) {
-      const {$error, $ref} = val;
-      if ($error) return toError($error);
-      if ($ref) val = get(db, $ref);
-    }
-  }
-  return val;
-};
+export const toKey = obj =>
+  isArray(obj) ? JSON.stringify(toKeys(obj)) :
+  isObject(obj) ? JSON.stringify(orderObj(obj)) :
+  String(obj);
 
-export const resolvePath = (db, path) => {
-  let val = db;
-  for (let i = 0, l = path.length; i < l && val != null; ++i) {
-    if (val = val[toKey(path[i])]) {
-      const {$ref} = val;
-      if ($ref) return resolvePath(db, $ref.concat(path.slice(i + 1)));
-    }
-  }
-  return path;
-};
-
-export const set = (db, path, value) => {
-  path = resolvePath(db, path.slice(0, -1)).concat(path.slice(-1));
+export const get = (db, path) => {
   let cursor = db;
-  for (let i = 0, l = path.length; i < l; ++i) {
-    const key = toKey(path[i]);
+  for (let i = 0, l = path.length; i < l && cursor != null; ++i) {
+    if (cursor = cursor[toKey(path[i])]) {
+      const {$error, $ref} = cursor;
+      if ($error) return toError($error);
+      if ($ref) cursor = get(db, $ref);
+    }
+  }
+  return cursor;
+};
+
+export const resolvePath = (db, path, paths = []) => {
+  let cursor = db;
+  paths.unshift(path);
+  for (let i = 0, l = path.length; i < l && cursor != null; ++i) {
+    if (cursor = cursor[toKey(path[i])]) {
+      const {$ref} = cursor;
+      if ($ref) {
+        return resolvePath(db, $ref.concat(path.slice(i + 1)), paths);
+      }
+    }
+  }
+  return paths;
+};
+
+export const set = (db, path, value, watchers) => {
+  const paths = [];
+  const resolved = resolvePath(db, path.slice(0, -1));
+  const tail = path[path.length - 1];
+  for (let i = 0, l = resolved.length; i < l; ++i) {
+    const path = resolved[i].concat(tail);
+    paths.push(path);
+    if (watchers) trigger(watchers, path);
+  }
+  let cursor = db;
+  for (let i = 0, l = paths[0].length; i < l; ++i) {
+    const key = toKey(paths[0][i]);
     if (i === l - 1) return cursor[key] = value;
     if (cursor[key] == null) cursor[key] = {};
     cursor = cursor[key];
   }
 };
 
-export const applyChange = (db, change) => {
+export const applyChange = (db, change, watchers) => {
   if (!change) return;
-  if (!isArray(change)) return set(db, change.path, change.value);
-  for (let i = 0, l = change.length; i < l; ++i) applyChange(db, change[i]);
+  if (!isArray(change)) return set(db, change.path, change.value, watchers);
+  for (let i = 0, l = change.length; i < l; ++i) {
+    applyChange(db, change[i], watchers);
+  }
 };
 
 const toError = attrs => {
   const er = new Error();
-  for (const key in attrs) try { er[key] = attrs[key]; } catch (er) {}
+  for (let key in attrs) try { er[key] = attrs[key]; } catch (er) {}
   return er;
 };
 
-let nextSid = 1;
-export const sub = (subs, path, cb) => {
+let nextFnid = 1;
+export const watch = (watchers, path, cb) => {
   const key = toKey(path);
-  let {__SID__: sid} = cb;
-  if (!sid) sid = cb.__SID__ = nextSid++;
-  if (!subs[key]) subs[key] = {};
-  if (!subs[key][sid]) subs[key][sid] = cb;
-  if (!subs[sid]) subs[sid] = {};
-  if (!subs[sid][key]) subs[sid][key] = true;
+  let {__FNID__: fnid} = cb;
+  if (!fnid) fnid = cb.__FNID__ = nextFnid++;
+
+  if (!watchers[key]) watchers[key] = {};
+  watchers[key][fnid] = cb;
+
+  if (!watchers[fnid]) watchers[fnid] = {};
+  watchers[fnid][key] = true;
 };
 
-export const unsub = (subs, path, cb) => {
+export const unwatch = (watchers, path, cb) => {
   if (typeof path === 'function') {
-    const {__SID__: sid} = path;
-    for (const key in subs[sid]) unsub(subs, key, path);
+    const {__FNID__: fnid} = path;
+    for (let key in watchers[fnid]) unwatch(watchers, key, path);
     return;
   }
+
   const key = toKey(path);
-  const {__SID__: sid} = cb;
-  if (subs[key]) {
-    delete subs[key][sid];
-    if (!Object.keys(subs[key]).length) delete subs[key];
+  const {__FNID__: fnid} = cb;
+
+  if (watchers[key]) {
+    delete watchers[key][fnid];
+    if (!Object.keys(watchers[key]).length) delete watchers[key];
   }
-  if (subs[sid]) {
-    delete subs[sid][key];
-    if (!Object.keys(subs[sid]).length) delete subs[sid];
+
+  if (watchers[fnid]) {
+    delete watchers[fnid][key];
+    if (!Object.keys(watchers[fnid]).length) delete watchers[fnid];
   }
 };
 
-export const pub = (subs, paths) => {
-  const called = {};
-  for (let i = 0, l = paths.length; i < l; ++i) {
-    const path = paths[i];
-    for (let j = 0, m = path.length; j < m; ++j) {
-      const key = toKey(path.slice(0, j + 1));
-      if (called[key]) continue;
-      called[key] = true;
-      for (const sid in subs[key]) {
-        if (called[sid]) continue;
-        called[sid] = true;
-        subs[key][sid]();
+export const trigger = (watchers, path) => {
+  const pending = watchers.pending || [];
+  pending.push(path);
+  if (!watchers.pending) {
+    watchers.pending = pending;
+    setTimeout(invoke.bind(null, watchers));
+  }
+};
+
+export const invoke = watchers => {
+  const pending = watchers.pending;
+  delete watchers.pending;
+  const keyHits = {};
+  const fnHits = {};
+  for (let i = 0, l = pending.length; i < l; ++i) {
+    const path = pending[i];
+    for (let j = path.length; j >= 0; --j) {
+      const key = toKey(path.slice(0, j));
+      if (keyHits[key]) break;
+      keyHits[key] = true;
+      for (let fnid in watchers[key]) {
+        if (fnHits[fnid]) continue;
+        fnHits[fnid] = true;
+        watchers[key][fnid]();
       }
     }
   }
 };
 
-const subs = {};
-const fn = console.log.bind(console, 'called!');
-sub(subs, ['foo'], fn);
-sub(subs, ['foo', 'bar'], fn);
-pub(subs, [['foo', 'bar', 'baz']]);
-pub(subs, ['foo']);
-unsub(subs, fn);
-pub(subs, ['foo', 'bar', 'baz']);
-pub(subs, ['foo', 'bar', 'baz']);
+export class Router {
+  constructor({routes: DEFAULT_ROUTES} = {}) {
+    this.routes = createRouter(routes);
+  }
+
+  run({
+    query = [],
+    context = {},
+    force = false,
+    change = [],
+    store = new Store(),
+    watchers,
+    bailOnError = false,
+    onlyUnresolved = false
+  }) {
+    return Promise
+      .resolve()
+      .then(() => {
+        let paths = queryToPaths(query);
+        if (!force) {
+          const undefPaths = [];
+          for (let i = 0, l = paths.length; i < l; ++i) {
+            const path = paths[i];
+            const [resolved] = resolvePath(db, path);
+            if (onlyUnresolved && path === resolved) continue;
+            if (get(db, resolved) === undefined) undefPaths.push(resolved);
+          }
+          paths = undefPaths;
+        }
+
+        if (!paths.length) return change;
+
+        const jobs = new Map();
+        const unresolvedPaths = [];
+        for (let i = 0, l = paths.length; i < l; ++i) {
+          const path = paths[i];
+          let route = getRouteForPath(router, path);
+          if (!route) continue;
+          const {fn, arity} = route;
+
+          if (path.length > arity && arity > 0) unresolvedPaths.push(path);
+
+          let job = jobs.get(fn);
+          if (!job) {
+            job = {arity, options: {context, db, paths: []}, keys: []};
+            jobs.set(fn, job);
+          }
+
+          const {keys, options} = job;
+          options.paths.push(path);
+
+          for (let i = 0; i < arity; ++i) {
+            if (!options[i]) {
+              options[i] = [];
+              keys[i] = {};
+            }
+            const segment = path[i];
+            const key = toKey(segment);
+            if (keys[i][key]) continue;
+            options[i].push(segment);
+            keys[i][key] = true;
+          }
+        }
+
+        const work = [];
+        for (let [fn, {arity, options}] of jobs) {
+          work.push(Promise
+            .resolve(options)
+            .then(fn)
+            .catch(er => {
+              if (bailOnError) throw er;
+              let $error = er;
+              if (er instanceof Error) {
+                $error = {name: er.name, message: er.message, ...er};
+              }
+              const value = {$error};
+              const change = [];
+              const {paths} = options;
+              for (let i = 0, l = paths.length; i < l; ++i) {
+                const path = arity > 0 ? paths[i].slice(0, arity) : paths[i];
+                change.push({path, value});
+              }
+              return change;
+            })
+            .then(newChange => {
+              applyChange(db, newChange, watchers);
+              change.push(newChange);
+            })
+          );
+        }
+
+        const recurse = () =>
+          this.run({
+            store,
+            query: [unresolvedPaths],
+            context,
+            change,
+            bailOnError,
+            onlyUnresolved: true
+          });
+
+        return Promise.all(work).then(recurse);
+      });
+}
+
+export class Run {
+  constructor({
+    router: DEFAULT_ROUTER,
+    query = [],
+    context = {},
+    force = false,
+    store = new Store(),
+    watchers,
+    bailOnError = false,
+    onlyUnresolved = false
+  } = {}) {
+    this.router = router,
+    this.query = query;
+    this.context = {};
+    this.force = force;
+    this.change = change = [];
+    this.store = store;
+    this.bailOnError = bailOnError;
+    this.onlyUnresolved = onlyUnresolved;
+  }
+
+  start() {
+    return Promise.resolve().then(() => {
+      const paths = this.getPaths();  
+    });
+  }
+}
+
+const ROUTE_NOT_FOUND_ERROR = new Error('Route not found');
+const DEFAULT_ROUTES = {'*': () => { throw ROUTE_NOT_FOUND_ERROR; }};
+const DEFAULT_ROUTER = new Router({routes: DEFAULT_ROUTES});
+
+export class Store {
+  constructor({cache = {}, router = DEFAULT_ROUTER} = {}) {
+    this.cache = cache;
+    this.router = router;
+    this.watchers = {};
+  }
+
+  run({query, context, force = false, bailOnError = false}) {
+    return this.router.run({store: this, query, context, force, bailOnError});
+  }
+}
+
+console.log(new Router({routes: {'foo|bar': () => {}}}));
+
+// store
+//   .run({query: ['verify!', {token: 'xxx'}], bailOnError: true})
+//   .then(() => {})
+//   .catch(er => {});

@@ -12,6 +12,11 @@ export default class extends Component {
   componentDidMount() {
     const {location: {query: {token}}, router: {replace}} = this.context;
     if (!token) return replace('/');
+    run({
+      router,
+      db,
+      context: {failOnError: true}
+    })
     live.send('verify', token, (er, auth) => {
       if (er) return console.error(er);
       db.set('auth', auth);
