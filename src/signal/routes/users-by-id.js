@@ -12,7 +12,14 @@ export default {
             user.id === userId || key !== 'emailAddress' ?
             user[key] :
             null
-        }))
+        })).concat({
+          path: ['usersById', user.id, 'hosts'],
+          value: [
+            {$ref: ['hostsById', '1-Larry']},
+            {$ref: ['hostsById', '1-Curly']},
+            {$ref: ['hostsById', '1-Mo']}
+          ]
+        })
       )
     )
 };

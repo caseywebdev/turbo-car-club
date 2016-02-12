@@ -1,7 +1,7 @@
-import db from '../utils/db';
+import disk from '../utils/disk';
 import Meta from './meta';
 import React, {Component, PropTypes} from 'react';
-import live from '../utils/live';
+import store from '../utils/store';
 
 export default class extends Component {
   static contextTypes = {
@@ -12,17 +12,13 @@ export default class extends Component {
   componentDidMount() {
     const {location: {query: {token}}, router: {replace}} = this.context;
     if (!token) return replace('/');
-    run({
-      router,
-      db,
-      context: {failOnError: true}
-    })
-    live.send('verify', token, (er, auth) => {
-      if (er) return console.error(er);
-      db.set('auth', auth);
-      console.log('verify authorized!');
-      replace('/');
-    });
+    store
+      .run({query: ['verify!', {token}], allOrNothing: true})
+      .then(() => {
+        disk.set('authToken', store.get(['authToken']))
+        replace('/');
+      })
+      .catch(er => console.error(er));
   }
 
   render() {

@@ -1,8 +1,31 @@
-import config from '../config';
+import disk from './disk';
+import {Store, Router} from '../../shared/utils/falcomlay';
+import live from './live';
+import promisify from '../../shared/utils/promisify';
 
-const {prefix} = config.db;
+const send = promisify(::live.send);
 
-export default {
-  get: key => JSON.parse(localStorage[[prefix, key].join(':')] || null),
-  set: (key, val) => localStorage[[prefix, key].join(':')] = JSON.stringify(val)
-};
+const store = new Store({
+  db: {
+    authToken: disk.get('authToken')
+  },
+  router: new Router({
+    routes: {
+      '*': ({paths}) => {
+        const token = store.get(['authToken']);
+        return send('falcomlay', {
+          query: [[
+            token ? ['auth!', {token}] : [],
+            ...paths
+          ]]
+        });
+      }
+    }
+  })
+});
+
+live.on('change', ::store.applyChange);
+
+store.watch(['authToken'], console.log.bind('auth token changed!'));
+
+export default store;

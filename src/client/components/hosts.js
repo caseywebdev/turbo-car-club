@@ -9,7 +9,7 @@ export default createContainer(
   ({isLoading, hosts}) =>
     <div>
       <div>Hosts</div>
-      {_.map(_.compact(hosts), renderHost)}
+      {_.map(hosts, renderHost)}
       {isLoading ? 'Loading...' : null}
     </div>,
   {
@@ -19,15 +19,15 @@ export default createContainer(
 
     queries: ({range}) => [
       'hosts',
-      {foo: 'bar'},
+      {range},
       [
         'length',
         [range, Host.fragments().host]
       ]
     ],
 
-    remap: ({range}) => ({
-      hosts: get(db, ['hosts', {foo: 'bar'}])
+    props: () => ({
+      hosts: ['hosts']
     })
   }
 );

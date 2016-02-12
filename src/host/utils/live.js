@@ -9,8 +9,6 @@ live.on('open', () => {
   log.info('Connected to signal server, authorizing as a host...');
   live.send('falcomlay', {
     query: ['auth-host!', {token: config.key}]
-  }, (er, change) => {
-    console.log(er, JSON.stringify(change));
   });
 });
 

@@ -1,13 +1,12 @@
 import _ from 'underscore';
 import React, {Component, PropTypes} from 'react';
-import db from '../utils/db';
-import router from '../utils/router';
-import {run} from '../../shared/utils/falcomlay';
+import store from '../utils/store';
 
 export default (ContainedComponent, {
   defaultParams = {},
   queries = _.constant([]),
-  remap = _.identity,
+  props = _.constant({}),
+  onLoad = _.noop,
   ...statics
 } = {}) => {
   class Container extends Component {
@@ -27,25 +26,36 @@ export default (ContainedComponent, {
 
     setParams = params => {
       this.params = _.extend({}, this.params, params);
-      this.run();
+      return this.run();
     };
 
     run() {
-      ++this.loading;
-      run({router, db, queries: queries(this.params)}).then(this.handleRun);
+      this.setState({isLoading: true});
+      return store
+        .run({queries: queries(this.params)})
+        .then(::this.handleRunResolve, ::this.handleRunReject);
     }
 
-    handleRun = changes => {
-      --this.loading;
-      this.setState(remap(json));
-    };
+    handleRunResolve() {
+      this.setState({
+        error: null,
+        isLoading: false,
+        ..._.mapObject(props(this.params), path => store.get(path))
+      });
+    }
+
+    handleRunReject(er) {
+      this.setState({
+        error: er,
+        isLoading: false
+      });
+    }
 
     render() {
       return (
         <ContainedComponent
           {...this.state}
           {...this.props}
-          isLoading={this.loading > 0}
           params={this.params}
           setParams={this.setParams}
         />

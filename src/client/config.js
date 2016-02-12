@@ -2,7 +2,7 @@ import shared from '../shared/config';
 
 export default {
   ...shared,
-  db: {
+  disk: {
     prefix: 'tcc'
   },
   signal: {

@@ -1,4 +1,4 @@
-import {createRouter} from '../../shared/utils/falcomlay';
+import {Router} from '../../shared/utils/falcomlay';
 
 import auth from './auth';
 import authHost from './auth-host';
@@ -10,14 +10,17 @@ import user from './user';
 import usersById from './users-by-id';
 import verify from './verify';
 
-export default createRouter({
-  ...auth,
-  ...authHost,
-  ...hosts,
-  ...hostsById,
-  ...notFound,
-  ...signIn,
-  ...user,
-  ...usersById,
-  ...verify
+export default new Router({
+  maxQueryCost: 10000,
+  routes: {
+    ...auth,
+    ...authHost,
+    ...hosts,
+    ...hostsById,
+    ...notFound,
+    ...signIn,
+    ...user,
+    ...usersById,
+    ...verify
+  }
 });

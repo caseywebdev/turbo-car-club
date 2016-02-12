@@ -7,8 +7,6 @@ import './utils/livereload';
 //
 // render(<Router {...{history, routes}} />, document.getElementById('main'));
 
-import live from './utils/live';
-
 // live.send('sign-in', 'c@sey.me', (er) => {
 //   console.log(er || 'Email sent');
 // });
@@ -25,43 +23,13 @@ import live from './utils/live';
 // };
 
 import _ from 'underscore';
-import {
-  createRouter,
-  run,
-  // applyChange,
-  get,
-  watch
-} from '../shared/utils/falcomlay';
+import store from './utils/store';
 
-import db from './utils/db';
-
-const router = createRouter({
-  '*': ({paths, context: {failOnError}}) =>
-    new Promise((resolve, reject) =>
-      console.log(paths) ||
-      live.send('falcomlay', {
-        query: [paths],
-        failOnError
-      }, (er, change) => {
-        if (er) return reject(er);
-        resolve(change);
-      })
-    )
-});
-
-const watchers = {};
-watch(watchers, ['hosts'], () => {
-  console.log('hosts triggered!');
-});
-
-run({
-  router,
-  db,
-  context: {},
-  query: ['verify!', {token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbEFkZHJlc3MiOiJjQHNleS5tZSIsInNpZ25lZEluQXQiOm51bGwsInNvY2tldElkIjoiNjM5NzdjYWItYzQ3Yy00ZmZiLTg0YTctMjdkY2Q0YzVlOTIzIiwiaWF0IjoxNDU1MjMxMTc2LCJzdWIiOiJ2ZXJpZnkifQ.zS4ZczoNeD6374zRLfaxS4RMR5_Q2iCXXnyzWqEtlIY'}]
-}).then(::console.log);
-// run({
-//   router,
+// store.run({
+//   allOrNothing: true,
+//   query: ['verify!', {token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbEFkZHJlc3MiOiJjQHNleS5tZSIsInNpZ25lZEluQXQiOm51bGwsInNvY2tldElkIjoiNjM5NzdjYWItYzQ3Yy00ZmZiLTg0YTctMjdkY2Q0YzVlOTIzIiwiaWF0IjoxNDU1MjMxMTc2LCJzdWIiOiJ2ZXJpZnkifQ.zS4ZczoNeD6374zRLfaxS4RMR5_Q2iCXXnyzWqEtlIY'}]
+// }).then(::console.log).catch(::console.error);
+// store.run({
 //   query: ['sign-in!', {emailAddress: 'c@sey.me'}]
 // }).then(::console.log);
 // run({
@@ -70,11 +38,7 @@ run({
 //   query: ['auth!', {token: get(db, ['authToken'])}]
 // }).then(::console.log);
 
-run({
-  router,
-  db,
-  watchers,
-  context: {},
+store.run({
   query: [[
     [
       'hosts',
@@ -89,12 +53,12 @@ run({
           ]
         ]
       ]
-    ],
-    ['user', ['id', 'name']]
+    ]
+    // ['user', ['id', 'name']]
   ]]
 })
   .then(() => {
-    console.log(db);
-    console.log(get(db, ['hosts', 0, 'owner']));
+    console.log(store.cache);
+    console.log(store.get(['hosts', 0]));
   })
   .catch(::console.error);

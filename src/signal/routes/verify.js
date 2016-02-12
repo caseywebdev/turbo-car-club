@@ -22,8 +22,9 @@ export default {
       .then(user => {
         const authToken = sign(key, 'auth', {userId: user.id});
         const origin = app.live.sockets[data.socketId];
-        if (origin && origin !== socket) origin.send('auth', authToken);
-        return {path: 'authToken', value: authToken};
+        const change = {path: 'authToken', value: authToken};
+        if (origin && origin !== socket) origin.send('change', change);
+        return change;
       });
   }
 };
