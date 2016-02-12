@@ -5,25 +5,27 @@ import React from 'react';
 
 const renderHost = (host, key) => <Host {...{host, key}} />;
 
+let tid;
+
 export default createContainer(
-  ({isLoading, hosts}) =>
+  ({error, isLoading, hosts, setParams, params: {to}}) =>
+    clearTimeout(tid) ||
+    (tid = setTimeout(() => setParams({to: ++to % 4}), 1000)) &&
     <div>
       <div>Hosts</div>
-      {_.map(hosts, renderHost)}
+      {error ? error.toString() : null}
+      {_.map(hosts, renderHost).slice(0, to)}
       {isLoading ? 'Loading...' : null}
     </div>,
   {
     defaultParams: {
-      range: _.range(10)
+      to: 0
     },
 
-    queries: ({range}) => [
+    query: ({to}) => [
       'hosts',
-      {range},
-      [
-        'length',
-        [range, Host.fragments().host]
-      ]
+      _.range(to),
+      Host.fragments().host
     ],
 
     props: () => ({

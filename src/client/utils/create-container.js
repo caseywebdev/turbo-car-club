@@ -4,24 +4,21 @@ import store from '../utils/store';
 
 export default (ContainedComponent, {
   defaultParams = {},
-  queries = _.constant([]),
+  query = _.constant([]),
   props = _.constant({}),
-  onLoad = _.noop,
   ...statics
 } = {}) => {
   class Container extends Component {
     static propTypes = {
-      params: PropTypes.object,
-      ...statics.propTypes
+      params: PropTypes.object
     };
 
     params = defaultParams;
 
     loading = 0;
 
-    constructor(props) {
-      super(props);
-      this.setParams(props.params);
+    componentWillMount() {
+      this.setParams(this.props.params);
     }
 
     setParams = params => {
@@ -32,7 +29,7 @@ export default (ContainedComponent, {
     run() {
       this.setState({isLoading: true});
       return store
-        .run({queries: queries(this.params)})
+        .run({query: query(this.params)})
         .then(::this.handleRunResolve, ::this.handleRunReject);
     }
 

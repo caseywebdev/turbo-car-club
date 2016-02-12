@@ -52,7 +52,7 @@ module.exports = {
     {name: 'json', only: '**/*.json'},
     {
       name: 'babel',
-      only: 'src/**/*.+(js|json|frag|vert)',
+      only: ['src/**/*.+(js|json|frag|vert)', 'build/client/class-names.json'],
       options: {presets: ['es2015', 'stage-0', 'react']}
     },
     {
