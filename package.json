@@ -37,6 +37,7 @@
     "cogs-transformer-text": "2.0.0",
     "cogs-transformer-uglify-js": "1.0.3",
     "cogs": "2.0.7",
+    "eslint-plugin-react": "3.16.1",
     "eslint": "1.10.3",
     "livereload": "0.4.1",
     "react-dom": "0.14.7",
