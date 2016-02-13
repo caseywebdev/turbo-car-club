@@ -1,4 +1,5 @@
 #!/bin/bash -e
 
-while [ ! -f node_modules/.bin/livereload ]; do sleep 1; done
-exec node_modules/.bin/livereload build/client
+LIVERELOAD=node_modules/.bin/livereload
+while [ ! -f $LIVERELOAD ]; do sleep 1; done
+exec $LIVERELOAD build/client

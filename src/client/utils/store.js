@@ -6,7 +6,7 @@ import promisify from '../../shared/utils/promisify';
 const send = promisify(::live.send);
 
 const store = new Store({
-  db: {
+  cache: {
     authToken: disk.get('authToken')
   },
   router: new Router({

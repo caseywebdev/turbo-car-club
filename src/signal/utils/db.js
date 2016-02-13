@@ -3,4 +3,6 @@ import knex from 'knex';
 import log from './log';
 
 export default knex(config.knex)
-  .on('query', ({sql}) => log.info(`SQL ${sql}`));
+  .on('query', ({sql, bindings}) =>
+    log.info(`SQL ${sql} : ${JSON.stringify(bindings)}`)
+  );

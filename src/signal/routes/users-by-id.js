@@ -3,7 +3,7 @@ import _ from 'underscore';
 
 export default {
   'usersById.$key.id|name|emailAddress':
-  ({1: ids, 2: keys, context: {userId}}) =>
+  ({1: ids, 2: keys, context: {socket: {userId}}}) =>
     db('users').select('*').whereIn('id', ids).then(users =>
       _.map(users, user =>
         _.map(keys, key => ({

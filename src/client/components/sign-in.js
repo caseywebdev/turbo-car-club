@@ -1,16 +1,33 @@
 import React, {Component} from 'react';
-import Hosts from 'client/components/hosts';
-
-// live.send('sign-in', 'c@sey.me', (er) => {
-//   console.log(er || 'Email sent');
-// });
+import store from '../utils/store';
 
 export default class extends Component {
+  state = {
+    error: null,
+    isLoading: false
+  };
+
+  handleKeyDown({key, target: {value: emailAddress}}) {
+    if (key !== 'Enter') return;
+
+    this.setState({
+      error: null,
+      isLoading: true
+    });
+
+    store
+      .run({query: ['sign-in!', {emailAddress}]})
+      .then(() => {
+        console.log('email sent');
+      })
+      .catch(er => {
+        console.error(er);
+      });
+  }
+
   render() {
     return (
-      <div>
-        <Hosts />
-      </div>
+      <input onKeyDown={::this.handleKeyDown} />
     );
   }
 }
