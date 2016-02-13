@@ -5,9 +5,9 @@ KNEX=$(BIN)knex \
 	--knexfile build/signal/config.js \
 	--env knex
 
-all: dependencies cogs-server cogs-client
+all: cogs-server cogs-client
 
-dependencies:
+install:
 	@echo 'Installing dependencies...'
 	@npm install --loglevel error
 	@echo 'Deduping dependencies...'

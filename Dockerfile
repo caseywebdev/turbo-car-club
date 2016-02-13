@@ -1,5 +1,7 @@
 FROM node:5.6.0
-COPY . /code
 WORKDIR /code
+COPY package.json /code/package.json
+RUN make install
+COPY . /code
 RUN MINIFY=1 make
 CMD ["bin/host"]
