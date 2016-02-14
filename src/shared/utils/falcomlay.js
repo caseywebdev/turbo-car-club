@@ -85,7 +85,7 @@ const toKeys = arr => {
   return keys;
 };
 
-const toKey = obj =>
+export const toKey = obj =>
   isArray(obj) ? JSON.stringify(toKeys(obj)) :
   isObject(obj) ? JSON.stringify(orderObj(obj)) :
   String(obj);
@@ -292,68 +292,22 @@ export class Store {
     return this.router.run({...options, store: this});
   }
 
-  watch(path, cb) {
-    const key = toKey(path);
-    const fnid = getFnid(cb);
-
-    const {watchers} = this;
-    if (!watchers[key]) watchers[key] = {};
-    watchers[key][fnid] = cb;
-
-    if (!watchers[fnid]) watchers[fnid] = {};
-    watchers[fnid][key] = true;
+  watch(cb) {
+    this.watchers[getFnid(cb)] = cb;
   }
 
-  unwatch(path, cb) {
-    const {watchers} = this;
-    if (typeof path === 'function') {
-      const fnid = getFnid(path);
-      for (let key in watchers[fnid]) this.unwatch(key, path);
-      return;
-    }
-
-    const key = toKey(path);
-    const fnid = getFnid(cb);
-
-    if (watchers[key]) {
-      delete watchers[key][fnid];
-      if (!Object.keys(watchers[key]).length) delete watchers[key];
-    }
-
-    if (watchers[fnid]) {
-      delete watchers[fnid][key];
-      if (!Object.keys(watchers[fnid]).length) delete watchers[fnid];
-    }
+  unwatch(cb) {
+    delete this.watchers[getFnid(cb)];
   }
 
-  trigger(path) {
-    const {watchers} = this;
-    const pending = watchers.pending || [];
-    pending.push(path);
-    if (!watchers.pending) {
-      watchers.pending = pending;
-      setTimeout(() => this.flushPending());
-    }
+  trigger() {
+    if (this.triggerTimeoutId) return;
+    this.triggerTimeoutId = setTimeout(::this.flushPending);
   }
 
   flushPending() {
-    const {watchers, watchers: {pending}} = this;
-    if (!pending) return;
-    delete watchers.pending;
-    const keyHits = {};
-    const fnHits = {};
-    for (let i = 0, l = pending.length; i < l; ++i) {
-      const path = pending[i];
-      for (let j = path.length; j >= 0; --j) {
-        const key = toKey(path.slice(0, j));
-        if (keyHits[key]) break;
-        keyHits[key] = true;
-        for (let fnid in watchers[key]) {
-          if (fnHits[fnid]) continue;
-          fnHits[fnid] = true;
-          watchers[key][fnid]();
-        }
-      }
-    }
+    delete this.triggerTimeoutId;
+    const {watchers} = this;
+    for (let key in watchers) watchers[key]();
   }
 }

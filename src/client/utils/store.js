@@ -24,8 +24,6 @@ const store = new Store({
   })
 });
 
-live.on('change', ::store.applyChange);
-
-store.watch(['authToken'], console.log.bind('auth token changed!'));
+live.on('falcomlay', ::store.applyChange);
 
 export default store;

@@ -2,6 +2,7 @@ import {Router} from '../../shared/utils/falcomlay';
 
 import auth from './auth';
 import authHost from './auth-host';
+import hostKey from './host-key';
 import hosts from './hosts';
 import hostsById from './hosts-by-id';
 import notFound from './not-found';
@@ -15,6 +16,7 @@ export default new Router({
   routes: {
     ...auth,
     ...authHost,
+    ...hostKey,
     ...hosts,
     ...hostsById,
     ...notFound,

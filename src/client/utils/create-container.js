@@ -5,7 +5,7 @@ import store from '../utils/store';
 export default (ContainedComponent, {
   defaultParams = {},
   query = _.constant([]),
-  props = _.constant({}),
+  paths = _.constant({}),
   ...statics
 } = {}) => {
   class Container extends Component {
@@ -15,10 +15,15 @@ export default (ContainedComponent, {
 
     params = defaultParams;
 
-    loading = 0;
+    subs = [];
 
     componentWillMount() {
+      store.watch(this.update);
       this.setParams(this.props.params);
+    }
+
+    componentWillUnmount() {
+      store.unwatch(this.update);
     }
 
     setParams = params => {
@@ -26,19 +31,25 @@ export default (ContainedComponent, {
       return this.run();
     };
 
-    run() {
+    run = ({force = false} = {}) => {
       this.setState({isLoading: true});
       return store
-        .run({query: query(this.params)})
+        .run({force, query: query(this.params)})
         .then(::this.handleRunResolve, ::this.handleRunReject);
     }
 
     handleRunResolve() {
       this.setState({
         error: null,
-        isLoading: false,
-        ..._.mapObject(props(this.params), path => store.get(path))
+        isLoading: false
       });
+      this.update();
+    }
+
+    update = () => {
+      this.setState(
+        _.mapObject(paths(this.params), path => store.get(path))
+      );
     }
 
     handleRunReject(er) {
@@ -55,6 +66,7 @@ export default (ContainedComponent, {
           {...this.props}
           params={this.params}
           setParams={this.setParams}
+          run={this.run}
         />
       );
     }
