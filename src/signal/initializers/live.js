@@ -5,17 +5,11 @@ import ws from 'ws';
 
 import open from '../listeners/open';
 import close from '../listeners/close';
-import auth from '../listeners/auth';
-import authHost from '../listeners/auth-host';
 import falcomlay from '../listeners/falcomlay';
-import signIn from '../listeners/sign-in';
 const LISTENERS = {
   open,
   close,
-  auth,
-  'auth-host': authHost,
-  falcomlay,
-  'sign-in': signIn
+  falcomlay
 };
 
 log.info(`Starting WebSocket server on port 80`);
