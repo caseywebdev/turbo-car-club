@@ -24,6 +24,4 @@ const store = new Store({
   })
 });
 
-live.on('falcomlay', ::store.applyChange);
-
 export default store;

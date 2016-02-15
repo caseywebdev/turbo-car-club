@@ -1,12 +1,11 @@
-import _ from 'underscore';
 import app from '..';
 import log from '../utils/log';
+import {remove, trigger} from '../utils/subs';
 
 export default ({socket}) => {
+  remove(socket);
   delete app.live.sockets[socket.id];
   log.info(`${socket.id} disconnected`);
   if (!socket.host) return;
-  _.each(app.live.sockets, socket =>
-    socket.send('falcomlay', {path: ['hosts'], value: undefined})
-  );
+  trigger('host-removed');
 };

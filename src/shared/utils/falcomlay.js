@@ -140,7 +140,7 @@ export class Router {
         const undefPaths = [];
         for (let i = 0, l = paths.length; i < l; ++i) {
           const path = paths[i];
-          const [resolved] = store.resolvePath(path);
+          const resolved = store.resolvePath(path);
           if (onlyUnresolved && path === resolved) continue;
           if (store.get(resolved) === undefined) undefPaths.push(resolved);
         }
@@ -214,7 +214,7 @@ export class Store {
   constructor({cache = {}, router = DEFAULT_ROUTER, maxRefDepth = 3} = {}) {
     this.cache = cache;
     this.router = router;
-    this.watchers = {};
+    this.listeners = {};
     this.maxRefDepth = maxRefDepth;
   }
 
@@ -250,64 +250,80 @@ export class Store {
   }
 
   set(path, value) {
-    const paths = [];
-    const resolved = this.resolvePath(path.slice(0, -1));
-    const tail = path[path.length - 1];
-    for (let i = 0, l = resolved.length; i < l; ++i) {
-      const path = resolved[i].concat(tail);
-      paths.push(path);
-      this.trigger(path);
-    }
+    path = this.resolvePath(path.slice(0, -1)).concat(path[path.length - 1]);
     let cursor = this.cache;
-    for (let i = 0, l = paths[0].length; i < l; ++i) {
-      const key = toKey(paths[0][i]);
-      if (i === l - 1) return cursor[key] = value;
-      if (cursor[key] == null) cursor[key] = {};
-      cursor = cursor[key];
+    for (let i = 0, l = path.length; i < l; ++i) {
+      const key = toKey(path[i]);
+      if (i === l - 1) {
+        if (cursor[key] === value) break;
+        cursor[key] = value;
+        this.triggerChange();
+      } else {
+        if (cursor[key] == null) cursor[key] = {};
+        cursor = cursor[key];
+      }
     }
     return this;
   }
 
-  resolvePath(path, paths = []) {
-    paths.unshift(path);
+  resolvePath(path) {
     let cursor = this.cache;
     for (let i = 0, l = path.length; i < l && cursor != null; ++i) {
       if (cursor = cursor[toKey(path[i])]) {
         const {$ref} = cursor;
-        if ($ref) {
-          return this.resolvePath($ref.concat(path.slice(i + 1)), paths);
-        }
+        if ($ref) return this.resolvePath($ref.concat(path.slice(i + 1)));
       }
     }
-    return paths;
+    return path;
   }
 
   applyChange(change) {
     if (!change) return;
     if (!isArray(change)) return this.set(change.path, change.value);
     for (let i = 0, l = change.length; i < l; ++i) this.applyChange(change[i]);
+    return this;
   }
 
   run(options) {
     return this.router.run({...options, store: this});
   }
 
-  watch(cb) {
-    this.watchers[getFnid(cb)] = cb;
+  triggerChange() {
+    if (!this.triggerChangeTimeoutId) {
+      this.triggerChangeTimeoutId = setTimeout(::this._triggerChange);
+    }
+    return this;
   }
 
-  unwatch(cb) {
-    delete this.watchers[getFnid(cb)];
+  _triggerChange() {
+    delete this.triggerChangeTimeoutId;
+    return this.trigger('change');
   }
 
-  trigger() {
-    if (this.triggerTimeoutId) return;
-    this.triggerTimeoutId = setTimeout(::this.flushPending);
+  on(name, cb) {
+    let listeners = this.listeners[name];
+    if (!listeners) listeners = this.listeners[name] = [];
+    listeners.push(cb);
+    return this;
   }
 
-  flushPending() {
-    delete this.triggerTimeoutId;
-    const {watchers} = this;
-    for (let key in watchers) watchers[key]();
+  off(name, cb) {
+    if (!name) this.listeners = {};
+    if (!cb) delete this.listeners[name];
+    let listeners = this.listeners[name];
+    if (!listeners) return this;
+    const newListeners = this.listeners[name] = [];
+    for (let i = 0, l = listeners.length; i < l; ++i) {
+      if (listeners[i] !== cb) newListeners.push(listeners[i]);
+    }
+    if (!newListeners.length) delete this.listeners[name];
+    return this;
+  }
+
+  trigger(name, data, cb) {
+    const listeners = this.listeners[name];
+    if (!listeners) return this;
+    for (let i = 0, l = listeners.length; i < l; ++i) listeners[i](data, cb);
+    return this;
   }
 }

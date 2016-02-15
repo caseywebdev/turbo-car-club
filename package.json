@@ -41,6 +41,7 @@
     "eslint": "1.10.3",
     "livereload": "0.4.1",
     "react-dom": "0.14.7",
+    "react-list": "0.7.14",
     "react-router": "2.0.0",
     "react": "0.14.7",
     "three": "0.74.0",

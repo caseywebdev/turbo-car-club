@@ -3,13 +3,19 @@ import Live from 'live-socket';
 import log from '../utils/log';
 import ws from 'ws';
 
-import open from '../listeners/open';
 import close from '../listeners/close';
 import falcomlay from '../listeners/falcomlay';
+import open from '../listeners/open';
+import signal from '../listeners/signal';
+import sub from '../listeners/sub';
+import unsub from '../listeners/unsub';
 const LISTENERS = {
-  open,
   close,
-  falcomlay
+  falcomlay,
+  open,
+  signal,
+  sub,
+  unsub
 };
 
 log.info(`Starting WebSocket server on port 80`);

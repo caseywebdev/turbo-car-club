@@ -1,8 +1,8 @@
-import _ from 'underscore';
 import app from '..';
 import config from '../config';
 import log from '../utils/log';
 import verify from '../../shared/utils/verify';
+import {trigger} from '../utils/subs';
 
 const {key, errors: {invalidKey}} = config;
 
@@ -20,8 +20,6 @@ export default {
     log.info(`${socket.id} signed in as host ${id}`);
     delete app.live.sockets[socket.id];
     app.live.sockets[socket.id = id] = socket;
-    _.each(app.live.sockets, socket =>
-      socket.send('falcomlay', {path: ['hosts'], value: undefined})
-    );
+    trigger('host-added');
   }
 };

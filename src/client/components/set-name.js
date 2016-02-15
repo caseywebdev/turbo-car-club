@@ -18,7 +18,7 @@ export default class extends Component {
     store
       .run({query: ['user!', {name}]})
       .then(() => {
-        console.log('email sent');
+        console.log('name set');
       })
       .catch(er => {
         console.error(er);

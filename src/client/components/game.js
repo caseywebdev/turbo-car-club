@@ -56,9 +56,6 @@ export default class extends Component {
         console.log('verify authorized!');
       });
     }
-    // this.live.send('sign-in', 'c@sey.me', (er) => {
-    //   console.log(er || 'Email sent');
-    // });
   }
 
   setHost(id) {
