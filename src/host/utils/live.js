@@ -7,9 +7,7 @@ log.info(`Connecting to signal server at ${config.signal.url}...`);
 const live = new Live({WebSocket: ws, url: config.signal.url});
 live.on('open', () => {
   log.info('Connected to signal server, authorizing as a host...');
-  live.send('falcomlay', {
-    query: ['auth-host!', {token: config.key}]
-  });
+  live.send('pave', {query: ['auth-host!', {token: config.key}]});
 });
 
 export default live;

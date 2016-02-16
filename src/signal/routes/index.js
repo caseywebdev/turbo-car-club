@@ -1,4 +1,4 @@
-import {Router} from '../../shared/utils/falcomlay';
+import {Router} from 'pave';
 
 import auth from './auth';
 import authHost from './auth-host';

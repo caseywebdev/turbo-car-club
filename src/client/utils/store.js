@@ -1,5 +1,5 @@
 import disk from './disk';
-import {Store, Router} from '../../shared/utils/falcomlay';
+import {Store, Router} from 'pave';
 import live from './live';
 import promisify from '../../shared/utils/promisify';
 
@@ -13,7 +13,7 @@ const store = new Store({
     routes: {
       '*': ({paths}) => {
         const token = store.get(['authToken']);
-        return send('falcomlay', {
+        return send('pave', {
           query: [[
             token ? ['auth!', {token}] : [],
             ...paths

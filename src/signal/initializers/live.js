@@ -4,15 +4,16 @@ import log from '../utils/log';
 import ws from 'ws';
 
 import close from '../listeners/close';
-import falcomlay from '../listeners/falcomlay';
 import open from '../listeners/open';
+import pave from '../listeners/pave';
 import signal from '../listeners/signal';
 import sub from '../listeners/sub';
 import unsub from '../listeners/unsub';
+
 const LISTENERS = {
   close,
-  falcomlay,
   open,
+  pave,
   signal,
   sub,
   unsub

@@ -2,12 +2,12 @@ import _ from 'underscore';
 import live from '../utils/live';
 import Host from './host';
 import React from 'react';
-import FalcomlayComponent from './falcomlay-component';
+import {Component} from 'pave-react';
 import ReactList from 'react-list';
 
 import store from '../utils/store';
 
-export default class extends FalcomlayComponent {
+export default class extends Component {
   store = store;
 
   getQuery() {
@@ -29,7 +29,7 @@ export default class extends FalcomlayComponent {
 
   state = {
     from: 0,
-    size: 10
+    size: 100
   };
 
   componentWillMount() {
@@ -47,7 +47,7 @@ export default class extends FalcomlayComponent {
   update = () => {
     const {hosts, from, size} = this.state;
     if (!hosts) return;
-    for (let index of hosts) {
+    for (let index in hosts) {
       index = parseInt(index);
       if (isNaN(index)) continue;
       if (index < from || index > from + size) {

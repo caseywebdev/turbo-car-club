@@ -40,6 +40,8 @@
     "eslint-plugin-react": "3.16.1",
     "eslint": "1.10.3",
     "livereload": "0.4.1",
+    "pave": "0.0.1",
+    "pave-react": "0.0.2",
     "react-dom": "0.14.7",
     "react-list": "0.7.14",
     "react-router": "2.0.0",

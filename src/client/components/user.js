@@ -1,10 +1,10 @@
-import FalcomlayComponent from './falcomlay-component';
+import {Component} from 'pave-react';
 import React from 'react';
 import SignIn from './sign-in';
 import SetName from './set-name';
 import store from '../utils/store';
 
-export default class extends FalcomlayComponent {
+export default class extends Component {
   store = store;
 
   getQuery() {
