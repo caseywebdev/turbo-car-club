@@ -7,8 +7,8 @@ import mail from '../utils/mail';
 const {key} = config;
 
 export default {
-  'sign-in!.$params':
-  ({context: {socket}, 1: [{emailAddress}]}) =>
+  'sign-in!.$obj':
+  ({context: {socket}, 1: {emailAddress}}) =>
     findUser({emailAddress}).then(({signedInAt} = {}) =>
       mail({
         to: emailAddress,

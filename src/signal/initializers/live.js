@@ -19,10 +19,12 @@ const LISTENERS = {
   unsub
 };
 
-log.info(`Starting WebSocket server on port 80`);
+log.info('Starting WebSocket server on port 80');
 const server = new ws.Server({port: 80});
 
 const sockets = {};
+const users = {};
+const hosts = {};
 
 server.on('connection', ws => {
   const socket = new Live({socket: ws});
@@ -31,11 +33,10 @@ server.on('connection', ws => {
       Promise
         .resolve({socket, params})
         .then(cb)
-        .then(res => res === undefined || done(null, res))
-        .catch(done)
+        .then(res => res === undefined || done(null, res), done)
     )
   );
   socket.trigger('open');
 });
 
-export default {sockets};
+export default {sockets, users, hosts};

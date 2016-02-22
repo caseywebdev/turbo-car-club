@@ -1,15 +1,15 @@
-import app from '..';
 import _ from 'underscore';
+import app from '..';
 
 export default {
-  'hosts.$key':
+  'hosts.$keys':
   ({1: keys}) => {
-    const hosts = _.compact(_.map(app.live.sockets, 'host'));
+    const hosts = _.values(app.live.hosts);
     return _.map(keys, key => ({
       path: ['hosts', key],
       value:
-        key === 'length' ? hosts.length :
-        hosts[key] ? {$ref: ['hostsById', hosts[key].id]} :
+        key === 'length' ? _.size(hosts) :
+        hosts[key] ? {$ref: ['hostsById', hosts[key].host.id]} :
         null
     }));
   }

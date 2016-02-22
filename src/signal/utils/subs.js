@@ -13,7 +13,7 @@ export const remove = (socket, event) => {
   if (!events) return;
 
   if (!event) {
-    for (let e of events) remove(socket, e);
+    for (let e in events) remove(socket, e);
     return;
   }
 

@@ -11,17 +11,11 @@ const store = new Store({
   },
   router: new Router({
     routes: {
-      '*': ({paths}) => {
-        const token = store.get(['authToken']);
-        return send('pave', {
-          query: [[
-            token ? ['auth!', {token}] : [],
-            ...paths
-          ]]
-        });
-      }
+      '*': ({paths}) => send('pave', {query: [paths]})
     }
   })
 });
+
+live.on('auth', token => store.set(['authToken'], token));
 
 export default store;

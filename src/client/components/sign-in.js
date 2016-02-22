@@ -26,8 +26,6 @@ export default class extends Component {
   }
 
   render() {
-    return (
-      <input onKeyDown={::this.handleKeyDown} />
-    );
+    return <input placeholder='Sign In' onKeyDown={::this.handleKeyDown} />;
   }
 }

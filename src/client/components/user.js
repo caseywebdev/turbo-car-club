@@ -7,13 +7,18 @@ import store from '../utils/store';
 export default class extends Component {
   store = store;
 
-  getQuery() {
-    return ['user', ['id', 'name', 'emailAddress']];
+  getPaveQuery() {
+    const token = store.get(['authToken']);
+    if (!token) return [];
+    return [[
+      ['auth!', {token}],
+      ['user', ['id', 'name', 'emailAddress']]
+    ]];
   }
 
-  getPaths() {
+  getPaveState() {
     return {
-      user: ['user']
+      user: store.get(['user'])
     };
   }
 
@@ -22,14 +27,15 @@ export default class extends Component {
     return (
       <div>
         <div>User</div>
-        {isLoading ? 'Loading...' : null}
         {
-          error ?
-          <SignIn /> :
-          <div>
-            <pre>{JSON.stringify(user)}</pre>
-            <SetName />
-          </div>
+          isLoading ? 'Loading...' :
+          error ? error.toString() :
+          user ?
+            <div>
+              <pre>{JSON.stringify(user)}</pre>
+              <SetName />
+            </div> :
+          <SignIn />
         }
       </div>
     );

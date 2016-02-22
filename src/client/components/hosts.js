@@ -10,7 +10,7 @@ import store from '../utils/store';
 export default class extends Component {
   store = store;
 
-  getQuery() {
+  getPaveQuery() {
     const {from, size} = this.state;
     return [
       'hosts',
@@ -21,9 +21,9 @@ export default class extends Component {
     ];
   }
 
-  getPaths() {
+  getPaveState() {
     return {
-      hosts: ['hosts']
+      hosts: store.get(['hosts'])
     };
   }
 

@@ -8,8 +8,8 @@ import verify from '../../shared/utils/verify';
 const {key, errors: {invalidKey}, verifyKeyMaxAge} = config;
 
 export default {
-  'verify!.$params':
-  ({context: {socket}, 1: [{token}]}) => {
+  'verify!.$obj':
+  ({context: {socket}, 1: {token}}) => {
     const data = verify(key, 'verify', token, verifyKeyMaxAge);
     if (!data) throw invalidKey;
     const {emailAddress} = data;
@@ -20,11 +20,10 @@ export default {
         return updateSignedInAt(id);
       })
       .then(user => {
-        const authToken = sign(key, 'auth', {userId: user.id});
+        const authToken = sign(key, 'auth', {type: 'user', userId: user.id});
         const origin = app.live.sockets[data.socketId];
-        const change = {path: ['authToken'], value: authToken};
-        if (origin && origin !== socket) origin.send('change', change);
-        return change;
+        if (origin && origin !== socket) origin.send('auth', authToken);
+        return {path: ['authToken'], value: authToken};
       });
   }
 };

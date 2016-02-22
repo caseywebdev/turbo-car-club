@@ -1,4 +1,7 @@
-FROM node:5.6.0
+FROM node:5
+
+# Workaround until https://github.com/npm/npm/issues/9863 is resolved.
+RUN curl -L https://npmjs.org/install.sh | npm_install=2 sh
 
 WORKDIR /code
 

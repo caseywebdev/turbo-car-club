@@ -75,7 +75,7 @@ larry:
   links:
     - signal
   environment:
-    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvd25lcklkIjoxLCJuYW1lIjoiTGFycnkiLCJpYXQiOjE0NTM2MDAzNjgsInN1YiI6ImtleSJ9.xG2GFwbE6jgyjOmMYMd733cjAorzBr-1i1e2JlHIqGc
+    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoiaG9zdCIsIm93bmVySWQiOjEsIm5hbWUiOiJMYXJyeSIsImlhdCI6MTQ1NjE2ODUyMCwic3ViIjoiYXV0aCJ9.Jy-PJLm1Hclm-wFT8PmMW4naNA-8IMXhCIWgq66i9L0
     SIGNAL_URL: ws://signal
   command: make host-w
 
@@ -84,7 +84,7 @@ curly:
   links:
     - signal
   environment:
-    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvd25lcklkIjoxLCJuYW1lIjoiQ3VybHkiLCJpYXQiOjE0NTM2MDAzODUsInN1YiI6ImtleSJ9.FuhNt3a12hfCmcMlaI6X7z0CPDSqLN3MCwGhJHpZY4c
+    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoiaG9zdCIsIm93bmVySWQiOjEsIm5hbWUiOiJDdXJseSIsImlhdCI6MTQ1NjE2ODUyNCwic3ViIjoiYXV0aCJ9.qTDNlKMfTRyYdYKAqV6N72X0UlL6acQntNvoq7Grd-Q
     SIGNAL_URL: ws://signal
   command: make host-w
 
@@ -93,6 +93,6 @@ mo:
   links:
     - signal
   environment:
-    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvd25lcklkIjoxLCJuYW1lIjoiTW8iLCJpYXQiOjE0NTM2MDA0MDEsInN1YiI6ImtleSJ9.i-Rb6RxSylQpXOqyf7uGyE5LmzMiXU6gPDsm6pjP4K8
+    KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoiaG9zdCIsIm93bmVySWQiOjEsIm5hbWUiOiJNbyIsImlhdCI6MTQ1NjE2ODUyNiwic3ViIjoiYXV0aCJ9.vuBb3U5Q_LPn2omLT_-AOo8EX0iWSL84qZz2Q80R1LI
     SIGNAL_URL: ws://signal
   command: make host-w

@@ -14,8 +14,8 @@ export default {
     return {path: ['user'], value: {$ref: ['usersById', userId]}};
   },
 
-  'user!.$params':
-  ({1: [{name}], context: {socket: {userId}}}) => {
+  'user!.$obj':
+  ({1: {name}, context: {socket: {userId}}}) => {
     if (!userId) throw authRequired;
     name = _str.clean(name);
     if (!name || name.length > MAX) throw INVALID_NAME;
