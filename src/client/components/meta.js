@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import React, {Component, PropTypes} from 'react';
 
-const components = new Set();
+let components = [];
 
 export default class extends Component {
   static propTypes = {
@@ -9,9 +9,8 @@ export default class extends Component {
     title: PropTypes.string
   };
 
-  constructor(props) {
-    super(props);
-    components.add(this);
+  componentWillMount() {
+    components.push(this);
   }
 
   componentDidMount() {
@@ -23,13 +22,16 @@ export default class extends Component {
   }
 
   componentWillUnmount() {
-    components.delete(this);
+    components = _.without(components, this);
   }
 
   updateTitle() {
-    const titles = [];
-    components.forEach(({props: {title}}) => titles.push(title));
-    document.title = _.compact(titles).join(' > ');
+    document.title = _.chain(components)
+      .map(({props: {title}}) => title)
+      .compact()
+      .reverse()
+      .join(' | ')
+      .value();
   }
 
   render() {
