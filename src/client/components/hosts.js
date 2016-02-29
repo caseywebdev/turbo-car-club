@@ -54,7 +54,7 @@ export default class extends Component {
         store.set(['hosts', index], undefined);
       }
     }
-    this.runQuery({force: true});
+    this.updatePave({force: true});
   }
 
   updateRange = _.debounce(() => {
@@ -72,10 +72,10 @@ export default class extends Component {
   }
 
   render() {
-    const {error, hosts} = this.state;
+    const {error, hosts, isLoading} = this.state;
     return (
       <div>
-        <div>Hosts</div>
+        <div>Hosts{isLoading ? ' (Loading...)' : ''}</div>
         {error ? error.toString() : null}
         <ReactList
           itemRenderer={this.renderHost}

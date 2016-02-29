@@ -5,6 +5,7 @@ const ENV = process.env;
 
 var REQUIRED = [
   'KEY',
+  'NAME',
   'SIGNAL_URL'
 ];
 
@@ -14,6 +15,7 @@ if (_.any(missing)) throw new Error('Missing env vars: ' + missing.join(', '));
 export default {
   ...shared,
   key: ENV.KEY,
+  name: ENV.NAME,
   log: {name: 'host'},
   signal: {
     url: ENV.SIGNAL_URL

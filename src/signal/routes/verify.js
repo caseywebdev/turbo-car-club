@@ -20,7 +20,7 @@ export default {
         return updateSignedInAt(id);
       })
       .then(user => {
-        const authToken = sign(key, 'auth', {type: 'user', userId: user.id});
+        const authToken = sign(key, 'auth', {userId: user.id});
         const origin = app.live.sockets[data.socketId];
         if (origin && origin !== socket) origin.send('auth', authToken);
         return {path: ['authToken'], value: authToken};
