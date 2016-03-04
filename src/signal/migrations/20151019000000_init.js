@@ -6,6 +6,7 @@ export const up = ({schema}) =>
       t.specificType('emailAddress', 'citext').unique().index();
       t.specificType('name', 'citext').unique().index();
       t.timestamp('signedInAt');
+      t.timestamp('expiredTokensAt');
       t.timestamp('createdAt').defaultTo('now()');
     });
 

@@ -49,14 +49,6 @@ export default {
       restitution: 0.5
     }
   },
-  jwt: {
-
-    // What to sign new tokens with.
-    signAlgorithm: 'HS256',
-
-    // Permissible algorithms to verify signed tokens with.
-    verifyAlgorithms: ['HS256']
-  },
   errors: {
     authRequired: new Error('Authentication required'),
     invalidKey: new Error('Invalid or expired key'),

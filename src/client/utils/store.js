@@ -11,11 +11,8 @@ const store = new Store({
   },
   router: new Router({
     routes: {
-      '*': ({paths}) => {
-        const token = store.get(['authToken']);
-        if (token) paths = [['auth!', {token}], ...paths];
-        return send('pave', {query: [paths]});
-      }
+      '*': ({paths}) =>
+        send('pave', {query: [paths], authToken: store.get(['authToken'])})
     }
   })
 });
