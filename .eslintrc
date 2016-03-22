@@ -1,12 +1,15 @@
 {
   "parser": "babel-eslint",
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 6,
+    "ecmaFeatures": {
+      "jsx": true
+    },
+  },
   "plugins": [
     "react"
   ],
-  "ecmaFeatures": {
-    "modules": true,
-    "jsx": true
-  },
   "env": {
     "amd": true,
     "browser": true,

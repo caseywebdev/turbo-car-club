@@ -50,11 +50,9 @@ export default class extends Component {
     for (let index in hosts) {
       index = parseInt(index);
       if (isNaN(index)) continue;
-      if (index < from || index > from + size) {
-        store.set(['hosts', index], undefined);
-      }
+      if (index < from || index > from + size) store.set(['hosts', index]);
     }
-    this.updatePave({force: true});
+    this.reloadPave();
   }
 
   updateRange = _.debounce(() => {

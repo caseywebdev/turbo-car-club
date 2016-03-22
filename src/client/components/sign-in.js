@@ -1,13 +1,9 @@
-import React from 'react';
-import {Component} from 'pave-react';
+import React, {Component} from 'react';
 import store from '../utils/store';
 
 export default class extends Component {
-  store = store;
-
   handleKeyDown({key, target: {value: emailAddress}}) {
-    if (key !== 'Enter') return;
-    this.updatePave({query: ['sign-in!', {emailAddress}]});
+    if (key === 'Enter') store.run({query: ['signIn!', {emailAddress}]});
   }
 
   render() {

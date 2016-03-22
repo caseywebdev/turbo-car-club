@@ -1,9 +1,10 @@
 import {Component} from 'pave-react';
-import React from 'react';
-import SignIn from './sign-in';
-import SetName from './set-name';
-import store from '../utils/store';
 import disk from '../utils/disk';
+import live from '../utils/live';
+import React from 'react';
+import SetName from './set-name';
+import SignIn from './sign-in';
+import store from '../utils/store';
 
 export default class extends Component {
   store = store;
@@ -21,10 +22,20 @@ export default class extends Component {
     };
   }
 
+  componentWillMount() {
+    super.componentWillMount();
+    live.on('auth', this.handleAuth);
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    live.off(this.handleAuth);
+  }
+
+  handleAuth = () => this.reloadPave();
+
   signOut() {
-    disk.delete('authToken');
-    store.set(['authToken'], undefined);
-    store.set(['user'], undefined);
+    store.run({query: ['signOut!']}).then(() => disk.delete('authToken'));
   }
 
   render() {
