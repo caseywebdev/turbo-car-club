@@ -4,9 +4,9 @@ export default {
   'signOut!':
   ({context: {socket}}) => {
     signOut(socket);
-    return [
-      {path: ['authToken'], value: null},
-      {path: ['user'], value: null}
-    ];
+    return {
+      authToken: {$set: null},
+      user: {$set: null}
+    };
   }
 };

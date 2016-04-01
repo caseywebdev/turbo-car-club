@@ -9,10 +9,15 @@ import store from '../utils/store';
 export default class extends Component {
   store = store;
 
+  getPaveWatchQuery() {
+    return [[
+      ['authToken'],
+      ['user']
+    ]];
+  }
+
   getPaveQuery() {
-    if (store.get(['authToken'])) {
-      return ['user', ['id', 'name', 'emailAddress']];
-    }
+    if (store.get(['authToken'])) return ['user'];
   }
 
   getPaveState() {

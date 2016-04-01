@@ -21,10 +21,7 @@ const createAuthToken = (socket, data, {id: userId}) => {
   const token = sign(key, 'auth', {userId});
   const origin = app.live.sockets[data.socketId];
   if (origin && origin !== socket) origin.send('auth', token);
-  return auth(socket, token).then(() => ({
-    path: ['authToken'],
-    value: token
-  }));
+  return auth(socket, token).then(() => ({authToken: {$set: token}}));
 };
 
 export default {

@@ -1,18 +1,17 @@
 import db from '../utils/db';
 import _ from 'underscore';
 
+const PRIVATE_FIELDS = ['emailAddress'];
+
 export default {
-  'usersById.$keys.$keys':
-  ({1: ids, 2: keys, context: {socket: {userId}}}) =>
-    db('users').select('*').whereIn('id', ids).then(users =>
-      _.map(users, user =>
-        _.map(keys, key => ({
-          path: ['usersById', user.id, key],
-          value:
-            user.id === userId || key !== 'emailAddress' ?
-            user[key] :
-            null
-        }))
-      )
-    )
+  'usersById.$keys':
+  ({1: ids, context: {socket: {userId}}}) =>
+    db('users').select('*').whereIn('id', ids).then(users => ({
+      usersById: _.reduce(users, (obj, user) => {
+        obj[user.id] = {
+          $merge: _.omit(user, user.id === userId ? [] : PRIVATE_FIELDS)
+        };
+        return obj;
+      }, {})
+    }))
 };

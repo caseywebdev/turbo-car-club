@@ -19,7 +19,7 @@ const store = new Store({
 
 live.on('auth', token => {
   disk.set('authToken', token);
-  store.set(['authToken'], token);
+  store.update({authToken: {$set: token}});
 });
 
 export default store;
