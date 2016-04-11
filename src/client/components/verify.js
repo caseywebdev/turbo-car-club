@@ -15,7 +15,7 @@ export default class extends Component {
     store
       .run({query: ['verify!', {token}], allOrNothing: true})
       .then(() => {
-        disk.set('authToken', store.get(['authToken']));
+        disk.write('authToken', store.get(['authToken']));
         replace('/');
       })
       .catch(er => console.error(er));

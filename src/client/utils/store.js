@@ -7,7 +7,7 @@ const send = promisify(::live.send);
 
 const store = new Store({
   cache: {
-    authToken: disk.get('authToken')
+    authToken: disk.read('authToken')
   },
   router: new Router({
     routes: {
@@ -18,7 +18,7 @@ const store = new Store({
 });
 
 live.on('auth', token => {
-  disk.set('authToken', token);
+  disk.write('authToken', token);
   store.update({authToken: {$set: token}});
 });
 
