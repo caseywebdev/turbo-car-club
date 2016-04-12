@@ -12,12 +12,7 @@ var REQUIRED = [
 var missing = _.reject(REQUIRED, _.partial(_.has, ENV));
 if (_.any(missing)) throw new Error('Missing env vars: ' + missing.join(', '));
 
-const knex = {
-  client: 'postgresql',
-  connection: ENV.POSTGRES_URL,
-  pool: {min: 2, max: 10},
-  migrations: {tableName: 'migrations'}
-};
+const knex = {client: 'pg', connection: ENV.POSTGRES_URL};
 
 export {knex};
 
