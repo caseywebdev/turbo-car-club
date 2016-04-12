@@ -1,9 +1,6 @@
 BIN=node_modules/.bin/
 COGS=$(BIN)cogs
 WATCHY=$(BIN)watchy
-KNEX=$(BIN)knex \
-	--knexfile build/signal/config.js \
-	--env knex
 
 all: install cogs-server cogs-client
 
@@ -37,17 +34,3 @@ host-w:
 
 signal-w:
 	@$(WATCHY) -pw build/shared,build/signal -- bin/signal
-
-migrate:
-	@$(KNEX) migrate:latest
-
-migrate-rollback:
-	@$(KNEX) migrate:rollback
-
-bootstrap:
-	@docker-compose stop
-	@docker-compose up -d postgres
-	@sleep 5
-	@docker-compose run cogs-client make
-	@docker-compose run signal make migrate
-	@docker-compose up -d
