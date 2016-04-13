@@ -1,13 +1,14 @@
-import db from './db';
-import config from '../config';
-import verify from '../../shared/utils/verify';
+import {SyncPromise} from 'pave';
 import authHost from './auth-host';
 import authUser from './auth-user';
+import config from '../config';
+import db from './db';
+import verify from '../../shared/utils/verify';
 
 const {key, errors: {invalidKey}, authKeyMaxAge} = config;
 
 export default (socket, token, {host: {name} = {}} = {}) => {
-  if (socket.userId || socket.host) return;
+  if (socket.userId || socket.host) return SyncPromise.resolve();
 
   const data = verify(key, 'auth', token, authKeyMaxAge);
   if (!data) throw invalidKey;
@@ -16,8 +17,8 @@ export default (socket, token, {host: {name} = {}} = {}) => {
   return db('users').select('*').where({id: userId}).then(([user]) => {
     if (!user) throw invalidKey;
 
-    const {invalidatedTokensAt} = user;
-    if (invalidatedTokensAt && data.iat * 1000 < invalidatedTokensAt) {
+    const {expiredTokensAt} = user;
+    if (expiredTokensAt && data.iat * 1000 < expiredTokensAt) {
       throw invalidKey;
     }
 
@@ -25,5 +26,4 @@ export default (socket, token, {host: {name} = {}} = {}) => {
 
     return authUser(socket, userId);
   });
-
 };

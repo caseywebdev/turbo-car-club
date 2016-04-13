@@ -22,10 +22,6 @@ const LISTENERS = {
 log.info('Starting WebSocket server on port 80');
 const server = new ws.Server({port: 80});
 
-const sockets = {};
-const users = {};
-const hosts = {};
-
 server.on('connection', ws => {
   const socket = new Live({socket: ws});
   _.each(LISTENERS, (cb, name) =>
@@ -39,4 +35,4 @@ server.on('connection', ws => {
   socket.trigger('open');
 });
 
-export default {sockets, users, hosts};
+export default {sockets: {}, users: {}, hosts: {}};

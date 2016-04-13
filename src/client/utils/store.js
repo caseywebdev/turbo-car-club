@@ -21,6 +21,6 @@ store.watch(['authToken'], () =>
   disk.write('authToken', store.get(['authToken']))
 );
 
-live.on('auth', token => store.update({authToken: {$set: token}}));
+live.on('pave', delta => store.update(delta));
 
 export default store;

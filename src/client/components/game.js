@@ -39,23 +39,7 @@ export default class extends Component {
 
     (window.live = this.live = new Live(config.signal))
       .on('host', ::this.setHost)
-      .on('signal', ({data}) => this.host.signal(data))
-      .on('auth', auth => db.set('auth', auth))
-      .on('open', () => {
-        const auth = db.get('auth');
-        if (!auth) return;
-        this.live.send('auth', auth, er => {
-          if (er) return console.error(er);
-          console.log('authorized!');
-        });
-      });
-    if (props.verify) {
-      this.live.send('verify', props.verify, (er, auth) => {
-        if (er) return console.error(er);
-        db.set('auth', auth);
-        console.log('verify authorized!');
-      });
-    }
+      .on('signal', ({data}) => this.host.signal(data));
   }
 
   setHost(id) {

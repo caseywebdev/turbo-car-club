@@ -1,5 +1,4 @@
 import {Component} from 'pave-react';
-import live from '../utils/live';
 import React from 'react';
 import SetName from './set-name';
 import SignIn from './sign-in';
@@ -26,20 +25,12 @@ export default class extends Component {
     };
   }
 
-  componentWillMount() {
-    super.componentWillMount();
-    live.on('auth', this.handleAuth);
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    live.off(this.handleAuth);
-  }
-
-  handleAuth = () => this.reloadPave();
-
   signOut() {
     store.run({query: ['signOut!']});
+  }
+
+  expireTokens() {
+    store.run({query: ['expireTokens!']});
   }
 
   render() {
@@ -56,6 +47,7 @@ export default class extends Component {
               <pre>{authToken}</pre>
               <SetName />
               <button onClick={::this.signOut}>Sign Out</button>
+              <button onClick={::this.expireTokens}>Expire Tokens</button>
             </div> :
           <SignIn />
         }

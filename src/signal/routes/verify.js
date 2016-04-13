@@ -17,11 +17,16 @@ const checkSignedInAt = (data, {id, signedInAt, expiredTokensAt}) => {
   return updateSignedInAt(id);
 };
 
-const createAuthToken = (socket, data, {id: userId}) => {
+const createAuthToken = (socket, data, user) => {
+  const {id: userId} = user;
   const token = sign(key, 'auth', {userId});
   const origin = app.live.sockets[data.socketId];
-  if (origin && origin !== socket) origin.send('auth', token);
-  return auth(socket, token).then(() => ({authToken: {$set: token}}));
+  const delta = {authToken: {$set: token}, user: {$set: user}};
+  if (origin && origin !== socket) {
+    auth(origin, token);
+    origin.send('pave', delta);
+  }
+  return auth(socket, token).then(() => delta);
 };
 
 export default {

@@ -9,11 +9,13 @@ export default socket => {
     delete app.live.hosts[socket.host.id];
     trigger('host-removed');
     delete socket.host;
+    socket.close();
   } else if (socket.userId) {
     const {userId} = socket;
     const {users} = app.live;
     users[userId] = _.without(users[userId], socket);
     if (!users[userId].length) delete users[userId];
     delete socket.userId;
+    socket.send('pave', {authToken: {$set: null}, user: {$set: null}});
   }
 };
