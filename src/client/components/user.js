@@ -1,5 +1,4 @@
 import {Component} from 'pave-react';
-import disk from '../utils/disk';
 import live from '../utils/live';
 import React from 'react';
 import SetName from './set-name';
@@ -40,7 +39,7 @@ export default class extends Component {
   handleAuth = () => this.reloadPave();
 
   signOut() {
-    store.run({query: ['signOut!']}).then(() => disk.delete('authToken'));
+    store.run({query: ['signOut!']});
   }
 
   render() {

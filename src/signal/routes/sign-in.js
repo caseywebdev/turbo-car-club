@@ -9,7 +9,7 @@ const {key} = config;
 export default {
   'signIn!.$obj':
   ({context: {socket}, 1: {emailAddress}}) =>
-    findUser({emailAddress}).then(({signedInAt} = {}) =>
+    findUser({emailAddress}).then(({signedInAt = null} = {}) =>
       mail({
         to: emailAddress,
         subject: 'Sign in to Turbo Car Club',

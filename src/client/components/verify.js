@@ -1,4 +1,3 @@
-import disk from '../utils/disk';
 import Meta from './meta';
 import React, {Component, PropTypes} from 'react';
 import store from '../utils/store';
@@ -13,11 +12,8 @@ export default class extends Component {
     const {location: {query: {token}}, router: {replace}} = this.context;
     if (!token) return replace('/');
     store
-      .run({query: ['verify!', {token}], allOrNothing: true})
-      .then(() => {
-        disk.write('authToken', store.get(['authToken']));
-        replace('/');
-      })
+      .run({query: ['verify!', {token}]})
+      .then(() => replace('/'))
       .catch(er => console.error(er));
   }
 

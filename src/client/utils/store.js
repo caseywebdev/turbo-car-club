@@ -17,9 +17,10 @@ const store = new Store({
   })
 });
 
-live.on('auth', token => {
-  disk.write('authToken', token);
-  store.update({authToken: {$set: token}});
-});
+store.watch(['authToken'], () =>
+  disk.write('authToken', store.get(['authToken']))
+);
+
+live.on('auth', token => store.update({authToken: {$set: token}}));
 
 export default store;
