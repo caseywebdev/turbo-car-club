@@ -1,4 +1,5 @@
 import {Component} from 'pave-react';
+import live from '../utils/live';
 import React from 'react';
 import SetName from './set-name';
 import SignIn from './sign-in';
@@ -26,7 +27,8 @@ export default class extends Component {
   }
 
   signOut() {
-    store.run({query: ['signOut!']});
+    store.update({authToken: {$set: null}, user: {$set: null}});
+    live.socket.close();
   }
 
   expireTokens() {
