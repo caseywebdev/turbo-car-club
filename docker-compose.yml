@@ -24,11 +24,6 @@ postgres:
   image: postgres:9.4.5
   volumes_from:
     - dbdata
-  environment:
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: postgres
-  ports:
-    - '5432'
 
 nginx:
   image: nginx:1.9.5
