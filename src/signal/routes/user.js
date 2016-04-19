@@ -12,7 +12,7 @@ export default {
   ({context: {socket: {userId}}}) =>
     ({user: {$set: userId ? {$ref: ['usersById', userId]} : null}}),
 
-  'user!.$obj':
+  'updateUser!.$obj':
   ({1: {name}, context: {socket: {userId}}}) => {
     if (!userId) throw authRequired;
 
