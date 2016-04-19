@@ -12,10 +12,6 @@ var REQUIRED = [
 var missing = _.reject(REQUIRED, _.partial(_.has, ENV));
 if (_.any(missing)) throw new Error('Missing env vars: ' + missing.join(', '));
 
-const knex = {client: 'pg', connection: ENV.POSTGRES_URL};
-
-export {knex};
-
 export default {
   ...shared,
   log: {name: 'signal'},
@@ -30,7 +26,7 @@ export default {
     }
   },
   key: ENV.KEY,
-  knex,
+  knex: {client: 'pg', connection: ENV.POSTGRES_URL},
   verifyKeyMaxAge: '1 hour',
   authKeyMaxAge: '60 days',
   maxUserNameLength: 16
