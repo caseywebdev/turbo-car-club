@@ -6,13 +6,14 @@ import promisify from '../../shared/utils/promisify';
 const send = promisify(::live.send);
 
 const store = new Store({
+  batchDelay: 1,
   cache: {
-    authToken: disk.read('authToken')
+    authToken: disk.read('authToken') || null
   },
   router: new Router({
     routes: {
-      '*': ({paths}) =>
-        send('pave', {query: [paths], authToken: store.get(['authToken'])})
+      '*': ({query}) =>
+        send('pave', {query, authToken: store.get(['authToken'])})
     }
   })
 });

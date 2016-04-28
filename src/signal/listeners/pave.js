@@ -1,7 +1,7 @@
 import auth from '../utils/auth';
 import config from '../config';
 import router from '../routes/index';
-import {SyncPromise} from 'pave';
+import {Store, SyncPromise} from 'pave';
 
 const {invalidKey} = config.errors;
 
@@ -18,6 +18,6 @@ export default ({socket, params: {query, authToken}}) =>
   tryAuth(socket, authToken)
     .then(authTokenDelta =>
       router
-        .run({query, context: {socket}})
+        .run({query, store: new Store({cache: {socket}})})
         .then(delta => authTokenDelta ? [authTokenDelta, delta] : delta)
     );

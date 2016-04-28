@@ -1,29 +1,38 @@
-import {Component} from 'pave-react';
 import live from '../utils/live';
-import React from 'react';
+import PaveSubscription from 'pave-subscription';
+import React, {Component} from 'react';
 import SetName from './set-name';
 import SignIn from './sign-in';
 import store from '../utils/store';
 
+const getQuery = () => [[].concat(
+  [['authToken']],
+  store.get(['authToken']) ? [['user']] : []
+)];
+
+const getState = () => ({
+  authToken: store.get(['authToken']),
+  user: store.get(['user'])
+});
+
 export default class extends Component {
-  store = store;
-
-  getPaveWatchQuery() {
-    return [[
-      ['authToken'],
-      ['user']
-    ]];
+  componentWillMount() {
+    this.sub = new PaveSubscription({
+      store,
+      query: getQuery(),
+      onChange: sub => {
+        sub.setQuery(getQuery());
+        this.setState({
+          error: sub.error,
+          isLoading: sub.isLoading,
+          ...getState()
+        });
+      }
+    });
   }
 
-  getPaveQuery() {
-    if (store.get(['authToken'])) return ['user'];
-  }
-
-  getPaveState() {
-    return {
-      authToken: store.get(['authToken']),
-      user: store.get(['user'])
-    };
+  componentWillUnmount() {
+    this.sub.destroy();
   }
 
   signOut() {

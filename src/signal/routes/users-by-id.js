@@ -5,7 +5,7 @@ const PRIVATE_FIELDS = ['emailAddress'];
 
 export default {
   'usersById.$keys':
-  ({1: ids, context: {socket: {userId}}}) =>
+  ({1: ids, store: {cache: {socket: {userId}}}}) =>
     db('users').select('*').whereIn('id', ids).then(users => ({
       usersById: _.reduce(users, (obj, user) => {
         obj[user.id] = {

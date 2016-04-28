@@ -9,11 +9,11 @@ const INVALID_NAME = new Error(`Name must be between 1 and ${MAX} characters`);
 
 export default {
   user:
-  ({context: {socket: {userId}}}) =>
+  ({store: {cache: {socket: {userId}}}}) =>
     ({user: {$set: userId ? {$ref: ['usersById', userId]} : null}}),
 
   'updateUser!.$obj':
-  ({1: {name}, context: {socket: {userId}}}) => {
+  ({1: {name}, store: {cache: {socket: {userId}}}}) => {
     if (!userId) throw authRequired;
 
     name = _str.clean(name);
