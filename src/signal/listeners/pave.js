@@ -17,7 +17,7 @@ const tryAuth = (socket, authToken) =>
 export default ({socket, params: {query, authToken}}) =>
   tryAuth(socket, authToken)
     .then(authTokenDelta =>
-      router
-        .run({query, store: new Store({cache: {socket}})})
+      (new Store({cache: {socket}, router}))
+        .run({query})
         .then(delta => authTokenDelta ? [authTokenDelta, delta] : delta)
     );
