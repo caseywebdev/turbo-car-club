@@ -28,6 +28,5 @@ export default {
   key: ENV.KEY,
   knex: {client: 'pg', connection: ENV.POSTGRES_URL},
   verifyKeyMaxAge: '1 hour',
-  authKeyMaxAge: '90 days',
   maxUserNameLength: 16
 };

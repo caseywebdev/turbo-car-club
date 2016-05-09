@@ -5,12 +5,12 @@ import config from '../config';
 import db from './db';
 import verify from '../../shared/utils/verify';
 
-const {key, errors: {invalidKey}, authKeyMaxAge} = config;
+const {key, errors: {invalidKey}} = config;
 
 export default (socket, token, {host: {name} = {}} = {}) => {
   if (socket.userId || socket.host) return SyncPromise.resolve();
 
-  const data = verify(key, 'auth', token, authKeyMaxAge);
+  const data = verify(key, 'auth', token);
   if (!data) throw invalidKey;
 
   const {userId} = data;
