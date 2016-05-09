@@ -22,8 +22,8 @@ const LISTENERS = {
 log.info('Starting WebSocket server on port 80');
 const server = new ws.Server({port: 80});
 
-server.on('connection', ws => {
-  const socket = new Live({socket: ws});
+server.on('connection', socket => {
+  socket = new Live({socket});
   _.each(LISTENERS, (cb, name) =>
     socket.on(name, (params, done) =>
       Promise
