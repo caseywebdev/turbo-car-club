@@ -3,11 +3,10 @@ import React from 'react';
 import Hosts from './hosts';
 import User from './user';
 
-const {index: cxl} = cx;
+const {home: cxl} = cx;
 
 export default () =>
-  <div>
-    <img className={cxl.logo} src='/gfx/logo.svg' />
+  <div className={cxl.root}>
     <User />
     <Hosts />
   </div>;

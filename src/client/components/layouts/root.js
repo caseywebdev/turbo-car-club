@@ -1,4 +1,4 @@
-import Meta from './meta';
+import Meta from '../meta';
 import React, {Component, PropTypes} from 'react';
 
 export default class extends Component {
@@ -12,6 +12,7 @@ export default class extends Component {
   };
 
   static propTypes = {
+    children: PropTypes.node,
     location: PropTypes.object.isRequired
   };
 
@@ -23,10 +24,6 @@ export default class extends Component {
   }
 
   render() {
-    return (
-      <Meta title='Turbo Car Club'>
-        {this.props.children}
-      </Meta>
-    );
+    return <Meta title='Turbo Car Club'>{this.props.children}</Meta>;
   }
 }
