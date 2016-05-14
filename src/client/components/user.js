@@ -4,10 +4,11 @@ import React, {Component} from 'react';
 import SetName from './set-name';
 import SignIn from './sign-in';
 import store from '../utils/store';
+import getAvatarUrl from '../../shared/utils/get-avatar-url';
 
 const getQuery = () => [[].concat(
   [['authToken']],
-  store.get(['authToken']) ? [['user']] : []
+  store.get(['authToken']) ? [['user', ['id', 'name', 'emailHash']]] : []
 )];
 
 const getState = () => ({
@@ -55,6 +56,7 @@ export default class extends Component {
           user ?
             <div>
               <pre>{JSON.stringify(user)}</pre>
+              <img src={getAvatarUrl(user.emailHash)} />
               <pre>{authToken}</pre>
               <SetName />
               <button onClick={::this.signOut}>Sign Out</button>
