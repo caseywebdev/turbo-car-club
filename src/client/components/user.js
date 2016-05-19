@@ -46,21 +46,18 @@ export default class extends Component {
   }
 
   render() {
-    const {error, isLoading, authToken, user} = this.state;
+    const {error, isLoading, user} = this.state;
     return (
       <div>
-        <div>User</div>
         {
           isLoading ? 'Loading...' :
           error ? error.toString() :
           user ?
             <div>
-              <pre>{JSON.stringify(user)}</pre>
-              <img src={getAvatarUrl(user.emailHash)} />
-              <pre>{authToken}</pre>
               <SetName />
               <button onClick={::this.signOut}>Sign Out</button>
               <button onClick={::this.expireTokens}>Expire Tokens</button>
+              <img src={getAvatarUrl(user.emailHash)} />
             </div> :
           <SignIn />
         }

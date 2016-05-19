@@ -1,3 +1,42 @@
+.header,
+.body {
+  margin: 0 auto;
+  max-width: 1000px;
+  overflow: hidden;
+}
+
+.headerWrapper {
+  background: #222;
+  position: fixed;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.headerLeft {
+  padding: 10px;
+}
+
+.headerRight {
+  align-self: flex-end;
+
+  img {
+    vertical-align: bottom;
+  }
+}
+
+.logoWrapper {
+  padding: 10px;
+}
+
 .logo {
   color: #f00;
+  height: 80px;
+}
+
+.body {
+  padding-top: 100px;
 }

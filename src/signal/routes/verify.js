@@ -21,7 +21,10 @@ const createAuthToken = (socket, data, user) => {
   const {id: userId} = user;
   const token = sign(key, 'auth', {userId});
   const origin = app.live.sockets[data.socketId];
-  const delta = {authToken: {$set: token}, user: {$set: user}};
+  const delta = {
+    authToken: {$set: token},
+    user: {$set: {$ref: ['usersById', userId]}}
+  };
   if (origin && origin !== socket) {
     auth(origin, token);
     origin.send('pave', delta);
