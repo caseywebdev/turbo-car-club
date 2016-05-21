@@ -84,7 +84,8 @@ module.exports = {
       name: 'clean-css',
       only: '**/*.+(scss|css)',
       options: {processImport: false}
-    } : []
+    } : [],
+    {name: 'imagemin', only: '**/*.svg', options: {plugins: {svgo: {}}}}
   ),
   builds: BUILDS
 };
