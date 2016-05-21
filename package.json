@@ -2,7 +2,7 @@
   "private": true,
   "dependencies": {
     "ammo.js": "0.0.10",
-    "jsonwebtoken": "6.2.0",
+    "jsonwebtoken": "7.0.0",
     "knex": "0.11.3",
     "live-socket": "0.10.7",
     "node-uuid": "1.4.7",
@@ -42,9 +42,9 @@
     "eslint": "2.10.2",
     "livereload": "0.4.1",
     "pave-subscription": "0.1.1",
-    "react-dom": "15.0.2",
-    "react-router": "2.4.0",
-    "react": "15.0.2",
+    "react-dom": "15.1.0",
+    "react-router": "2.4.1",
+    "react": "15.1.0",
     "three": "0.76.1",
     "watchy": "0.6.6"
   },
