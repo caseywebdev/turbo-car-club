@@ -1,5 +1,5 @@
 data:
-  image: &image quay.io/caseywebdev/turbo-car-club:0.0.33
+  image: &image quay.io/caseywebdev/turbo-car-club:0.0.34
   volumes:
     - ./.eslintrc:/code/.eslintrc
     - ./.sass-lint.yml:/code/.sass-lint.yml
