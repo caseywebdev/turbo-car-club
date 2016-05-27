@@ -3,7 +3,7 @@
   "dependencies": {
     "ammo.js": "0.0.10",
     "jsonwebtoken": "7.0.0",
-    "knex": "0.11.4",
+    "knex": "0.11.5",
     "live-socket": "0.10.7",
     "node-uuid": "1.4.7",
     "nodemailer-markdown": "1.0.0",
@@ -27,7 +27,7 @@
     "cogs-transformer-autoprefixer": "1.0.0",
     "cogs-transformer-babel": "2.0.4",
     "cogs-transformer-clean-css": "1.0.0",
-    "cogs-transformer-concat-commonjs": "1.1.1",
+    "cogs-transformer-concat-commonjs": "1.1.2",
     "cogs-transformer-directives": "2.0.0",
     "cogs-transformer-eslint": "2.0.0",
     "cogs-transformer-imagemin": "2.0.1",
