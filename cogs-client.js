@@ -34,7 +34,7 @@ module.exports = {
   manifestPath: 'build/manifest-client.json',
   pipe: [].concat(
     {name: 'eslint', only: 'src/**/*.js'},
-    {name: 'sass-lint', only: 'src/**/*.scss'},
+    {name: 'stylelint', only: 'src/**/*.scss', options: {syntax: 'scss'}},
     {name: 'directives', only: 'src/**/*.+(js|scss)'},
     {
       name: 'replace',
