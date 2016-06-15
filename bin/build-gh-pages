@@ -5,7 +5,7 @@ git reset --hard origin/master
 IMAGE=`grep -Eo 'quay.io/caseywebdev/turbo-car-club\S+' docker-compose.yml`
 rm -fr * .dockerignore .eslintrc .gitignore .stylelintrc
 ID=`docker create $IMAGE`
-docker cp $ID:/code/build/client
+docker cp $ID:/code/build/client .
 docker rm $ID
 git push origin gh-pages
 git checkout master
