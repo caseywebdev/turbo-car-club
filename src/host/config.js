@@ -5,8 +5,7 @@ const ENV = process.env;
 
 var REQUIRED = [
   'KEY',
-  'NAME',
-  'SIGNAL_URL'
+  'NAME'
 ];
 
 var missing = _.reject(REQUIRED, _.partial(_.has, ENV));

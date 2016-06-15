@@ -4,9 +4,7 @@ import shared from '../shared/config';
 const ENV = process.env;
 
 var REQUIRED = [
-  'CLIENT_URL',
-  'KEY',
-  'POSTGRES_URL'
+  'KEY'
 ];
 
 var missing = _.reject(REQUIRED, _.partial(_.has, ENV));
@@ -19,7 +17,7 @@ export default {
     url: ENV.CLIENT_URL
   },
   mail: {
-    enabled: ENV.MAIL_ENABLED != '0',
+    enabled: ENV.MAIL_ENABLED !== '0',
     from: {
       name: ENV.MAIL_FROM_NAME,
       address: ENV.MAIL_FROM_ADDRESS
