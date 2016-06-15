@@ -6,7 +6,6 @@ data:
     - ./bin:/code/bin
     - ./cogs-client.js:/code/cogs-client.js
     - ./cogs-server.js:/code/cogs-server.js
-    - ./Makefile:/code/Makefile
     - ./nginx.conf:/etc/nginx/nginx.conf
     - ./package.json:/code/package.json
     - ./src:/code/src
@@ -38,11 +37,11 @@ cogs-client: &shared
     - data
   environment:
     SIGNAL_URL: ws://docker:1337
-  command: make cogs-client-w
+  command: bin/build-client -pw build/client/class-names.json,src/client,src/shared
 
 cogs-server:
   <<: *shared
-  command: make cogs-server-w
+  command: bin/build-server -pw src/host,src/shared,src/signal
 
 livereload:
   <<: *shared
@@ -60,7 +59,7 @@ signal:
     CLIENT_URL: http://docker
     KEY: foo
     MAIL_ENABLED: 0
-  command: make signal-w
+  command: bin/watch-signal
 
 larry:
   <<: *shared
@@ -70,7 +69,7 @@ larry:
     KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTQ1NjU3NzczMCwic3ViIjoiYXV0aCJ9.s4NSGM67mLtr177ND3WsMObZT3QVJRD0chjDDf8aPe0
     NAME: Larry
     SIGNAL_URL: ws://signal
-  command: make host-w
+  command: bin/watch-host
 
 curly:
   <<: *shared
@@ -80,7 +79,7 @@ curly:
     KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTQ1NjU3NzczMCwic3ViIjoiYXV0aCJ9.s4NSGM67mLtr177ND3WsMObZT3QVJRD0chjDDf8aPe0
     NAME: Curly
     SIGNAL_URL: ws://signal
-  command: make host-w
+  command: bin/watch-host
 
 mo:
   <<: *shared
@@ -90,4 +89,4 @@ mo:
     KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTQ1NjU3NzczMCwic3ViIjoiYXV0aCJ9.s4NSGM67mLtr177ND3WsMObZT3QVJRD0chjDDf8aPe0
     NAME: Mo
     SIGNAL_URL: ws://signal
-  command: make host-w
+  command: bin/watch-host
