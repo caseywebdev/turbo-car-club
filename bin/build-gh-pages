@@ -1,4 +1,4 @@
-#!bash -e
+#!/usr/bin/env bash -e
 
 shopt -s extglob dotglob
 git checkout gh-pages
