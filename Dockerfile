@@ -16,10 +16,10 @@ COPY package.json /code/package.json
 RUN npm install && npm dedupe
 
 # Build class names
-COPY bin /code/bin
 COPY .stylelintrc /code/.stylelintrc
-COPY src/client/styles /code/src/client/styles
+COPY bin /code/bin
 COPY cogs-client.js /code/cogs-client.js
+COPY src/client/styles /code/src/client/styles
 RUN MINIFY=1 ONLY_CLASS_NAMES=1 bin/build-client
 
 # Build client
@@ -29,6 +29,7 @@ COPY src/shared /code/src/shared
 RUN MINIFY=1 bin/build-client
 
 # Build server
+COPY cogs-server.js /code/cogs-server.js
 COPY src/host /code/src/host
 COPY src/signal /code/src/signal
 RUN bin/build-server
