@@ -5,7 +5,7 @@ WORKDIR /code
 COPY . /code
 
 ARG CLIENT_URL=http://www.turbocarclub.com
-ARG SIGNAL_URL=http://signal.turbocarclub.com
+ARG SIGNAL_URL=ws://signal.turbocarclub.com
 
 ENV CLIENT_URL $CLIENT_URL
 ENV KEY foo
