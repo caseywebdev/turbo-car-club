@@ -57,11 +57,6 @@ signal:
   ports:
     - '1337:80'
   environment:
-    KEY: foo
-    MAIL_ENABLED: 0
-    MAIL_FROM_NAME: Turbo Car Club
-    MAIL_FROM_ADDRESS: support@turbocarclub.com
-    POSTGRES_URL: pg://postgres:postgres@postgres/postgres
     CLIENT_URL: http://docker
   command: make signal-w
 
