@@ -1,0 +1,12 @@
+#!bash -e
+
+shopt -s extglob dotglob
+git checkout gh-pages
+git reset --hard origin/master
+IMAGE=`grep -Eo 'quay.io/caseywebdev/turbo-car-club\S+' docker-compose.yml`
+rm -fr !(.git)
+ID=`docker create $IMAGE`
+docker cp $ID:/code/build/client
+docker rm $ID
+git push origin gh-pages
+git checkout master
