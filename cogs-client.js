@@ -1,5 +1,3 @@
-'use strict';
-
 const ENV = process.env;
 const MINIFY = ENV.MINIFY === '1';
 const ONLY_CLASS_NAMES = ENV.ONLY_CLASS_NAMES === '1';
@@ -66,7 +64,10 @@ module.exports = {
     },
     MINIFY ? {
       name: 'uglify-js',
-      only: '**/*.+(js|json|vert|frag)',
+      only: [
+        '**/*.+(js|json|vert|frag)',
+        'node_modules/cogs-transformer-concat-commonjs/module-resolver'
+      ],
       except: ['**/*+(-|_|.)min.js', 'node_modules/ammo.js/ammo.js']
     } : [],
     {name: 'sass', only: '**/*.scss'},
