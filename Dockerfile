@@ -1,19 +1,19 @@
 FROM node:6
 
-ARG CLIENT_URL=http://www.turbocarclub.com
-ARG SIGNAL_URL=ws://signal.turbocarclub.com
-
-ENV CLIENT_URL $CLIENT_URL
-ENV MAIL_FROM_ADDRESS support@turbocarclub.com
-ENV MAIL_FROM_NAME Turbo Car Club
-ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
-ENV SIGNAL_URL $SIGNAL_URL
-
 WORKDIR /code
 
 # Install node modules
 COPY package.json /code/package.json
 RUN npm install && npm dedupe
+
+ARG CLIENT_URL=http://www.turbocarclub.com
+ENV CLIENT_URL $CLIENT_URL
+
+ARG SIGNAL_URL=ws://signal.turbocarclub.com
+ENV SIGNAL_URL $SIGNAL_URL
+
+ARG VERSION
+ENV VERSION $VERSION
 
 # Build class names
 COPY .stylelintrc /code/.stylelintrc
@@ -33,5 +33,9 @@ COPY cogs-server.js /code/cogs-server.js
 COPY src/host /code/src/host
 COPY src/signal /code/src/signal
 RUN bin/build-server
+
+ENV MAIL_FROM_ADDRESS support@turbocarclub.com
+ENV MAIL_FROM_NAME Turbo Car Club
+ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
 
 CMD ["bin/host"]

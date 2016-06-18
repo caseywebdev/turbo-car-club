@@ -1,7 +1,7 @@
 const ENV = process.env;
 const MINIFY = ENV.MINIFY === '1';
 const ONLY_CLASS_NAMES = ENV.ONLY_CLASS_NAMES === '1';
-const SIGNAL_URL = ENV.SIGNAL_URL;
+const {SIGNAL_URL, VERSION} = ENV;
 
 const TARGET = {
   dir: 'build/client',
@@ -41,9 +41,9 @@ module.exports = {
         flags: 'g',
         patterns: {
           __LIVERELOAD__: (!MINIFY).toString(),
-          __MIN__: MINIFY ? '.min' : '',
           __SIGNAL_URL__: SIGNAL_URL,
-          'process.env.NODE_ENV': MINIFY ? "'production'" : "'development'"
+          'process.env.NODE_ENV': MINIFY ? "'production'" : "'development'",
+          __VERSION__: VERSION
         }
       }
     },
