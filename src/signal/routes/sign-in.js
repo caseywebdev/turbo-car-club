@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import config from '../config';
 import findUser from '../utils/find-user';
 import sign from '../../shared/utils/sign';
@@ -21,5 +22,5 @@ export default {
           })
         })
       })
-    )
+    ).then(_.noop)
 };
