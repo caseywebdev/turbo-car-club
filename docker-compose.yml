@@ -1,5 +1,5 @@
 data:
-  image: &image quay.io/caseywebdev/turbo-car-club:8b921b29325d2469ee33bf1b8e44c5551d13a770
+  image: &image quay.io/caseywebdev/turbo-car-club:ee4490944160a7b0c32bcf5e08cdf010cd436539
   volumes:
     - ./.eslintrc:/code/.eslintrc
     - ./.stylelintrc:/code/.stylelintrc
