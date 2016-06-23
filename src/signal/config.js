@@ -1,15 +1,13 @@
-import fs from 'fs';
 import shared from '../shared/config';
 
 const ENV = process.env;
 
 export default {
   ...shared,
-  cert: ENV.CERT || (ENV.CERT_FILE && fs.readFileSync(ENV.CERT_FILE)),
   client: {
     url: ENV.CLIENT_URL
   },
-  key: ENV.KEY || (ENV.KEY_FILE && fs.readFileSync(ENV.KEY_FILE)),
+  key: ENV.KEY,
   knex: {client: 'pg', connection: ENV.POSTGRES_URL},
   log: {name: 'signal'},
   mail: {

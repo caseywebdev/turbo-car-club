@@ -1,6 +1,4 @@
 import _ from 'underscore';
-import config from '../config';
-import https from 'https';
 import Live from 'live-socket';
 import log from '../utils/log';
 import ws from 'ws';
@@ -11,8 +9,6 @@ import pave from '../listeners/pave';
 import signal from '../listeners/signal';
 import sub from '../listeners/sub';
 import unsub from '../listeners/unsub';
-
-const {cert, client: {url}, key} = config;
 
 const LISTENERS = _.map({
   close,
@@ -32,13 +28,7 @@ const LISTENERS = _.map({
 );
 
 log.info('Starting WebSocket server...');
-const server = https.createServer({cert, key}, (__, res) => {
-  res.writeHead(302, {Location: url});
-  res.end();
-}).listen(443, () =>
-  log.info('WebSocket server ready')
-);
-const wss = new ws.Server({server});
+const wss = new ws.Server({port: 80});
 
 wss.on('connection', socket => {
   _.invoke(LISTENERS, 'call', null, socket = new Live({socket}));

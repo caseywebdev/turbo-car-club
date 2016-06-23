@@ -1,7 +1,0 @@
-#!/usr/bin/env bash -e
-
-mkdir -p .ssl
-cd .ssl
-openssl genrsa 4096 > key
-openssl req -new -key key -out csr
-openssl x509 -req -days 365 -in csr -signkey key -out cert

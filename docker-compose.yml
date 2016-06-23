@@ -25,30 +25,30 @@ postgres:
   volumes_from:
     - dbdata
 
-nginx:
-  image: nginx:1.9.5
-  volumes_from:
-    - data
-  ports:
-    - '80:80'
-
 cogs-client: &shared
   image: *image
   volumes_from:
     - data
   environment:
-    SIGNAL_URL: wss://docker
-  command: bin/build-client -pw build/client/class-names.json,src/client,src/shared
+    SIGNAL_URL: ws://docker:1337
+  command: >
+    bin/build-client -pw build/client/class-names.json,src/client,src/shared
 
 cogs-server:
   <<: *shared
-  command: bin/build-server -pw src/host,src/shared,src/signal
+  command: bin/build-server -pw src/host,src/region,src/shared,src/signal
 
 livereload:
   <<: *shared
   ports:
     - '35729:35729'
   command: bin/livereload
+
+nginx:
+  <<: *shared
+  ports:
+    - '80:80'
+  command: nginx
 
 signal:
   <<: *shared
@@ -59,5 +59,13 @@ signal:
   environment:
     CLIENT_URL: http://docker
     MAIL_ENABLED: 0
+    REGION_URLS: http://docker:1338
   command: >
     node_modules/.bin/watchy -pw build/shared,build/signal -- node build/signal
+
+# region:
+#   <<: *shared
+#   ports:
+#     - '1338:1338'
+#   command: >
+#     node_modules/.bin/watchy -pw build/region,build/shared -- node build/region
