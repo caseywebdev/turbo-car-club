@@ -1,5 +1,5 @@
 data:
-  image: &image quay.io/caseywebdev/turbo-car-club:ee4490944160a7b0c32bcf5e08cdf010cd436539
+  image: &image quay.io/caseywebdev/turbo-car-club:f388ea1e975007c5e17599510637fc2ebea703a7
   volumes:
     - ./.eslintrc:/code/.eslintrc
     - ./.ssl:/code/.ssl
