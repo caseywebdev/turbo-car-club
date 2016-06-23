@@ -6,7 +6,7 @@ WORKDIR /code
 COPY package.json /code/package.json
 RUN npm install && npm dedupe
 
-ARG SIGNAL_URL=ws://signal.turbocarclub.com
+ARG SIGNAL_URL=wss://signal.turbocarclub.com
 ENV SIGNAL_URL $SIGNAL_URL
 
 ARG VERSION
