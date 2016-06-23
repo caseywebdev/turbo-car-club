@@ -1,21 +1,17 @@
-import _ from 'underscore';
+import fs from 'fs';
 import shared from '../shared/config';
 
 const ENV = process.env;
 
-var REQUIRED = [
-  'KEY'
-];
-
-var missing = _.reject(REQUIRED, _.partial(_.has, ENV));
-if (_.any(missing)) throw new Error('Missing env vars: ' + missing.join(', '));
-
 export default {
   ...shared,
-  log: {name: 'signal'},
+  cert: ENV.CERT || (ENV.CERT_FILE && fs.readFileSync(ENV.CERT_FILE)),
   client: {
     url: ENV.CLIENT_URL
   },
+  key: ENV.KEY || (ENV.KEY_FILE && fs.readFileSync(ENV.KEY_FILE)),
+  knex: {client: 'pg', connection: ENV.POSTGRES_URL},
+  log: {name: 'signal'},
   mail: {
     enabled: ENV.MAIL_ENABLED !== '0',
     from: {
@@ -23,8 +19,6 @@ export default {
       address: ENV.MAIL_FROM_ADDRESS
     }
   },
-  key: ENV.KEY,
-  knex: {client: 'pg', connection: ENV.POSTGRES_URL},
-  verifyKeyMaxAge: '1 hour',
-  maxUserNameLength: 16
+  maxUserNameLength: 16,
+  verifyKeyMaxAge: '1 hour'
 };

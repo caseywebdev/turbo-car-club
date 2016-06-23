@@ -1,3 +1,0 @@
-#!/bin/bash -e
-
-exec node_modules/.bin/watchy -pw build/shared,build/signal -- bin/signal

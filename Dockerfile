@@ -6,9 +6,6 @@ WORKDIR /code
 COPY package.json /code/package.json
 RUN npm install && npm dedupe
 
-ARG CLIENT_URL=http://www.turbocarclub.com
-ENV CLIENT_URL $CLIENT_URL
-
 ARG SIGNAL_URL=ws://signal.turbocarclub.com
 ENV SIGNAL_URL $SIGNAL_URL
 
@@ -34,8 +31,13 @@ COPY src/host /code/src/host
 COPY src/signal /code/src/signal
 RUN bin/build-server
 
+ARG CLIENT_URL=http://www.turbocarclub.com
+ENV CLIENT_URL $CLIENT_URL
+
+ENV CERT_FILE .ssl/cert
+ENV KEY_FILE .ssl/key
 ENV MAIL_FROM_ADDRESS support@turbocarclub.com
 ENV MAIL_FROM_NAME Turbo Car Club
 ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
 
-CMD ["bin/host"]
+CMD ["node", "build/signal"]
