@@ -10,7 +10,7 @@ RUN wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz \
     ./configure && \
     make && \
     cp objs/nginx /usr/local/bin/ && \
-    cd - &&
+    cd - && \
     rm -fr nginx && \
     wget https://github.com/joyent/containerpilot/releases/download/$CONTAINERPILOT_VERSION/containerpilot-$CONTAINERPILOT_VERSION.tar.gz \
       -O containerpilot.tar.gz && \
