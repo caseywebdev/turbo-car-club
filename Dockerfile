@@ -1,8 +1,6 @@
 FROM node:6
 
 ENV NGINX_VERSION 1.10.1
-ENV CONTAINERPILOT_VERSION 2.3.0
-
 RUN wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz \
       -O nginx.tar.gz && \
     tar -xzf nginx.tar.gz && \
@@ -11,8 +9,10 @@ RUN wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz \
     make && \
     cp objs/nginx /usr/local/bin/ && \
     cd - && \
-    rm -fr nginx-$NGINX_VERSION && \
-    wget https://github.com/joyent/containerpilot/releases/download/$CONTAINERPILOT_VERSION/containerpilot-$CONTAINERPILOT_VERSION.tar.gz \
+    rm -fr nginx.tar.gz nginx-$NGINX_VERSION
+
+ENV CONTAINERPILOT_VERSION 2.3.0
+RUN wget https://github.com/joyent/containerpilot/releases/download/$CONTAINERPILOT_VERSION/containerpilot-$CONTAINERPILOT_VERSION.tar.gz \
       -O containerpilot.tar.gz && \
     tar -xzf containerpilot.tar.gz && \
     mv containerpilot /usr/local/bin/ && \
