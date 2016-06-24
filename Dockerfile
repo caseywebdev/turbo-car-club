@@ -1,6 +1,6 @@
 FROM node:6
 
-ENV NGINX_VERSION = 1.10.1
+ENV NGINX_VERSION 1.10.1
 ENV CONTAINERPILOT_VERSION 2.3.0
 
 RUN wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz \
