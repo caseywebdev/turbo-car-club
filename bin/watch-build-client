@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+exec bin/build-client -pw build/client/class-names.json,src/client,src/shared

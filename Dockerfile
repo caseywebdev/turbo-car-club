@@ -1,6 +1,22 @@
 FROM node:6
 
-RUN apt-get update && apt-get install -y nginx;
+ENV NGINX_VERSION = 1.10.1
+ENV CONTAINERPILOT_VERSION 2.3.0
+
+RUN wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz \
+      -O nginx.tar.gz && \
+    tar -xzf nginx.tar.gz && \
+    cd nginx && \
+    ./configure && \
+    make && \
+    cp objs/nginx /usr/local/bin/ && \
+    cd - &&
+    rm -fr nginx && \
+    wget https://github.com/joyent/containerpilot/releases/download/$CONTAINERPILOT_VERSION/containerpilot-$CONTAINERPILOT_VERSION.tar.gz \
+      -O containerpilot.tar.gz && \
+    tar -xzf containerpilot.tar.gz && \
+    mv containerpilot /usr/local/bin/ && \
+    rm containerpilot.tar.gz
 
 WORKDIR /code
 
@@ -11,7 +27,7 @@ RUN npm install && npm dedupe
 # Build class names
 COPY .stylelintrc /code/.stylelintrc
 COPY bin /code/bin
-COPY cogs-client.js /code/cogs-client.js
+COPY etc/cogs/client.js /code/etc/cogs/client.js
 COPY src/client/styles /code/src/client/styles
 RUN MINIFY=1 ONLY_CLASS_NAMES=1 bin/build-client
 
@@ -28,12 +44,11 @@ COPY src/shared /code/src/shared
 RUN MINIFY=1 bin/build-client
 
 # Build server
-COPY cogs-server.js /code/cogs-server.js
-COPY src/host /code/src/host
-COPY src/signal /code/src/signal
+COPY etc/cogs/server.js /code/etc/cogs/server.js
+COPY src /code/src
 RUN bin/build-server
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY etc /code/etc
 
 ARG CLIENT_URL=http://www.turbocarclub.com
 ENV CLIENT_URL $CLIENT_URL
@@ -43,4 +58,4 @@ ENV MAIL_FROM_ADDRESS support@turbocarclub.com
 ENV MAIL_FROM_NAME Turbo Car Club
 ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
 
-CMD ["node", "build/signal"]
+CMD ["bin/signal"]

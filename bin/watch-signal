@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+exec containerpilot -config file:///code/etc/containerpilot/signal.json \
+  node_modules/.bin/watchy -w build/shared,build/signal node build/server
