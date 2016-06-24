@@ -6,12 +6,12 @@ ENV CONTAINERPILOT_VERSION 2.3.0
 RUN wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz \
       -O nginx.tar.gz && \
     tar -xzf nginx.tar.gz && \
-    cd nginx && \
+    cd nginx-$NGINX_VERSION && \
     ./configure && \
     make && \
     cp objs/nginx /usr/local/bin/ && \
     cd - && \
-    rm -fr nginx && \
+    rm -fr nginx-$NGINX_VERSION && \
     wget https://github.com/joyent/containerpilot/releases/download/$CONTAINERPILOT_VERSION/containerpilot-$CONTAINERPILOT_VERSION.tar.gz \
       -O containerpilot.tar.gz && \
     tar -xzf containerpilot.tar.gz && \
