@@ -1,21 +1,19 @@
-FROM node:6
-
-RUN apt-get update && apt-get install -y unzip
+FROM node:6.2.2
 
 ENV NGINX_VERSION 1.10.1
-RUN curl -L https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz > \
-      nginx.tar.gz && \
-    tar -xzf nginx.tar.gz && \
-    cd nginx-$NGINX_VERSION && \
+RUN curl -L https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | \
+      tar xz -C /usr/local/src/ && \
+    cd /usr/local/src/nginx-$NGINX_VERSION && \
     ./configure && \
     make && \
-    cp objs/nginx /usr/local/bin/ && \
-    cd - && \
-    rm -fr nginx.tar.gz nginx-$NGINX_VERSION
+    mv objs/nginx /usr/local/bin/ && \
+    rm -fr /usr/local/src/nginx-$NGINX_VERSION
 
 ENV CONSUL_TEMPLATE_VERSION 0.15.0
 ENV curl -L https://releases.hashicorp.com/consul-template/$CONSUL_TEMPLATE_VERSION/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip > \
       consul-template.zip && \
+    apt-get update && \
+    apt-get install -y unzip && \
     unzip consul-template.zip && \
     mv consul-template /usr/local/bin/ && \
     rm consul-template.zip
