@@ -1,12 +1,12 @@
 {
-  "consul": "http://{{.CONSUL_URL}}:8500",
+  "consul": "http://{{ .CONSUL_URL }}:8500",
   "preStart": [
     "consul-template",
     "-once",
     "-consul",
-    "{{.CONSUL_URL}}:8500",
+    "{{ .CONSUL_URL }}:8500",
     "-template",
-    "/code/etc/nginx.conf.ctmpl:/usr/local/etc/nginx/nginx.conf"
+    "/code/etc/nginx.conf.ctmpl:/usr/local/nginx/conf/nginx.conf"
   ],
   "services": [
     {
@@ -25,9 +25,9 @@
         "consul-template",
         "-once",
         "-consul",
-        "{{.CONSUL_URL}}:8500",
+        "{{ .CONSUL_URL }}:8500",
         "-template",
-        "/code/etc/nginx.conf.ctmpl:/usr/local/etc/nginx/nginx.conf:nginx -s reload"
+        "/code/etc/nginx.conf.ctmpl:/usr/local/nginx/conf/nginx.conf:nginx -s reload"
       ]
     }
   ]

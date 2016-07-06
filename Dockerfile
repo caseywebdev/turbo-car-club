@@ -1,14 +1,13 @@
 FROM node:6.2.2
 
 ENV NGINX_VERSION 1.10.1
-RUN curl -L https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | \
-      tar xz -C /usr/local/src/ && \
-    cd /usr/local/src/nginx-$NGINX_VERSION && \
+RUN mkdir -p /usr/local/nginx && \
+    curl -L https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | \
+      tar xz -C /usr/local/nginx --strip-components 1 && \
+    cd /usr/local/nginx && \
     ./configure && \
     make && \
-    cp objs/nginx /usr/local/bin/ && \
-    mkdir /usr/local/etc/nginx && \
-    cp conf/mime.types /usr/local/etc/nginx/
+    ln -s /usr/local/nginx/objs/nginx /usr/local/bin/
 
 ENV CONSUL_TEMPLATE_VERSION 0.15.0
 RUN curl -L https://releases.hashicorp.com/consul-template/$CONSUL_TEMPLATE_VERSION/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip > \
