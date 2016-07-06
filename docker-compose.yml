@@ -1,5 +1,5 @@
 data:
-  image: &image quay.io/caseywebdev/turbo-car-club:0e8c62ee864da96a8aacada3d46880cfef1a518e
+  image: &image quay.io/caseywebdev/turbo-car-club:0bc9c7d1de524534b3b13ea18366e2f810412a05
   volumes:
     - ./.eslintrc:/code/.eslintrc
     - ./.stylelintrc:/code/.stylelintrc
@@ -21,7 +21,14 @@ consul:
   image: consul:v0.6.4
   ports:
     - '8500:8500'
-  command: agent -dev -client 0.0.0.0
+    - '53:8600/udp'
+  command: >
+    agent
+    -dev
+    -client 0.0.0.0
+    -dc dev
+    -recursor 8.8.8.8
+    -recursor 8.8.4.4
 
 postgres:
   image: postgres:9.4.5
@@ -32,11 +39,10 @@ cogs-client: &shared
   image: *image
   volumes_from:
     - data
-  links:
-    - consul
   environment:
-    CONSUL_URL: consul
-    SIGNAL_URL: ws://docker:1337
+    CLIENT_URL: http://www.turbocarclub.com.dev
+    SIGNAL_URL: ws://signal.turbocarclub.com.dev
+    SIGNAL_SERVER_NAME: signal.turbocarclub.com.dev
   command: bin/watch-build-client
 
 cogs-server:
@@ -51,20 +57,19 @@ livereload:
 
 client:
   <<: *shared
+  dns: 172.17.0.1
   ports:
     - '80:80'
   command: bin/client
 
 signal:
   <<: *shared
+  dns: 172.17.0.1
   links:
     - postgres
-  ports:
-    - '1337:80'
   environment:
-    CLIENT_URL: http://docker
+    CLIENT_URL: http://www.turbocarclub.com.dev
     MAIL_ENABLED: 0
-    REGION_URLS: http://docker:1338
   command: bin/watch-signal
 
 # region:

@@ -60,6 +60,8 @@ ENV CLIENT_URL $CLIENT_URL
 ENV KEY xxx
 ENV MAIL_FROM_ADDRESS support@turbocarclub.com
 ENV MAIL_FROM_NAME Turbo Car Club
-ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
+ENV POSTGRES_URL pg://postgres:postgres@postgres.service.consul/postgres
+
+EXPOSE 80
 
 CMD ["bin/signal"]

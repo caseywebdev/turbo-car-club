@@ -1,0 +1,11 @@
+{
+  "consul": "http://consul.service.consul:8500",
+  "services": [
+    {
+      "name": "signal",
+      "port": 80,
+      "poll": 10,
+      "ttl": 30
+    }
+  ]
+}

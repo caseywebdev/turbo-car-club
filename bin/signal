@@ -1,4 +1,4 @@
 #!/bin/bash -e
 
 exec containerpilot -config file:///code/etc/containerpilot/signal.json \
-  node build/server
+  node build/signal
