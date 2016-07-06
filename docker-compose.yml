@@ -1,5 +1,5 @@
 data:
-  image: &image quay.io/caseywebdev/turbo-car-club:0ec52eab581acf673c96e4a038ec54ef849c7445
+  image: &image quay.io/caseywebdev/turbo-car-club:2e629bdfc590b2d6eb33653e300f9434034b4946
   volumes:
     - ./.eslintrc:/code/.eslintrc
     - ./.stylelintrc:/code/.stylelintrc
@@ -21,9 +21,7 @@ consul:
   image: consul:v0.6.4
   ports:
     - '8500:8500'
-  environment:
-    CONSUL_BIND_INTERFACE: eth0
-    CONSUL_CLIENT_INTERFACE: eth0
+  command: agent -dev -client 0.0.0.0
 
 postgres:
   image: postgres:9.4.5

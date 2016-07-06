@@ -1,8 +1,10 @@
 FROM node:6
 
+RUN apt-get update && apt-get install -y unzip
+
 ENV NGINX_VERSION 1.10.1
-RUN wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz \
-      -O nginx.tar.gz && \
+RUN curl https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz > \
+      nginx.tar.gz && \
     tar -xzf nginx.tar.gz && \
     cd nginx-$NGINX_VERSION && \
     ./configure && \
@@ -11,9 +13,16 @@ RUN wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz \
     cd - && \
     rm -fr nginx.tar.gz nginx-$NGINX_VERSION
 
+ENV CONSUL_TEMPLATE_VERSION 0.15.0
+ENV curl https://releases.hashicorp.com/consul-template/$CONSUL_TEMPLATE_VERSION/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip > \
+      consul-template.zip && \
+    unzip consul-template && \
+    mv consul-template /usr/local/bin/ && \
+    rm consul-template.zip
+
 ENV CONTAINERPILOT_VERSION 2.3.0
-RUN wget https://github.com/joyent/containerpilot/releases/download/$CONTAINERPILOT_VERSION/containerpilot-$CONTAINERPILOT_VERSION.tar.gz \
-      -O containerpilot.tar.gz && \
+RUN curl https://github.com/joyent/containerpilot/releases/download/$CONTAINERPILOT_VERSION/containerpilot-$CONTAINERPILOT_VERSION.tar.gz > \
+      containerpilot.tar.gz && \
     tar -xzf containerpilot.tar.gz && \
     mv containerpilot /usr/local/bin/ && \
     rm containerpilot.tar.gz

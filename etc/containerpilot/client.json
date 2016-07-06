@@ -1,0 +1,34 @@
+{
+  "consul": "http://{{.CONSUL_URL}}:8500",
+  "preStart": [
+    "consul-template",
+    "-once",
+    "-consul",
+    "{{.CONSUL_URL}}:8500",
+    "-template",
+    "/code/etc/nginx.conf.ctmpl:/etc/nginx/nginx.conf"
+  ],
+  "services": [
+    {
+      "name": "nginx",
+      "port": 80,
+      "health": "curl --fail -s http://localhost/health",
+      "poll": 10,
+      "ttl": 25
+    }
+  ],
+  "backends": [
+    {
+      "name": "signal",
+      "poll": 3,
+      "onChange": [
+        "consul-template",
+        "-once",
+        "-consul",
+        "{{.CONSUL_URL}}:8500",
+        "-template",
+        "/code/etc/nginx.conf.ctmpl:/etc/nginx/nginx.conf:nginx -s reload"
+      ]
+    }
+  ]
+}
