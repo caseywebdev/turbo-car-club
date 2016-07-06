@@ -1,7 +1,7 @@
 FROM node:6.2.2
 
 ENV NGINX_VERSION 1.10.1
-RUN mkdir -p /usr/local/nginx && \
+RUN mkdir -p /usr/local/nginx/logs && \
     curl -L https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | \
       tar xz -C /usr/local/nginx --strip-components 1 && \
     cd /usr/local/nginx && \
