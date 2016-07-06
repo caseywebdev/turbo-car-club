@@ -10,7 +10,7 @@ RUN curl -L https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | \
     rm -fr /usr/local/src/nginx-$NGINX_VERSION
 
 ENV CONSUL_TEMPLATE_VERSION 0.15.0
-ENV curl -L https://releases.hashicorp.com/consul-template/$CONSUL_TEMPLATE_VERSION/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip > \
+RUN curl -L https://releases.hashicorp.com/consul-template/$CONSUL_TEMPLATE_VERSION/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip > \
       consul-template.zip && \
     apt-get update && \
     apt-get install -y unzip && \
