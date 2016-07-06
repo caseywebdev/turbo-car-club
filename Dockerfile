@@ -6,8 +6,9 @@ RUN curl -L https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | \
     cd /usr/local/src/nginx-$NGINX_VERSION && \
     ./configure && \
     make && \
-    mv objs/nginx /usr/local/bin/ && \
-    rm -fr /usr/local/src/nginx-$NGINX_VERSION
+    cp objs/nginx /usr/local/bin/ && \
+    mkdir /usr/local/etc/nginx && \
+    cp conf/mime.types /usr/local/etc/nginx/
 
 ENV CONSUL_TEMPLATE_VERSION 0.15.0
 RUN curl -L https://releases.hashicorp.com/consul-template/$CONSUL_TEMPLATE_VERSION/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip > \

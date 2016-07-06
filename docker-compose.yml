@@ -32,7 +32,10 @@ cogs-client: &shared
   image: *image
   volumes_from:
     - data
+  links:
+    - consul
   environment:
+    CONSUL_URL: consul
     SIGNAL_URL: ws://docker:1337
   command: bin/watch-build-client
 

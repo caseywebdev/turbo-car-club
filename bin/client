@@ -1,4 +1,3 @@
 #!/bin/bash -e
 
-exec containerpilot -config file:///code/etc/containerpilot/client.json \
-  nginx -c /code/etc/nginx.conf
+exec containerpilot -config file:///code/etc/containerpilot/client.json nginx
