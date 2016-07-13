@@ -26,7 +26,7 @@ WORKDIR /code
 
 # Install node modules
 COPY package.json /code/package.json
-RUN npm install && npm dedupe
+RUN npm install
 
 # Build class names
 COPY .stylelintrc /code/.stylelintrc
