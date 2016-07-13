@@ -2,7 +2,7 @@ version: '2'
 
 services:
   data:
-    image: &image quay.io/caseywebdev/turbo-car-club:0bc9c7d1de524534b3b13ea18366e2f810412a05
+    image: &image quay.io/caseywebdev/turbo-car-club:4fdd984e75530f842d097d61b6a66e65365f0768
     volumes:
       - ./.eslintrc:/code/.eslintrc
       - ./.stylelintrc:/code/.stylelintrc
