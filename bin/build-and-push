@@ -1,0 +1,7 @@
+#!/usr/bin/env bash -e
+
+curl -sSL build.sey.me | \
+  REF=master \
+  GITHUB_REPO=caseywebdev/turbo-car-club \
+  IMAGE_REPO=quay.io/caseywebdev/turbo-car-club \
+  bash

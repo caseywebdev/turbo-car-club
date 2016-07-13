@@ -1,4 +1,4 @@
-FROM node:6.2.2
+FROM node:6.3.0
 
 ENV NGINX_VERSION 1.10.1
 RUN mkdir -p /usr/local/nginx/logs && \
@@ -60,7 +60,7 @@ ENV CLIENT_URL $CLIENT_URL
 ENV KEY xxx
 ENV MAIL_FROM_ADDRESS support@turbocarclub.com
 ENV MAIL_FROM_NAME Turbo Car Club
-ENV POSTGRES_URL pg://postgres:postgres@postgres.service.consul/postgres
+ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
 
 EXPOSE 80
 

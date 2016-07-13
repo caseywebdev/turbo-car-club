@@ -1,10 +1,10 @@
 {
-  "consul": "http://consul.service.consul:8500",
+  "consul": "http://consul:8500",
   "preStart": [
     "consul-template",
     "-once",
     "-consul",
-    "consul.service.consul:8500",
+    "consul:8500",
     "-template",
     "/code/etc/nginx.conf.ctmpl:/usr/local/nginx/conf/nginx.conf"
   ],
@@ -25,7 +25,7 @@
         "consul-template",
         "-once",
         "-consul",
-        "consul.service.consul:8500",
+        "consul:8500",
         "-template",
         "/code/etc/nginx.conf.ctmpl:/usr/local/nginx/conf/nginx.conf:nginx -s reload"
       ]

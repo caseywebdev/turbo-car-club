@@ -1,80 +1,81 @@
-data:
-  image: &image quay.io/caseywebdev/turbo-car-club:0bc9c7d1de524534b3b13ea18366e2f810412a05
-  volumes:
-    - ./.eslintrc:/code/.eslintrc
-    - ./.stylelintrc:/code/.stylelintrc
-    - ./bin:/code/bin
-    - ./etc:/code/etc
-    - ./package.json:/code/package.json
-    - ./src:/code/src
-    - /code/build
-    - /code/node_modules
-  command: 'true'
+version: '2'
 
-dbdata:
-  image: busybox:1.24.1
-  volumes:
-    - /var/lib/postgresql/data
-  command: 'true'
+services:
+  data:
+    image: &image quay.io/caseywebdev/turbo-car-club:0bc9c7d1de524534b3b13ea18366e2f810412a05
+    volumes:
+      - ./.eslintrc:/code/.eslintrc
+      - ./.stylelintrc:/code/.stylelintrc
+      - ./bin:/code/bin
+      - ./etc:/code/etc
+      - ./package.json:/code/package.json
+      - ./src:/code/src
+      - /code/build
+      - /code/node_modules
+    command: 'true'
 
-consul:
-  image: consul:v0.6.4
-  ports:
-    - '8500:8500'
-    - '53:8600/udp'
-  command: >
-    agent
-    -dev
-    -client 0.0.0.0
-    -dc dev
-    -recursor 8.8.8.8
-    -recursor 8.8.4.4
+  dbdata:
+    image: busybox:1.24.1
+    volumes:
+      - /var/lib/postgresql/data
+    command: 'true'
 
-postgres:
-  image: postgres:9.4.5
-  volumes_from:
-    - dbdata
+  consul:
+    image: quay.io/caseywebdev/consul:88c43403b5600a61a874700a6f773a00ac533841
+    dns: &dns 172.17.0.1
+    dns_search: service.consul
+    ports:
+      - '8500:8500'
+      - '172.17.0.1:53:53/udp'
+    command: -dev -bootstrap-expect 1
 
-cogs-client: &shared
-  image: *image
-  volumes_from:
-    - data
-  environment:
-    CLIENT_URL: http://www.turbocarclub.com.dev
-    SIGNAL_URL: ws://signal.turbocarclub.com.dev
-    SIGNAL_SERVER_NAME: signal.turbocarclub.com.dev
-  command: bin/watch-build-client
+  postgres:
+    image: quay.io/caseywebdev/postgres:eb5df614f21c64c25b25f711750b241e8cc1598e
+    dns: *dns
+    dns_search: service.consul
+    volumes_from:
+      - dbdata
 
-cogs-server:
-  <<: *shared
-  command: bin/watch-build-server
+  cogs-client: &shared
+    image: *image
+    volumes_from:
+      - data
+    environment:
+      CLIENT_URL: http://www.turbocarclub.com.dev
+      SIGNAL_URL: ws://signal.turbocarclub.com.dev
+      SIGNAL_SERVER_NAME: signal.turbocarclub.com.dev
+    command: bin/watch-build-client
 
-livereload:
-  <<: *shared
-  ports:
-    - '35729:35729'
-  command: bin/livereload
+  cogs-server:
+    <<: *shared
+    command: bin/watch-build-server
 
-client:
-  <<: *shared
-  dns: 172.17.0.1
-  ports:
-    - '80:80'
-  command: bin/client
+  livereload:
+    <<: *shared
+    ports:
+      - '35729:35729'
+    command: bin/livereload
 
-signal:
-  <<: *shared
-  dns: 172.17.0.1
-  links:
-    - postgres
-  environment:
-    CLIENT_URL: http://www.turbocarclub.com.dev
-    MAIL_ENABLED: 0
-  command: bin/watch-signal
+  client:
+    <<: *shared
+    dns: *dns
+    dns_search: service.consul
+    ports:
+      - '80:80'
+    command: bin/client
 
-# region:
-#   <<: *shared
-#   ports:
-#     - '1338:1338'
-#   command: >
-#     node_modules/.bin/watchy -pw build/region,build/shared -- node build/region
+  signal:
+    <<: *shared
+    dns: *dns
+    dns_search: service.consul
+    environment:
+      CLIENT_URL: http://www.turbocarclub.com.dev
+      MAIL_ENABLED: 0
+    command: bin/watch-signal
+
+  # region:
+  #   <<: *shared
+  #   ports:
+  #     - '1338:1338'
+  #   command: >
+  #     node_modules/.bin/watchy -pw build/region,build/shared -- node build/region
