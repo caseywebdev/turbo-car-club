@@ -70,6 +70,4 @@ services:
     <<: *shared
     ports:
       - '1337:80'
-    environment:
-      NAME: dev
     command: bin/region
