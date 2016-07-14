@@ -54,5 +54,5 @@ export default {
     invalidKey: new Error('Invalid or expired key'),
     unknown: new Error('An unknown error occurred')
   },
-  version: '__VERSION__'
+  version: typeof window === 'undefined' ? process.env.VERSION : window.VERSION
 };

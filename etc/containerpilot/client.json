@@ -6,13 +6,14 @@
     "-consul",
     "consul:8500",
     "-template",
-    "/code/etc/nginx.conf.ctmpl:/usr/local/nginx/conf/nginx.conf"
+    "/code/etc/nginx/client.conf.ctmpl:/usr/local/nginx/conf/nginx.conf",
+    "-template",
+    "/code/src/client/public/index.html.ctmpl:/code/build/client/index.html"
   ],
   "services": [
     {
       "name": "client",
       "port": 80,
-      "health": "curl --fail -s localhost",
       "poll": 10,
       "ttl": 30
     }
@@ -27,7 +28,7 @@
         "-consul",
         "consul:8500",
         "-template",
-        "/code/etc/nginx.conf.ctmpl:/usr/local/nginx/conf/nginx.conf:nginx -s reload"
+        "/code/etc/nginx/client.conf.ctmpl:/usr/local/nginx/conf/nginx.conf:nginx -s reload"
       ]
     }
   ]

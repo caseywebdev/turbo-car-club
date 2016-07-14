@@ -6,6 +6,6 @@ export default {
     prefix: 'tcc'
   },
   signal: {
-    url: '__SIGNAL_URL__'
+    url: window.SIGNAL_URL
   }
 };

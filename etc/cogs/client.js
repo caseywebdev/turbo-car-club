@@ -1,7 +1,6 @@
 const ENV = process.env;
 const MINIFY = ENV.MINIFY === '1';
 const ONLY_CLASS_NAMES = ENV.ONLY_CLASS_NAMES === '1';
-const {SIGNAL_URL, VERSION} = ENV;
 
 const TARGET = {
   dir: 'build/client',
@@ -19,7 +18,7 @@ const CLASS_NAMES_BUILDS = {
 
 const OTHER_BUILDS = {
   'src/client/index.js': TARGET,
-  'src/client/public/**/*': TARGET
+  'src/client/public/**/!(*.ctmpl)': TARGET
 };
 
 const BUILDS = Object.assign(
@@ -41,9 +40,7 @@ module.exports = {
         flags: 'g',
         patterns: {
           __LIVERELOAD__: (!MINIFY).toString(),
-          __SIGNAL_URL__: SIGNAL_URL,
-          'process.env.NODE_ENV': MINIFY ? "'production'" : "'development'",
-          __VERSION__: VERSION
+          'process.env.NODE_ENV': MINIFY ? "'production'" : "'development'"
         }
       }
     },

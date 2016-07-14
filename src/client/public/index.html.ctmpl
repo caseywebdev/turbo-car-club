@@ -9,6 +9,10 @@
     >
     <title>Turbo Car Club</title>
     <link href='index.css' rel='stylesheet' />
+    <script>
+      window.SIGNAL_URL = '{{ env "SIGNAL_URL" }}';
+      window.VERSION = '{{ env "VERSION" }}';
+    </script>
   </head>
 
   <body>

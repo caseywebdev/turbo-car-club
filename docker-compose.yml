@@ -38,12 +38,10 @@ services:
 
   cogs-client: &shared
     image: *image
+    dns: *dns
+    dns_search: service.consul
     volumes_from:
       - data
-    environment:
-      CLIENT_URL: http://www.turbocarclub.com.dev
-      SIGNAL_URL: ws://signal.turbocarclub.com.dev
-      SIGNAL_SERVER_NAME: signal.turbocarclub.com.dev
     command: bin/watch-build-client
 
   cogs-server:
@@ -58,24 +56,20 @@ services:
 
   client:
     <<: *shared
-    dns: *dns
-    dns_search: service.consul
     ports:
       - '80:80'
     command: bin/client
 
   signal:
     <<: *shared
-    dns: *dns
-    dns_search: service.consul
     environment:
-      CLIENT_URL: http://www.turbocarclub.com.dev
       MAIL_ENABLED: 0
     command: bin/watch-signal
 
-  # region:
-  #   <<: *shared
-  #   ports:
-  #     - '1338:1338'
-  #   command: >
-  #     node_modules/.bin/watchy -pw build/region,build/shared -- node build/region
+  region:
+    <<: *shared
+    ports:
+      - '1337:80'
+    environment:
+      NAME: dev
+    command: bin/region

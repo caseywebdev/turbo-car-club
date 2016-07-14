@@ -35,12 +35,6 @@ COPY etc/cogs/client.js /code/etc/cogs/client.js
 COPY src/client/styles /code/src/client/styles
 RUN MINIFY=1 ONLY_CLASS_NAMES=1 bin/build-client
 
-ARG SIGNAL_URL=ws://signal.turbocarclub.com
-ENV SIGNAL_URL $SIGNAL_URL
-
-ARG VERSION
-ENV VERSION $VERSION
-
 # Build client
 COPY .eslintrc /code/.eslintrc
 COPY src/client /code/src/client
@@ -54,13 +48,17 @@ RUN bin/build-server
 
 COPY etc /code/etc
 
-ARG CLIENT_URL=http://www.turbocarclub.com
-ENV CLIENT_URL $CLIENT_URL
-
+ENV CLIENT_URL http://www.turbocarclub.com.dev
 ENV KEY xxx
 ENV MAIL_FROM_ADDRESS support@turbocarclub.com
 ENV MAIL_FROM_NAME Turbo Car Club
 ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
+ENV REGION_URLS http://www.turbocarclub.com.dev:1337
+ENV SIGNAL_URL ws://signal.turbocarclub.com.dev
+
+# Bake version (git SHA1 revision) into the image
+ARG VERSION
+ENV VERSION $VERSION
 
 EXPOSE 80
 
