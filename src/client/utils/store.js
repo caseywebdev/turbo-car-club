@@ -24,11 +24,13 @@ store.watch(['authToken'], () =>
 );
 
 store.run({query: ['regions']}).then(() =>
-  Promise.all(_.map(store.get(['regions']), ({url}) => {
+  Promise.all(_.map(store.get(['regions']), ({id, url}) => {
     const start = Date.now();
-    return fetch(url).then(() => ({url, rtt: Date.now() - start}));
+    return fetch(url).then(() => {
+      store.update({regionsById: {[id]: {rtt: {$set: Date.now() - start}}}});
+    });
   }))
-).then(console.log.bind(console));
+).then(() => console.log(store.get(['regions'])));
 
 live.on('pave', delta => store.update(delta));
 

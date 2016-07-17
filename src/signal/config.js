@@ -1,4 +1,5 @@
 import _ from 'underscore';
+import Qs from 'qs';
 import shared from '../shared/config';
 
 const ENV = process.env;
@@ -8,7 +9,7 @@ export default {
   client: {
     url: ENV.CLIENT_URL
   },
-  regions: _.map(ENV.REGION_URLS.split(','), url => ({url})),
+  regions: _.map(Qs.parse(ENV.REGIONS), (url, id) => ({id, url})),
   key: ENV.KEY,
   knex: {client: 'pg', connection: ENV.POSTGRES_URL},
   log: {name: 'signal'},
