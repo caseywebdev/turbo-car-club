@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import disk from './disk';
 import {Store, Router} from 'pave';
 import live from './live';
@@ -21,6 +22,13 @@ const store = new Store({
 store.watch(['authToken'], () =>
   disk.write('authToken', store.get(['authToken']))
 );
+
+store.run({query: ['regions']}).then(() =>
+  Promise.all(_.map(store.get(['regions']), ({url}) => {
+    const start = Date.now();
+    return fetch(url).then(() => ({url, rtt: Date.now() - start}));
+  }))
+).then(console.log.bind(console));
 
 live.on('pave', delta => store.update(delta));
 

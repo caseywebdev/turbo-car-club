@@ -1,5 +1,6 @@
 import './utils/set-global';
 import './utils/livereload';
+import 'whatwg-fetch';
 import React from 'react';
 import {render} from 'react-dom';
 import {Router, hashHistory as history} from 'react-router';
