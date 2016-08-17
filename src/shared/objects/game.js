@@ -1,11 +1,12 @@
 import _ from 'underscore';
-import Ammo from 'ammo.js';
-import CarBody from '../bodies/car';
-import createBody from '../utils/create-body';
-import config from '../config';
 import * as MainWorld from '../worlds/main';
-import FloorBody from '../bodies/floor';
+import Ammo from 'ammo.js';
 import BallBody from '../bodies/ball';
+import CarBody from '../bodies/car';
+import config from '../config';
+import createBody from '../utils/create-body';
+import FloorBody from '../bodies/floor';
+import now from '../utils/now';
 
 const WALLS = [
   [48, 1, 4],
@@ -56,15 +57,16 @@ export default class {
 
   start() {
     this.time = 0;
-    this.lastStep = _.now();
+    this.lastStep = now();
     this.step();
   }
 
   step() {
     this.tickTimeoutId = _.defer(::this.step);
-    const now = _.now();
-    const dt = (now - this.lastStep) / 1000;
+    const step = now();
+    const dt = step - this.lastStep;
     if (dt < FIXED_TIME_STEP) return;
+
     _.each(this.cars, car => {
       car.vehicle.setSteeringValue(-car.steering * config.car.steering, 0);
       car.vehicle.setSteeringValue(-car.steering * config.car.steering, 1);
@@ -137,7 +139,7 @@ export default class {
     });
     this.time += dt;
     this.world.stepSimulation(dt, MAX_SUB_STEPS, FIXED_TIME_STEP);
-    this.lastStep = now;
+    this.lastStep = step;
     // let foo = new Ammo.btTransform();
     // this.ball.getMotionState().getWorldTransform(foo);
   }
