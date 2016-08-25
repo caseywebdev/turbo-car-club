@@ -1,7 +1,7 @@
-import app from '..';
 import auth from '../utils/auth';
 import config from '../config';
 import findOrCreateUser from '../utils/find-or-create-user';
+import sockets from '../utils/sockets';
 import sign from '../../shared/utils/sign';
 import updateSignedInAt from '../utils/update-signed-in-at';
 import verify from '../../shared/utils/verify';
@@ -20,7 +20,7 @@ const checkSignedInAt = (data, {id, signedInAt, expiredTokensAt}) => {
 const createAuthToken = (socket, data, user) => {
   const {id: userId} = user;
   const token = sign(key, 'auth', {userId});
-  const origin = app.live.sockets[data.socketId];
+  const origin = sockets.all[data.socketId];
   const delta = {
     authToken: {$set: token},
     user: {$set: {$ref: ['usersById', userId]}}

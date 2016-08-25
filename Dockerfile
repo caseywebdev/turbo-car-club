@@ -30,7 +30,7 @@ RUN npm install
 
 # Build class names
 COPY .stylelintrc /code/.stylelintrc
-COPY bin /code/bin
+COPY bin/build-client /code/bin/build-client
 COPY etc/cogs/client.js /code/etc/cogs/client.js
 COPY src/client/styles /code/src/client/styles
 RUN MINIFY=1 ONLY_CLASS_NAMES=1 bin/build-client
@@ -42,10 +42,12 @@ COPY src/shared /code/src/shared
 RUN MINIFY=1 bin/build-client
 
 # Build server
+COPY bin/build-server /code/bin/build-server
 COPY etc/cogs/server.js /code/etc/cogs/server.js
 COPY src /code/src
 RUN bin/build-server
 
+COPY bin /code/bin
 COPY etc /code/etc
 
 ENV CLIENT_URL http://www.turbocarclub.com.dev

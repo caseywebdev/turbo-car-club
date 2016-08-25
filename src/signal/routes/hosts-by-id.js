@@ -1,11 +1,11 @@
 import _ from 'underscore';
-import app from '..';
+import sockets from '../utils/sockets';
 
 export default {
   'hostsById.$keys':
   ({1: ids}) => ({
     hostsById: _.reduce(ids, (obj, id) => {
-      const hostSocket = app.live.hosts[id];
+      const hostSocket = sockets.hosts[id];
       const host = hostSocket && hostSocket.host;
       obj[id] =
         host ? {

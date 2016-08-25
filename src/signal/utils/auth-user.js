@@ -1,12 +1,12 @@
 import _ from 'underscore';
-import app from '..';
+import sockets from '../utils/sockets';
 import log from '../utils/log';
 
 export default (socket, userId) => {
   if (socket.userId === userId) return;
 
   log.info(`${socket.id} authorized as User ${userId}`);
-  const {users} = app.live;
+  const {users} = sockets;
   const prevId = socket.userId;
   if (prevId && users[prevId]) {
     users[prevId] = _.without(users[prevId], socket);

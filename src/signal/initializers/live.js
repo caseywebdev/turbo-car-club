@@ -34,5 +34,3 @@ wss.on('connection', socket => {
   _.invoke(LISTENERS, 'call', null, socket = new Live({socket}));
   socket.trigger('open');
 });
-
-export default {sockets: {}, users: {}, hosts: {}};

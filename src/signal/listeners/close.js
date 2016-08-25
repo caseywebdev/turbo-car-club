@@ -1,19 +1,19 @@
 import _ from 'underscore';
 import {remove, trigger} from '../utils/subs';
-import app from '..';
+import sockets from '../utils/sockets';
 import log from '../utils/log';
 
 export default ({socket}) => {
   remove(socket);
   if (socket.host) {
-    delete app.live.hosts[socket.host.id];
+    delete sockets.hosts[socket.host.id];
     trigger('host-removed');
   } else if (socket.userId) {
     const {userId} = socket;
-    const {users} = app.live;
+    const {users} = sockets;
     users[userId] = _.without(users[userId], socket);
     if (!users[userId].length) delete users[userId];
   }
-  delete app.live.sockets[socket.id];
+  delete sockets.all[socket.id];
   log.info(`${socket.id} disconnected`);
 };

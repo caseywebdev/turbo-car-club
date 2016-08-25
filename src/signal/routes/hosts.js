@@ -1,10 +1,10 @@
 import _ from 'underscore';
-import app from '..';
+import sockets from '../utils/sockets';
 
 export default {
   'hosts.$keys':
   ({1: keys}) => {
-    const hosts = _.map(app.live.hosts, 'host');
+    const hosts = _.map(sockets.hosts, 'host');
     return {
       hosts: {
         $set: _.reduce(keys, (obj, key) => {

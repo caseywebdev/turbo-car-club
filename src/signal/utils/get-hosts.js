@@ -1,4 +1,4 @@
 import _ from 'underscore';
-import app from '..';
+import sockets from '../utils/sockets';
 
-export default () => _.compact(_.map(app.live.sockets, 'host'));
+export default () => _.compact(_.map(sockets.all, 'host'));

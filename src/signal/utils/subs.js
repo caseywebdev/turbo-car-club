@@ -1,4 +1,4 @@
-import app from '..';
+import sockets from '../utils/sockets';
 
 const SUBS = {};
 
@@ -22,6 +22,6 @@ export const remove = (socket, event) => {
 };
 
 export const trigger = (event, data) => {
-  const {sockets} = app.live;
-  for (let id in SUBS[event]) sockets[id].send(event, data);
+  const {all} = sockets;
+  for (let id in SUBS[event]) all[id].send(event, data);
 };
