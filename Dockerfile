@@ -1,6 +1,6 @@
-FROM node:6.3.0
+FROM node:6.4.0
 
-ENV NGINX_VERSION 1.10.1
+ENV NGINX_VERSION 1.11.3
 RUN mkdir -p /usr/local/nginx/logs && \
     curl -L https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | \
       tar xz -C /usr/local/nginx --strip-components 1 && \
@@ -18,7 +18,7 @@ RUN curl -L https://releases.hashicorp.com/consul-template/$CONSUL_TEMPLATE_VERS
     mv consul-template /usr/local/bin/ && \
     rm consul-template.zip
 
-ENV CONTAINERPILOT_VERSION 2.3.0
+ENV CONTAINERPILOT_VERSION 2.4.1
 RUN curl -L https://github.com/joyent/containerpilot/releases/download/$CONTAINERPILOT_VERSION/containerpilot-$CONTAINERPILOT_VERSION.tar.gz | \
       tar xz -C /usr/local/bin/
 
