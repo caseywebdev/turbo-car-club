@@ -1,4 +1,4 @@
-FROM node:6.4.0
+FROM node:6.5.0
 
 ENV NGINX_VERSION 1.11.3
 RUN mkdir -p /usr/local/nginx/logs && \
