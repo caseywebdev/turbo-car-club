@@ -1,15 +1,6 @@
 {
   "consul": "http://consul:8500",
-  "preStart": [
-    "consul-template",
-    "-once",
-    "-consul",
-    "consul:8500",
-    "-template",
-    "/code/etc/nginx/client.conf.ctmpl:/usr/local/nginx/conf/nginx.conf",
-    "-template",
-    "/code/src/client/public/index.html.ctmpl:/code/build/client/index.html"
-  ],
+  "preStart": "/code/bin/client-pre-start",
   "services": [
     {
       "name": "client",
@@ -22,14 +13,7 @@
     {
       "name": "signal",
       "poll": 10,
-      "onChange": [
-        "consul-template",
-        "-once",
-        "-consul",
-        "consul:8500",
-        "-template",
-        "/code/etc/nginx/client.conf.ctmpl:/usr/local/nginx/conf/nginx.conf:nginx -s reload"
-      ]
+      "onChange": "/code/bin/client-on-change"
     }
   ]
 }
