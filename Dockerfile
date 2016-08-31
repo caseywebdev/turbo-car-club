@@ -52,6 +52,7 @@ COPY etc /code/etc
 
 ENV CLIENT_URL http://www.turbocarclub.com.dev
 ENV KEY xxx
+ENV MAIL_ENABLED 0
 ENV MAIL_FROM_ADDRESS support@turbocarclub.com
 ENV MAIL_FROM_NAME Turbo Car Club
 ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
