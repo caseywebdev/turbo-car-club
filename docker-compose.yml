@@ -2,7 +2,7 @@ version: '2'
 
 services:
   data:
-    image: &image quay.io/caseywebdev/turbo-car-club:a28713c6a4e9804113c688bf0b3d60987d95d63a
+    image: &image quay.io/caseywebdev/turbo-car-club:6308bd235d9e5219f25ef083cf9639c25f77eb08
     volumes:
       - ./.eslintrc:/code/.eslintrc
       - ./.stylelintrc:/code/.stylelintrc
@@ -62,8 +62,6 @@ services:
 
   signal:
     <<: *shared
-    environment:
-      MAIL_ENABLED: 0
     command: bin/watch-signal
 
   region:
