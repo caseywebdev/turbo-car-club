@@ -10,7 +10,7 @@
     "nodemailer-ses-transport": "1.4.0",
     "nodemailer": "2.5.0",
     "orgsync-logger": "1.4.0",
-    "pave": "0.3.9",
+    "pave": "0.3.10",
     "pg": "6.1.0",
     "qs": "6.2.1",
     "underscore.string": "3.3.4",

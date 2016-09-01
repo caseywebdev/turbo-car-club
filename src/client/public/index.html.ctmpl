@@ -12,6 +12,7 @@
     <script>
       window.SIGNAL_URL = '{{ env "SIGNAL_URL" }}';
       window.VERSION = '{{ env "VERSION" }}';
+      window.REGIONS = '{{ env "REGIONS" }}';
     </script>
   </head>
 

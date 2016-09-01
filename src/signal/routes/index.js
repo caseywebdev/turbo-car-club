@@ -1,10 +1,7 @@
 import {Router} from 'pave';
 import auth from './auth';
 import expireTokens from './expire-tokens';
-import hosts from './hosts';
-import hostsById from './hosts-by-id';
 import notFound from './not-found';
-import regions from './regions';
 import signIn from './sign-in';
 import user from './user';
 import usersById from './users-by-id';
@@ -15,10 +12,7 @@ export default new Router({
   routes: {
     ...auth,
     ...expireTokens,
-    ...hosts,
-    ...hostsById,
     ...notFound,
-    ...regions,
     ...signIn,
     ...user,
     ...usersById,
