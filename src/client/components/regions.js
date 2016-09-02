@@ -3,8 +3,8 @@ import PaveSubscription from 'pave-subscription';
 import React, {Component} from 'react';
 import store from '../utils/store';
 
-const renderRegion = region =>
-  <pre key={region.id}>{JSON.stringify(region)}</pre>;
+const renderRegion = ({id, ping}) =>
+  <div key={id}>{id} {Math.floor(ping * 1000)} ping</div>;
 
 export default class extends Component {
   componentWillMount() {
@@ -13,7 +13,7 @@ export default class extends Component {
       query: [
         'regionsById',
         _.keys(store.get(['regionsById'])),
-        ['id', 'url', 'rtt']
+        ['id', 'url', 'ping']
       ],
       onChange: sub =>
         this.setState({

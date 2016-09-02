@@ -10,16 +10,18 @@ const send = promisify(::live.send);
 
 const getMedian = ns => _.sortBy(ns)[Math.floor(ns.length / 2)];
 
-const getSingleRtt = url => {
+const getSinglePing = url => {
   const start = now();
   return fetch(url).then(() => now() - start);
 };
 
-const getRtt = url => {
-  const rtts = [];
-  return _.reduce(_.range(10), promise =>
-    promise.then(rtt => rtts.push(rtt) && getSingleRtt(url))
-  , getSingleRtt(url)).then(() => getMedian(rtts));
+const getPing = url => {
+  const pings = [];
+  return _.reduce(
+    _.range(10),
+    promise => promise.then(ping => pings.push(ping) && getSinglePing(url)),
+    getSinglePing(url)
+  ).then(() => getMedian(pings));
 };
 
 const store = new Store({
@@ -31,13 +33,13 @@ const store = new Store({
   },
   router: new Router({
     routes: {
-      'regionsById.$key.rtt':
+      'regionsById.$key.ping':
       ({1: id, store}) => {
         const url = store.get(['regionsById', id, 'url']);
-        if (!url) return {regionsById: {[id]: {rtt: {$set: null}}}};
+        if (!url) return {regionsById: {[id]: {ping: {$set: null}}}};
 
-        return getRtt(url).then(rtt => (
-          {regionsById: {[id]: {rtt: {$set: rtt}}}}
+        return getPing(url).then(ping => (
+          {regionsById: {[id]: {ping: {$set: ping}}}}
         ));
       },
 
