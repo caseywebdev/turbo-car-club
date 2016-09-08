@@ -50,8 +50,6 @@ export default class extends Component {
     return (
       <div>
         {
-          isLoading ? 'Loading...' :
-          error ? error.toString() :
           user ?
             <div>
               <SetName />
@@ -59,6 +57,8 @@ export default class extends Component {
               <button onClick={::this.expireTokens}>Expire Tokens</button>
               <img src={getAvatarUrl(user.emailHash)} />
             </div> :
+          isLoading ? 'Loading...' :
+          error ? error.toString() :
           <SignIn />
         }
       </div>

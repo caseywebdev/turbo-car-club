@@ -35,6 +35,8 @@ services:
     dns_search: service.consul
     volumes_from:
       - dbdata
+    depends_on:
+      - consul
 
   cogs-client: &shared
     image: *image
@@ -63,6 +65,8 @@ services:
   signal:
     <<: *shared
     command: bin/watch-signal
+    depends_on:
+      - postgres
 
   region:
     <<: *shared

@@ -4,7 +4,9 @@ import React, {Component} from 'react';
 import store from '../utils/store';
 
 const renderRegion = ({id, ping}) =>
-  <div key={id}>{id} {Math.floor(ping * 1000)} ping</div>;
+  <div key={id}>
+    {id} {ping == null ? '...' : Math.floor(ping * 1000)} ping
+  </div>;
 
 export default class extends Component {
   componentWillMount() {
@@ -29,15 +31,7 @@ export default class extends Component {
   }
 
   render() {
-    const {error, isLoading, regions} = this.state;
-    return (
-      <div>
-        {
-          isLoading ? 'Loading...' :
-          error ? error.toString() :
-          _.map(regions, renderRegion)
-        }
-      </div>
-    );
+    const {error, regions} = this.state;
+    return <div>{error ? error.toString() : _.map(regions, renderRegion)}</div>;
   }
 }
