@@ -1,6 +1,6 @@
-FROM node:6.5.0
+FROM node:6.6.0
 
-ENV NGINX_VERSION 1.11.3
+ENV NGINX_VERSION 1.11.4
 RUN mkdir -p /usr/local/nginx/logs && \
     curl -L https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | \
       tar xz -C /usr/local/nginx --strip-components 1 && \
