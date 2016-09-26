@@ -19,7 +19,7 @@ const LISTENERS = _.map({
   unsub
 }, (cb, name) =>
   socket =>
-    socket.on(name, (params, done) =>
+    socket.on(name, (params, done = _.noop) =>
       Promise
         .resolve({socket, params})
         .then(cb)
