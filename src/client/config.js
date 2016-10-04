@@ -7,5 +7,8 @@ export default {
   },
   signal: {
     url: window.SIGNAL_URL
+  },
+  livereload: {
+    url: window.LIVERELOAD_URL
   }
 };

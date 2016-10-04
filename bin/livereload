@@ -2,4 +2,5 @@
 
 LIVERELOAD=node_modules/.bin/livereload
 while [ ! -f $LIVERELOAD ]; do sleep 1; done
-exec $LIVERELOAD build/client
+exec containerpilot -config file:///code/etc/containerpilot/livereload.json \
+  $LIVERELOAD build/client -p 80

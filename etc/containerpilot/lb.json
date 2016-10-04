@@ -1,0 +1,41 @@
+{
+  "consul": "http://consul:8500",
+  "preStart": "/code/bin/lb-pre-start",
+  "services": [
+    {
+      "name": "lb-http",
+      "port": 80,
+      "poll": 10,
+      "ttl": 30
+    },
+    {
+      "name": "lb-https",
+      "port": 443,
+      "poll": 10,
+      "ttl": 30
+    }
+  ],
+  "backends": [
+    {
+      "name": "consul",
+      "poll": 10,
+      "onChange": "/code/bin/lb-on-change"
+    },
+    {
+      "name": "livereload",
+      "poll": 10,
+      "onChange": "/code/bin/lb-on-change"
+    },
+    {
+      "name": "signal",
+      "poll": 10,
+      "onChange": "/code/bin/lb-on-change"
+    }
+  ],
+  "tasks": [
+    {
+      "command": "bin/check-cert",
+      "frequency": "1h"
+    }
+  ]
+}

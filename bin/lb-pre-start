@@ -1,0 +1,15 @@
+#!/bin/bash -e
+
+IFS=: read -a SPLIT <<< $CONSUL_AUTH
+echo "${SPLIT[0]}:`echo ${SPLIT[1]} | openssl passwd -stdin`" > \
+  /usr/local/nginx/conf/consul_auth_basic_user_file
+
+while ! consul-template -once -consul consul:8500 \
+  -template \
+    /code/etc/nginx.conf.ctmpl:/usr/local/nginx/conf/nginx.conf \
+  -template \
+    /code/src/client/public/index.html.ctmpl:/code/build/client/index.html
+do :
+done
+
+bin/check-cert

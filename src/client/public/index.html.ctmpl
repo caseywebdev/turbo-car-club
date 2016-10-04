@@ -10,9 +10,10 @@
     <title>Turbo Car Club</title>
     <link href='index.css' rel='stylesheet' />
     <script>
+      window.LIVERELOAD_URL = '{{ env "LIVERELOAD_URL" }}';
+      window.REGIONS = '{{ env "REGIONS" }}';
       window.SIGNAL_URL = '{{ env "SIGNAL_URL" }}';
       window.VERSION = '{{ env "VERSION" }}';
-      window.REGIONS = '{{ env "REGIONS" }}';
     </script>
   </head>
 

@@ -1,7 +1,10 @@
-if (__LIVERELOAD__) {
+import config from '../config';
+
+const {url} = config.livereload;
+
+if (url) {
   const script = document.createElement('script');
-  const {protocol, hostname} = location;
-  script.src = `${protocol}//${hostname}:35729/livereload.js`;
+  script.src = `${url}/livereload.js?port=443`;
   script.async = true;
   document.body.appendChild(script);
 }

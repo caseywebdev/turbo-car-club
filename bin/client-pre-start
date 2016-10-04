@@ -1,9 +1,0 @@
-#!/bin/bash -e
-
-while ! consul-template -once -consul consul:8500 \
-  -template \
-    /code/etc/nginx/client.conf.ctmpl:/usr/local/nginx/conf/nginx.conf \
-  -template \
-    /code/src/client/public/index.html.ctmpl:/code/build/client/index.html
-do :
-done

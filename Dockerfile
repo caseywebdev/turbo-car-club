@@ -5,7 +5,7 @@ RUN mkdir -p /usr/local/nginx/logs && \
     curl -L https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | \
       tar xz -C /usr/local/nginx --strip-components 1 && \
     cd /usr/local/nginx && \
-    ./configure && \
+    ./configure --with-http_ssl_module && \
     make && \
     ln -s /usr/local/nginx/objs/nginx /usr/local/bin/
 
@@ -50,14 +50,17 @@ RUN bin/build-server
 COPY bin /code/bin
 COPY etc /code/etc
 
-ENV CLIENT_URL http://www.turbocarclub.com.dev
+ENV CLIENT_URL https://www.dev.turbocarclub.com
+ENV CONSUL_URL https://consul.dev.turbocarclub.com
+ENV CONSUL_AUTH foo:bar
 ENV KEY xxx
+ENV LIVERELOAD_URL https://livereload.dev.turbocarclub.com
 ENV MAIL_ENABLED 0
 ENV MAIL_FROM_ADDRESS support@turbocarclub.com
 ENV MAIL_FROM_NAME Turbo Car Club
 ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
-ENV REGIONS dev=http://www.turbocarclub.com.dev:1337
-ENV SIGNAL_URL ws://signal.turbocarclub.com.dev
+ENV REGIONS dev=https://www.dev.turbocarclub.com
+ENV SIGNAL_URL wss://signal.dev.turbocarclub.com
 
 # Bake version (git SHA1 revision) into the image
 ARG VERSION
@@ -65,4 +68,4 @@ ENV VERSION $VERSION
 
 EXPOSE 80
 
-CMD ["bin/signal"]
+CMD ["true"]

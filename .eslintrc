@@ -19,11 +19,6 @@
     "phantomjs": true,
     "worker": true
   },
-  "globals": {
-    "__LIVERELOAD__": true,
-    "__SIGNAL_URL__": true,
-    "__MIN__": true
-  },
   "rules": {
     "comma-dangle": [2, "never"],
     "no-comma-dangle": 0,

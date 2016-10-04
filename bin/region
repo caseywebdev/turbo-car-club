@@ -1,3 +1,0 @@
-#!/bin/bash -e
-
-exec containerpilot -config file:///code/etc/containerpilot/region.json nginx

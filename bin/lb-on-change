@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+consul-template -once -consul consul:8500 \
+  -template \
+    '/code/etc/nginx.conf.ctmpl:/usr/local/nginx/conf/nginx.conf:nginx -s reload'

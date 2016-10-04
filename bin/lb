@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+exec containerpilot -config file:///code/etc/containerpilot/lb.json nginx

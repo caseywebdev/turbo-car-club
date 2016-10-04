@@ -1,9 +1,8 @@
 {
   "consul": "http://consul:8500",
-  "preStart": "cp /code/etc/nginx/region.conf /usr/local/nginx/conf/nginx.conf",
   "services": [
     {
-      "name": "region",
+      "name": "livereload",
       "port": 80,
       "poll": 10,
       "ttl": 30

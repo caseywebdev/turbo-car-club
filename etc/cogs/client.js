@@ -39,7 +39,6 @@ module.exports = {
       options: {
         flags: 'g',
         patterns: {
-          __LIVERELOAD__: (!MINIFY).toString(),
           'process.env.NODE_ENV': MINIFY ? "'production'" : "'development'"
         }
       }

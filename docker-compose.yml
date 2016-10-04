@@ -1,8 +1,15 @@
 version: '2'
 
 services:
-  data:
-    image: &image quay.io/caseywebdev/turbo-car-club:ec33d1ba111253261435a60252964346f1afc15a
+  persisted-data:
+    image: busybox:1.24.1
+    volumes:
+      - /etc/ssl/private
+      - /var/lib/postgresql/data
+    command: 'true'
+
+  ephemeral-data:
+    image: &image db29abd45444
     volumes:
       - ./.eslintrc:/code/.eslintrc
       - ./.stylelintrc:/code/.stylelintrc
@@ -14,27 +21,21 @@ services:
       - /code/node_modules
     command: 'true'
 
-  dbdata:
-    image: busybox:1.24.1
-    volumes:
-      - /var/lib/postgresql/data
-    command: 'true'
-
   consul:
-    image: quay.io/caseywebdev/consul:88c43403b5600a61a874700a6f773a00ac533841
+    image: quay.io/caseywebdev/consul:354b064a91a7514992f1e5684dbb5e130c9192d2
     dns: &dns 172.17.0.1
     dns_search: service.consul
     ports:
-      - '8500:8500'
+      - '8500'
       - '172.17.0.1:53:53/udp'
-    command: -dev -bootstrap-expect 1
+    command: -dev
 
   postgres:
     image: quay.io/caseywebdev/postgres:eb5df614f21c64c25b25f711750b241e8cc1598e
     dns: *dns
     dns_search: service.consul
     volumes_from:
-      - dbdata
+      - persisted-data
     depends_on:
       - consul
 
@@ -43,8 +44,22 @@ services:
     dns: *dns
     dns_search: service.consul
     volumes_from:
-      - data
+      - persisted-data
+      - ephemeral-data
     command: bin/watch-build-client
+    depends_on:
+      - consul
+    environment:
+      CLIENT_SERVER_NAME: www.dev.turbocarclub.com
+      CLIENT_URL: https://www.dev.turbocarclub.com
+      CONSUL_SERVER_NAME: consul.dev.turbocarclub.com
+      CONSUL_URL: consul:8500
+      CONSUL_AUTH: foo:bar
+      REGIONS: dev=https://www.dev.turbocarclub.com
+      SIGNAL_SERVER_NAME: signal.dev.turbocarclub.com
+      SIGNAL_URL: wss://signal.dev.turbocarclub.com
+      LIVERELOAD_SERVER_NAME: livereload.dev.turbocarclub.com
+      LIVERELOAD_URL: https://livereload.dev.turbocarclub.com
 
   cogs-server:
     <<: *shared
@@ -52,24 +67,18 @@ services:
 
   livereload:
     <<: *shared
-    ports:
-      - '35729:35729'
     command: bin/livereload
 
-  client:
+  lb:
     <<: *shared
     ports:
       - '80:80'
-    command: bin/client
+      - '443:443'
+    command: bin/lb
 
   signal:
     <<: *shared
     command: bin/watch-signal
     depends_on:
       - postgres
-
-  region:
-    <<: *shared
-    ports:
-      - '1337:80'
-    command: bin/region
+    command: bin/signal

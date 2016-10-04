@@ -1,0 +1,35 @@
+#!/bin/bash -e
+
+SSL_DIR=/etc/ssl/private
+KEY_FILE=$SSL_DIR/key
+CERT_FILE=$SSL_DIR/cert
+
+if [ ! -f $KEY_FILE ]; then
+
+  echo 'Pulling key from consul'
+  curl $CONSUL_URL/v1/kv/global/ssl/key?raw -su $CONSUL_AUTH > $KEY_FILE
+  if [ ! -s $KEY_FILE ]; then
+
+    echo 'Key does not exist, creating a new key...'
+    openssl genrsa 4096 > $KEY_FILE
+    curl -XPUT $CONSUL_URL/v1/kv/global/ssl/key -su $CONSUL_AUTH --data-binary @$KEY_FILE
+  fi
+fi
+
+if [ ! -f $CERT_FILE ]; then
+  echo 'Pulling cert from consul'
+  curl $CONSUL_URL/v1/kv/global/ssl/cert?raw -su $CONSUL_AUTH > $CERT_FILE
+fi
+
+if openssl x509 -checkend 86400 -noout -in $CERT_FILE; then
+
+  echo 'Cert is good for at least 24 more hours'
+else
+
+  echo 'Cert is out of date or does not exist, creating a new cert...'
+  openssl req -new -key $KEY_FILE \
+    -subj "/C=AA/ST=A/L=A/O=A/CN=*.dev.turbocarclub.com" |
+    openssl x509 -req -days 365 -signkey $KEY_FILE > $CERT_FILE
+
+  curl -XPUT $CONSUL_URL/v1/kv/global/ssl/cert -su $CONSUL_AUTH --data-binary @$CERT_FILE
+fi

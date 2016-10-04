@@ -12,7 +12,7 @@ const getMedian = ns => _.sortBy(ns)[Math.floor(ns.length / 2)];
 
 const getSinglePing = url => {
   const start = now();
-  return fetch(url).then(() => now() - start);
+  return fetch(`${url}/ping`).then(() => now() - start);
 };
 
 const getPing = url => {
