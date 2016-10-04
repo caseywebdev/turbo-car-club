@@ -1,5 +1,5 @@
 {
-  "consul": "http://consul:8500",
+  "consul": "consul:8500",
   "services": [
     {
       "name": "livereload",
