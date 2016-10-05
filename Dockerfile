@@ -50,16 +50,20 @@ RUN bin/build-server
 COPY bin /code/bin
 COPY etc /code/etc
 
+ENV CLIENT_SERVER_NAME www.dev.turbocarclub.com
 ENV CLIENT_URL https://www.dev.turbocarclub.com
-ENV CONSUL_URL https://consul.dev.turbocarclub.com
 ENV CONSUL_AUTH foo:bar
+ENV CONSUL_SERVER_NAME consul.dev.turbocarclub.com
+ENV CONSUL_URL consul:8500
 ENV KEY xxx
+ENV LIVERELOAD_SERVER_NAME livereload.dev.turbocarclub.com
 ENV LIVERELOAD_URL https://livereload.dev.turbocarclub.com
 ENV MAIL_ENABLED 0
 ENV MAIL_FROM_ADDRESS support@turbocarclub.com
 ENV MAIL_FROM_NAME Turbo Car Club
 ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
 ENV REGIONS dev=https://www.dev.turbocarclub.com
+ENV SIGNAL_SERVER_NAME signal.dev.turbocarclub.com
 ENV SIGNAL_URL wss://signal.dev.turbocarclub.com
 
 # Bake version (git SHA1 revision) into the image
