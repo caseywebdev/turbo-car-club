@@ -4,7 +4,7 @@
     "ammo.js": "0.0.10",
     "jsonwebtoken": "7.1.9",
     "knex": "0.12.2",
-    "live-socket": "0.10.8",
+    "live-socket": "0.10.9",
     "node-uuid": "1.4.7",
     "nodemailer-markdown": "1.0.1",
     "nodemailer-ses-transport": "1.4.0",
