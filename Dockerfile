@@ -1,4 +1,4 @@
-FROM node:6.6.0
+FROM node:6.7.0
 
 ENV NGINX_VERSION 1.11.4
 RUN mkdir -p /usr/local/nginx/logs && \
@@ -9,7 +9,7 @@ RUN mkdir -p /usr/local/nginx/logs && \
     make && \
     ln -s /usr/local/nginx/objs/nginx /usr/local/bin/
 
-ENV CONSUL_TEMPLATE_VERSION 0.15.0
+ENV CONSUL_TEMPLATE_VERSION 0.16.0
 RUN curl -L https://releases.hashicorp.com/consul-template/$CONSUL_TEMPLATE_VERSION/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip > \
       consul-template.zip && \
     apt-get update && \
@@ -18,7 +18,7 @@ RUN curl -L https://releases.hashicorp.com/consul-template/$CONSUL_TEMPLATE_VERS
     mv consul-template /usr/local/bin/ && \
     rm consul-template.zip
 
-ENV CONTAINERPILOT_VERSION 2.4.1
+ENV CONTAINERPILOT_VERSION 2.4.3
 RUN curl -L https://github.com/joyent/containerpilot/releases/download/$CONTAINERPILOT_VERSION/containerpilot-$CONTAINERPILOT_VERSION.tar.gz | \
       tar xz -C /usr/local/bin/
 
@@ -66,6 +66,6 @@ ENV SIGNAL_URL wss://signal.dev.turbocarclub.com
 ARG VERSION
 ENV VERSION $VERSION
 
-EXPOSE 80
+EXPOSE 80 443
 
 CMD ["true"]

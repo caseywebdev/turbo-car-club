@@ -1,7 +1,7 @@
 import config from '../config';
 import Live from 'live-socket';
 import log from '../utils/log';
-import ws from 'ws';
+import ws from 'uws';
 
 const {key, name, signal: {url}} = config;
 

@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import Live from 'live-socket';
 import log from '../utils/log';
-import ws from 'ws';
+import ws from 'uws';
 
 import close from '../listeners/close';
 import open from '../listeners/open';

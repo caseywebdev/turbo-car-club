@@ -9,7 +9,8 @@ while ! consul-template -once -consul consul:8500 \
     /code/etc/nginx.conf.ctmpl:/usr/local/nginx/conf/nginx.conf \
   -template \
     /code/src/client/public/index.html.ctmpl:/code/build/client/index.html
-do :
+do
+  sleep 1
 done
 
 bin/check-cert
