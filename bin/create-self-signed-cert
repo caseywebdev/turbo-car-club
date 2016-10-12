@@ -1,0 +1,15 @@
+#!/bin/bash -e
+
+LE_DIR=/etc/letsencrypt/live
+CERT_PATH=$LE_DIR/fullchain.pem
+KEY_PATH=$LE_DIR/privkey.pem
+
+if [ ! -s $KEY_PATH ]; then
+  echo 'Key does not exist, creating a new key'
+  openssl genrsa 4096 > $KEY_PATH
+fi
+
+echo 'Creating new self-signed cert'
+openssl req -new -key $KEY_PATH \
+  -subj "/C=AA/ST=A/L=A/O=A/CN=*.turbocarclub.com" |
+  openssl x509 -req -days 365 -signkey $KEY_PATH > $CERT_PATH

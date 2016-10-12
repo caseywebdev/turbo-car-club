@@ -1,5 +1,5 @@
 {
-  "consul": "consul:8500",
+  "consul": "{{ .CONSUL_URL }}",
   "preStart": "/code/bin/lb-pre-start",
   "services": [
     {
@@ -32,10 +32,6 @@
       "onChange": "/code/bin/lb-on-change"
     }
   ],
-  "tasks": [
-    {
-      "command": "bin/check-cert",
-      "frequency": "1h"
-    }
-  ]
+  "coprocesses": [{"command": "bin/check-cert"}],
+  "tasks": [{"command": "bin/check-cert", "frequency": "1h"}]
 }

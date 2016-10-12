@@ -4,7 +4,7 @@ services:
   persisted-data:
     image: busybox:1.24.1
     volumes:
-      - /etc/ssl/private
+      - /etc/letsencrypt
       - /var/lib/postgresql/data
     command: 'true'
 
@@ -49,6 +49,12 @@ services:
     command: bin/watch-build-client
     depends_on:
       - consul
+    environment:
+      LIVERELOAD_SERVER_NAME: livereload.dev.turbocarclub.com
+      LIVERELOAD_URL: https://livereload.dev.turbocarclub.com
+      CONSUL_AUTH: foo:bar
+      CONSUL_SERVER_NAME: consul.dev.turbocarclub.com
+      SIGNAL_SERVER_NAME: signal.dev.turbocarclub.com
 
   cogs-server:
     <<: *shared
@@ -63,7 +69,6 @@ services:
     ports:
       - '80:80'
       - '443:443'
-    command: bin/lb
 
   signal:
     <<: *shared

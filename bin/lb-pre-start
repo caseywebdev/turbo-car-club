@@ -1,8 +1,10 @@
 #!/bin/bash -e
 
-IFS=: read -a SPLIT <<< $CONSUL_AUTH
-echo "${SPLIT[0]}:`echo ${SPLIT[1]} | openssl passwd -stdin`" > \
-  /usr/local/nginx/conf/consul_auth_basic_user_file
+if [ "$CONSUL_AUTH" ]; then
+  IFS=: read -a SPLIT <<< $CONSUL_AUTH
+  echo "${SPLIT[0]}:`echo ${SPLIT[1]} | openssl passwd -stdin`" > \
+    /usr/local/nginx/conf/consul_auth_basic_user_file
+fi
 
 while ! consul-template -once -consul consul:8500 \
   -template \
@@ -13,4 +15,4 @@ do
   sleep 1
 done
 
-bin/check-cert
+bin/create-self-signed-cert

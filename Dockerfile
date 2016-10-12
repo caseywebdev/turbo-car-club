@@ -1,6 +1,12 @@
 FROM node:6.7.0
 
-ENV NGINX_VERSION 1.11.4
+RUN apt-get update && \
+    apt-get install -y unzip && \
+    curl https://dl.eff.org/certbot-auto > /usr/local/bin/certbot-auto && \
+    chmod +x /usr/local/bin/certbot-auto && \
+    certbot-auto -n -h
+
+ENV NGINX_VERSION 1.11.5
 RUN mkdir -p /usr/local/nginx/logs && \
     curl -L https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | \
       tar xz -C /usr/local/nginx --strip-components 1 && \
@@ -12,8 +18,6 @@ RUN mkdir -p /usr/local/nginx/logs && \
 ENV CONSUL_TEMPLATE_VERSION 0.16.0
 RUN curl -L https://releases.hashicorp.com/consul-template/$CONSUL_TEMPLATE_VERSION/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip > \
       consul-template.zip && \
-    apt-get update && \
-    apt-get install -y unzip && \
     unzip consul-template.zip && \
     mv consul-template /usr/local/bin/ && \
     rm consul-template.zip
@@ -52,19 +56,15 @@ COPY etc /code/etc
 
 ENV CLIENT_SERVER_NAME www.dev.turbocarclub.com
 ENV CLIENT_URL https://www.dev.turbocarclub.com
-ENV CONSUL_AUTH foo:bar
-ENV CONSUL_SERVER_NAME consul.dev.turbocarclub.com
 ENV CONSUL_URL consul:8500
-ENV KEY xxx
-ENV LIVERELOAD_SERVER_NAME livereload.dev.turbocarclub.com
-ENV LIVERELOAD_URL https://livereload.dev.turbocarclub.com
+ENV KEY foo
 ENV MAIL_ENABLED 0
 ENV MAIL_FROM_ADDRESS support@turbocarclub.com
 ENV MAIL_FROM_NAME Turbo Car Club
 ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
 ENV REGIONS dev=https://www.dev.turbocarclub.com
-ENV SIGNAL_SERVER_NAME signal.dev.turbocarclub.com
 ENV SIGNAL_URL wss://signal.dev.turbocarclub.com
+ENV LETSENCRYPT_ENABLED 0
 
 # Bake version (git SHA1 revision) into the image
 ARG VERSION
@@ -72,4 +72,4 @@ ENV VERSION $VERSION
 
 EXPOSE 80 443
 
-CMD ["true"]
+CMD ["bin/lb"]
