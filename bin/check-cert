@@ -3,7 +3,7 @@
 LE_DIR=/etc/letsencrypt/live
 CERT_PATH=$LE_DIR/fullchain.pem
 KEY_PATH=$LE_DIR/privkey.pem
-KV_URL=$CONSUL_URL/v1/kv/letsencrypt
+KV_URL=$CONSUL_URL/v1/kv/letsencrypt/$CLIENT_SERVER_NAME
 
 if [ "$LETSENCRYPT_ENABLED" = "1" ]; then
   echo 'Pulling key from consul'
@@ -12,23 +12,20 @@ if [ "$LETSENCRYPT_ENABLED" = "1" ]; then
   echo 'Pulling cert from consul'
   curl -s $KV_URL/fullchain.pem?raw > $CERT_PATH
 
-  if openssl x509 -checkend 86400 -noout -in $CERT_PATH; then
-    echo 'Cert is good for at least 24 more hours'
+  if openssl x509 -checkend 604800 -noout -in $CERT_PATH; then
+    echo 'Cert is good for at least 7 more days'
   else
     echo 'Cert is out of date or does not exist'
 
     echo 'Waiting for nginx to start'
     while [ ! "`ps aux | grep [n]ginx`" ]; do sleep 1; done
 
-    echo 'Requesting cert from letsencrypt'
-    certbot-auto -n certonly --webroot \
-      -w /usr/local/nginx/html \
-      -d $CLIENT_SERVER_NAME \
-      -d $SIGNAL_SERVER_NAME \
-      -d $CONSUL_SERVER_NAME
+    DOMAINS=($CONSUL_SERVER_NAME $CLIENT_SERVER_NAME $SIGNAL_SERVER_NAME)
+    DOMAIN_ARG=''
+    for DOMAIN in ${DOMAINS[*]}; do DOMAIN_ARG+=" -d $DOMAIN"; done
 
-    echo 'Reloading nginx'
-    nginx -s reload
+    echo 'Requesting cert from letsencrypt'
+    certbot-auto -n certonly --webroot -w /usr/local/nginx/html $DOMAIN_ARG
 
     echo 'Saving key to consul'
     curl -sXPUT $KV_URL/privkey.pem --data-binary @$KEY_PATH
@@ -36,4 +33,7 @@ if [ "$LETSENCRYPT_ENABLED" = "1" ]; then
     echo 'Saving cert to consul'
     curl -sXPUT $KV_URL/fullchain.pem --data-binary @$CERT_PATH
   fi
+
+  echo 'Reloading nginx'
+  nginx -s reload
 fi

@@ -33,5 +33,5 @@
     }
   ],
   "coprocesses": [{"command": "bin/check-cert"}],
-  "tasks": [{"command": "bin/check-cert", "frequency": "1h"}]
+  "tasks": [{"command": "bin/check-cert", "frequency": "12h"}]
 }
