@@ -4,6 +4,8 @@ LE_DIR=/etc/letsencrypt/live
 CERT_PATH=$LE_DIR/fullchain.pem
 KEY_PATH=$LE_DIR/privkey.pem
 
+mkdir -p $LE_DIR
+
 if [ ! -s $KEY_PATH ]; then
   echo 'Key does not exist, creating a new key'
   openssl genrsa 4096 > $KEY_PATH
