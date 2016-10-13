@@ -9,7 +9,7 @@ services:
     command: 'true'
 
   ephemeral-data:
-    image: &image quay.io/caseywebdev/turbo-car-club:99277768e6a2c956dd4560c2c3b52d87cf2aa7e6
+    image: &image quay.io/caseywebdev/turbo-car-club:d9eece4240dcdbd82c37e45ecd9081c559685e27
     volumes:
       - ./.eslintrc:/code/.eslintrc
       - ./.stylelintrc:/code/.stylelintrc
@@ -22,7 +22,7 @@ services:
     command: 'true'
 
   consul:
-    image: quay.io/caseywebdev/consul:354b064a91a7514992f1e5684dbb5e130c9192d2
+    image: quay.io/caseywebdev/consul:836521c3324593cd3abeafb27c1ade813ae15a67
     dns: &dns 172.17.0.1
     dns_search: service.consul
     ports:
@@ -31,7 +31,7 @@ services:
     command: -dev
 
   postgres:
-    image: quay.io/caseywebdev/postgres:eb5df614f21c64c25b25f711750b241e8cc1598e
+    image: quay.io/caseywebdev/postgres:a979e843fdd850c2e72d93cb5fff994d91d7e2a3
     dns: *dns
     dns_search: service.consul
     volumes_from:
