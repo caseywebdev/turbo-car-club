@@ -13,10 +13,10 @@ while [ ! "`ps aux | grep [n]ginx`" ]; do sleep 1; done
 
 if [ "$LETSENCRYPT_ENABLED" = "1" ]; then
   echo 'Pulling cert from consul'
-  curl -s $KV_URL/fullchain.pem?raw > $CERT_PATH
+  set +e; curl -fs $KV_URL/fullchain.pem?raw > $CERT_PATH; set -e
 
   echo 'Pulling key from consul'
-  curl -s $KV_URL/privkey.pem?raw > $KEY_PATH
+  set +e; curl -fs $KV_URL/privkey.pem?raw > $KEY_PATH; set -e
 
   if openssl x509 -checkend 604800 -noout -in $CERT_PATH; then
     echo 'Cert is good for at least 7 more days'
