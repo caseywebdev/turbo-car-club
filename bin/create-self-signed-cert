@@ -1,10 +1,8 @@
 #!/bin/bash -e
 
-LE_DIR=/etc/letsencrypt/live/$CLIENT_SERVER_NAME
-CERT_PATH=$LE_DIR/fullchain.pem
-KEY_PATH=$LE_DIR/privkey.pem
-
-mkdir -p $LE_DIR
+SSL_DIR=/etc/ssl/private
+CERT_PATH=$SSL_DIR/fullchain.pem
+KEY_PATH=$SSL_DIR/privkey.pem
 
 if [ ! -s $KEY_PATH ]; then
   echo 'Key does not exist, creating a new key'

@@ -4,7 +4,7 @@ services:
   persisted-data:
     image: busybox:1.24.1
     volumes:
-      - /etc/letsencrypt
+      - /etc/ssl/private
       - /var/lib/postgresql/data
     command: 'true'
 
