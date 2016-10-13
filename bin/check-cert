@@ -5,6 +5,9 @@ CERT_PATH=$LE_DIR/fullchain.pem
 KEY_PATH=$LE_DIR/privkey.pem
 KV_URL=$CONSUL_URL/v1/kv/letsencrypt/$CLIENT_SERVER_NAME
 
+echo 'Waiting for nginx to start'
+while [ ! "`ps aux | grep [n]ginx`" ]; do sleep 1; done
+
 if [ "$LETSENCRYPT_ENABLED" = "1" ]; then
   echo 'Pulling key from consul'
   curl -s $KV_URL/privkey.pem?raw > $KEY_PATH
@@ -16,9 +19,6 @@ if [ "$LETSENCRYPT_ENABLED" = "1" ]; then
     echo 'Cert is good for at least 7 more days'
   else
     echo 'Cert is out of date or does not exist'
-
-    echo 'Waiting for nginx to start'
-    while [ ! "`ps aux | grep [n]ginx`" ]; do sleep 1; done
 
     DOMAINS=($CONSUL_SERVER_NAME $CLIENT_SERVER_NAME $SIGNAL_SERVER_NAME)
     DOMAIN_ARG=''
