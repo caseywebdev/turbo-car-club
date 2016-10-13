@@ -1,5 +1,5 @@
 {
-  "consul": "{{ .CONSUL_URL }}",
+  "consul": "{{ .CONSUL_URL }}:8500",
   "preStart": "/code/bin/lb-pre-start",
   "services": [
     {
@@ -17,7 +17,7 @@
   ],
   "backends": [
     {
-      "name": "consul",
+      "name": "consul-http",
       "poll": 10,
       "onChange": "/code/bin/lb-on-change"
     },

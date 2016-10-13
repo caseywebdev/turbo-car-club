@@ -6,7 +6,7 @@ KEY_PATH=$SSL_DIR/privkey.pem
 LE_DIR=/etc/letsencrypt/live/$CLIENT_SERVER_NAME
 LE_CERT_PATH=$LE_DIR/fullchain.pem
 LE_KEY_PATH=$LE_DIR/privkey.pem
-KV_URL=$CONSUL_URL/v1/kv/letsencrypt/$CLIENT_SERVER_NAME
+KV_URL=$CONSUL_URL:8500/v1/kv/letsencrypt/$CLIENT_SERVER_NAME
 
 echo 'Waiting for nginx to start'
 while [ ! "`ps aux | grep [n]ginx`" ]; do sleep 1; done

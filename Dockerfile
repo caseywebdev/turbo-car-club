@@ -56,7 +56,7 @@ COPY etc /code/etc
 
 ENV CLIENT_SERVER_NAME www.dev.turbocarclub.com
 ENV CLIENT_URL https://www.dev.turbocarclub.com
-ENV CONSUL_URL consul:8500
+ENV CONSUL_URL consul
 ENV KEY foo
 ENV MAIL_ENABLED 0
 ENV MAIL_FROM_ADDRESS support@turbocarclub.com

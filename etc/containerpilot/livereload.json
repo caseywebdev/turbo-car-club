@@ -1,5 +1,5 @@
 {
-  "consul": "{{ .CONSUL_URL }}",
+  "consul": "{{ .CONSUL_URL }}:8500",
   "services": [
     {
       "name": "livereload",

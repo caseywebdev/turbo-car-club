@@ -51,7 +51,7 @@ http {
   {{ if env "CONSUL_SERVER_NAME" }}
     upstream consul {
       least_conn;
-      {{ range service "consul" }}
+      {{ range service "consul-http" }}
         server {{.Address}}:{{.Port}};
       {{ else }}
         server localhost:65535;
