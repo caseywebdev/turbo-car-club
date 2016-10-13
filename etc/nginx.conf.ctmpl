@@ -18,7 +18,7 @@ http {
   server {
     listen 80 default_server;
 
-    location /.wellknown/acme-challenge {}
+    location /.well-known/acme-challenge {}
 
     location / {
       return 302 https://$host$request_uri;
