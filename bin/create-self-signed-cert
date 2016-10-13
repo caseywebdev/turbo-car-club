@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-LE_DIR=/etc/letsencrypt/live
+LE_DIR=/etc/letsencrypt/live/$CLIENT_SERVER_NAME
 CERT_PATH=$LE_DIR/fullchain.pem
 KEY_PATH=$LE_DIR/privkey.pem
 

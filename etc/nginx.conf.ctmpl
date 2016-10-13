@@ -7,8 +7,10 @@ http {
   gzip_types application/javascript application/json text/css;
   include mime.types;
   server_tokens off;
-  ssl_certificate /etc/letsencrypt/live/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/privkey.pem;
+  ssl_certificate
+    /etc/letsencrypt/live/{{ env "CLIENT_SERVER_NAME" }}/fullchain.pem;
+  ssl_certificate_key
+    /etc/letsencrypt/live/{{ env "CLIENT_SERVER_NAME" }}/privkey.pem;
 
   map $http_upgrade $connection_upgrade {
     '' close;

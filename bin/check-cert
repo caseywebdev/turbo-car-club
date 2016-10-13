@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-LE_DIR=/etc/letsencrypt/live
+LE_DIR=/etc/letsencrypt/live/$CLIENT_SERVER_NAME
 CERT_PATH=$LE_DIR/fullchain.pem
 KEY_PATH=$LE_DIR/privkey.pem
 KV_URL=$CONSUL_URL/v1/kv/letsencrypt/$CLIENT_SERVER_NAME
@@ -20,7 +20,7 @@ if [ "$LETSENCRYPT_ENABLED" = "1" ]; then
   else
     echo 'Cert is out of date or does not exist'
 
-    DOMAINS=($CONSUL_SERVER_NAME $CLIENT_SERVER_NAME $SIGNAL_SERVER_NAME)
+    DOMAINS=($CLIENT_SERVER_NAME $SIGNAL_SERVER_NAME $CONSUL_SERVER_NAME)
     DOMAIN_ARG=''
     for DOMAIN in ${DOMAINS[*]}; do DOMAIN_ARG+=" -d $DOMAIN"; done
 
