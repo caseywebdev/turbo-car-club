@@ -25,7 +25,8 @@ if [ "$LETSENCRYPT_ENABLED" = "1" ]; then
     for DOMAIN in ${DOMAINS[*]}; do DOMAIN_ARG+=" -d $DOMAIN"; done
 
     echo 'Requesting cert from letsencrypt'
-    certbot-auto -n certonly --webroot -w /usr/local/nginx/html $DOMAIN_ARG
+    certbot-auto -n --agree-tos --email=$MAIL_FROM_ADDRESS \
+      certonly --webroot -w /usr/local/nginx/html $DOMAIN_ARG
 
     echo 'Saving key to consul'
     curl -sXPUT $KV_URL/privkey.pem --data-binary @$KEY_PATH
