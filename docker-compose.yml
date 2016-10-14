@@ -26,7 +26,6 @@ services:
     dns: &dns 172.17.0.1
     dns_search: service.consul
     ports:
-      - '8500'
       - '172.17.0.1:53:53/udp'
     command: -dev
 
