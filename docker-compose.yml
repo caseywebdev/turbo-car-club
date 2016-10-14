@@ -22,7 +22,7 @@ services:
     command: 'true'
 
   consul:
-    image: quay.io/caseywebdev/consul:836521c3324593cd3abeafb27c1ade813ae15a67
+    image: quay.io/caseywebdev/consul:04a6ea3c10aae322ebb6518f3b681a13cb830fbe
     dns: &dns 172.17.0.1
     dns_search: service.consul
     ports:
@@ -48,12 +48,6 @@ services:
     command: bin/watch-build-client
     depends_on:
       - consul
-    environment:
-      LIVERELOAD_SERVER_NAME: livereload.dev.turbocarclub.com
-      LIVERELOAD_URL: https://livereload.dev.turbocarclub.com
-      CONSUL_AUTH: foo:bar
-      CONSUL_SERVER_NAME: consul.dev.turbocarclub.com
-      SIGNAL_SERVER_NAME: signal.dev.turbocarclub.com
 
   cogs-server:
     <<: *shared
@@ -68,6 +62,12 @@ services:
     ports:
       - '80:80'
       - '443:443'
+    environment:
+      LIVERELOAD_SERVER_NAME: livereload.dev.turbocarclub.com
+      LIVERELOAD_URL: https://livereload.dev.turbocarclub.com
+      CONSUL_AUTH: foo:bar
+      CONSUL_SERVER_NAME: consul.dev.turbocarclub.com
+      SIGNAL_SERVER_NAME: signal.dev.turbocarclub.com
     command: bin/lb
 
   signal:
