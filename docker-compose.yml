@@ -9,7 +9,7 @@ services:
     command: 'true'
 
   ephemeral-data:
-    image: &image quay.io/caseywebdev/turbo-car-club:d9eece4240dcdbd82c37e45ecd9081c559685e27
+    image: &image quay.io/caseywebdev/turbo-car-club:735278060f9abc2458a6ba78df54d76744c61076
     volumes:
       - ./.eslintrc:/code/.eslintrc
       - ./.stylelintrc:/code/.stylelintrc
@@ -30,7 +30,7 @@ services:
     command: -dev
 
   postgres:
-    image: quay.io/caseywebdev/postgres:a979e843fdd850c2e72d93cb5fff994d91d7e2a3
+    image: quay.io/caseywebdev/postgres:e60fa5929a345d6a68b64c8628de2f39beea6910
     dns: *dns
     dns_search: service.consul
     volumes_from:

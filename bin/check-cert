@@ -8,7 +8,7 @@ LE_CERT_PATH=$LE_DIR/fullchain.pem
 LE_KEY_PATH=$LE_DIR/privkey.pem
 KV_URL=$CONSUL_URL:8500/v1/kv/letsencrypt/$CLIENT_SERVER_NAME
 
-echo 'Waiting for nginx to start'
+# Wait for nginx to be running before doing anything...
 while [ ! "`ps aux | grep [n]ginx`" ]; do sleep 1; done
 
 if [ "$LETSENCRYPT_ENABLED" = "1" ]; then
