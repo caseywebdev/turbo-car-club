@@ -22,7 +22,7 @@ services:
     command: 'true'
 
   consul:
-    image: quay.io/caseywebdev/consul:04a6ea3c10aae322ebb6518f3b681a13cb830fbe
+    image: quay.io/caseywebdev/consul:1efdcf221f0c5fe92b737f51f9c57f9321712eca
     dns: &dns 172.17.0.1
     dns_search: service.consul
     ports:
