@@ -27,12 +27,8 @@ module.exports = [
       {name: 'stylelint', only: 'src/**/*.scss', options: {syntax: 'scss'}},
       {name: 'directives', only: 'src/**/*.scss'},
       {name: 'sass', only: '**/*.scss'},
-      {
-        name: 'local-css',
-        only: 'src/**/*.+(scss|css)',
-        options: {base: 'src/client/styles', debug: !MINIFY}
-      },
-      {name: 'autoprefixer', only: '**/*.+(scss|css)'},
+      {name: 'autoprefixer'},
+      {name: 'local-css', options: {base: 'src/client/styles', debug: !MINIFY}},
       MINIFY ? {
         name: 'clean-css',
         only: '**/*.+(scss|css)',
@@ -50,7 +46,7 @@ module.exports = [
       {name: 'sass', only: '**/*.scss'},
       {
         name: 'local-css',
-        only: 'src/**/*.+(scss|css)',
+        only: 'src/**/*.scss',
         options: {base: 'src/client/styles', debug: !MINIFY, export: true}
       },
       {name: 'eslint', only: 'src/**/*.js'},
