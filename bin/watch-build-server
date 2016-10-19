@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-set -e
-
-exec bin/build-server -pw src/host,src/region,src/shared,src/signal

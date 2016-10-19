@@ -1,8 +1,6 @@
-import cx from '../../utils/cx';
 import React, {Component, PropTypes} from 'react';
+import styles from '../../styles/layouts/main';
 import User from '../user';
-
-const {layoutsMain: cxl} = cx;
 
 export default class extends Component {
   static propTypes = {
@@ -12,17 +10,17 @@ export default class extends Component {
   render() {
     return (
       <div>
-        <div className={cxl.headerWrapper}>
-          <div className={cxl.header}>
-            <div className={cxl.headerLeft}>
-              <img className={cxl.logo} src='/gfx/logo.svg' />
+        <div className={styles.headerWrapper}>
+          <div className={styles.header}>
+            <div className={styles.headerLeft}>
+              <img className={styles.logo} src='/gfx/logo.svg' />
             </div>
-            <div className={cxl.headerRight}>
+            <div className={styles.headerRight}>
               <User />
             </div>
           </div>
         </div>
-        <div className={cxl.body}>
+        <div className={styles.body}>
           {this.props.children}
         </div>
       </div>

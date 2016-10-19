@@ -1,4 +1,4 @@
-FROM node:6.8.0
+FROM node:6.9.0
 
 RUN apt-get update && \
     apt-get install -y unzip && \
@@ -32,24 +32,13 @@ WORKDIR /code
 COPY package.json /code/package.json
 RUN npm install
 
-# Build class names
-COPY .stylelintrc /code/.stylelintrc
-COPY bin/build-client /code/bin/build-client
-COPY etc/cogs/client.js /code/etc/cogs/client.js
-COPY src/client/styles /code/src/client/styles
-RUN MINIFY=1 ONLY_CLASS_NAMES=1 bin/build-client
-
-# Build client
+# Build
 COPY .eslintrc /code/.eslintrc
-COPY src/client /code/src/client
-COPY src/shared /code/src/shared
-RUN MINIFY=1 bin/build-client
-
-# Build server
-COPY bin/build-server /code/bin/build-server
-COPY etc/cogs/server.js /code/etc/cogs/server.js
+COPY .stylelintrc /code/.stylelintrc
+COPY bin/build /code/bin/build
+COPY etc/cogs.js /code/etc/cogs.js
 COPY src /code/src
-RUN bin/build-server
+RUN MINIFY=1 bin/build
 
 COPY bin /code/bin
 COPY etc /code/etc

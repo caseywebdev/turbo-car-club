@@ -38,20 +38,16 @@ services:
     depends_on:
       - consul
 
-  cogs-client: &shared
+  cogs: &shared
     image: *image
     dns: *dns
     dns_search: service.consul
     volumes_from:
       - persisted-data
       - ephemeral-data
-    command: bin/watch-build-client
+    command: bin/watch-build
     depends_on:
       - consul
-
-  cogs-server:
-    <<: *shared
-    command: bin/watch-build-server
 
   livereload:
     <<: *shared
@@ -68,11 +64,9 @@ services:
       CONSUL_AUTH: foo:bar
       CONSUL_SERVER_NAME: consul.dev.turbocarclub.com
       SIGNAL_SERVER_NAME: signal.dev.turbocarclub.com
-    command: bin/lb
 
   signal:
     <<: *shared
     command: bin/watch-signal
     depends_on:
       - postgres
-    command: bin/signal
