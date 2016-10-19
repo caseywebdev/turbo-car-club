@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+
+set -e
 
 SSL_DIR=/etc/ssl/private
 CERT_PATH=$SSL_DIR/fullchain.pem

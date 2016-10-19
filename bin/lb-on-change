@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+
+set -e
 
 consul-template -once -consul $CONSUL_URL:8500 \
   -template \

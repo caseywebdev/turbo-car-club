@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+
+set -e
 
 if [ "$CONSUL_AUTH" ]; then
   IFS=: read -a SPLIT <<< $CONSUL_AUTH

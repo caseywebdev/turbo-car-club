@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+
+set -e
 
 LIVERELOAD=node_modules/.bin/livereload
 while [ ! -f $LIVERELOAD ]; do sleep 1; done
