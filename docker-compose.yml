@@ -64,6 +64,7 @@ services:
       CONSUL_AUTH: foo:bar
       CONSUL_SERVER_NAME: consul.dev.turbocarclub.com
       SIGNAL_SERVER_NAME: signal.dev.turbocarclub.com
+    command: bin/lb
 
   signal:
     <<: *shared
