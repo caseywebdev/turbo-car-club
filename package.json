@@ -29,7 +29,7 @@
     "cogs-transformer-clean-css": "3.0.0",
     "cogs-transformer-concat-commonjs": "3.0.0",
     "cogs-transformer-directives": "3.0.0",
-    "cogs-transformer-eslint": "3.0.0",
+    "cogs-transformer-eslint": "3.0.1",
     "cogs-transformer-imagemin": "3.0.0",
     "cogs-transformer-json": "3.0.0",
     "cogs-transformer-local-css": "3.0.0",
