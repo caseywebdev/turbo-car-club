@@ -9,7 +9,7 @@ services:
     command: 'true'
 
   ephemeral-data:
-    image: &image quay.io/caseywebdev/turbo-car-club:f6cee9a819ff23f31b3246ebb78e1500f9320b65
+    image: &image quay.io/caseywebdev/turbo-car-club:03aabea68efaae2127309e13a1c69664bbb4712d
     volumes:
       - ./.eslintrc:/code/.eslintrc
       - ./.stylelintrc:/code/.stylelintrc
