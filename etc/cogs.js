@@ -77,10 +77,7 @@ module.exports = [
       },
       MINIFY ? {
         name: 'uglify-js',
-        only: [
-          '**/*.+(js|json|vert|frag|scss)',
-          'node_modules/cogs-transformer-concat-commonjs/module-resolver'
-        ],
+        only: '**/*.+(js|json|vert|frag|scss)',
         except: ['**/*+(-|_|.)min.js', 'node_modules/ammo.js/ammo.js']
       } : []
     ),
