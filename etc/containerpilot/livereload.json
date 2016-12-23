@@ -4,7 +4,7 @@
     {
       "name": "livereload",
       "port": 80,
-      "health": "curl -fso /dev/null localhost",
+      "health": "curl -fso /dev/null localhost/livereload.js",
       "poll": 10,
       "ttl": 30,
       "consul": {"deregisterCriticalServiceAfter": "90m"}
