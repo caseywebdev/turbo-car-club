@@ -5,14 +5,18 @@
     {
       "name": "lb-http",
       "port": 80,
+      "health": "curl -fso /dev/null localhost",
       "poll": 10,
-      "ttl": 30
+      "ttl": 30,
+      "consul": {"deregisterCriticalServiceAfter": "90m"}
     },
     {
       "name": "lb-https",
       "port": 443,
+      "health": "curl -kfso /dev/null https://localhost",
       "poll": 10,
-      "ttl": 30
+      "ttl": 30,
+      "consul": {"deregisterCriticalServiceAfter": "90m"}
     }
   ],
   "backends": [

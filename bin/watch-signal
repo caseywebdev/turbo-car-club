@@ -3,4 +3,4 @@
 set -e
 
 exec containerpilot -config file:///code/etc/containerpilot/signal.json \
-  node_modules/.bin/watchy -pw build/shared,build/signal node build/signal
+  node_modules/.bin/watchy -w build/shared,build/signal node build/signal

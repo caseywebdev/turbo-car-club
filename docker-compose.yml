@@ -22,31 +22,23 @@ services:
     command: 'true'
 
   consul:
-    image: quay.io/caseywebdev/consul:1efdcf221f0c5fe92b737f51f9c57f9321712eca
-    dns: &dns 172.17.0.1
-    dns_search: service.consul
-    ports:
-      - '172.17.0.1:53:53/udp'
+    image: quay.io/caseywebdev/consul:971a22057648e734ad5ff8b494d3d842de74e793
     command: -dev
 
   postgres:
-    image: quay.io/caseywebdev/postgres:e60fa5929a345d6a68b64c8628de2f39beea6910
-    dns: *dns
-    dns_search: service.consul
+    image: quay.io/caseywebdev/postgres:4442cadfa34066f68add438cd644238f3c6db4a0
     volumes_from:
       - persisted-data
-    depends_on:
+    links:
       - consul
 
   cogs: &shared
     image: *image
-    dns: *dns
-    dns_search: service.consul
     volumes_from:
       - persisted-data
       - ephemeral-data
     command: bin/watch-build
-    depends_on:
+    links:
       - consul
 
   livereload:
@@ -69,5 +61,6 @@ services:
   signal:
     <<: *shared
     command: bin/watch-signal
-    depends_on:
+    links:
+      - consul
       - postgres

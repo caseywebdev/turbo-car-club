@@ -1,4 +1,4 @@
-FROM node:6.9.0
+FROM node:7.3.0
 
 RUN apt-get update && \
     apt-get install -y unzip && \
@@ -6,7 +6,7 @@ RUN apt-get update && \
     chmod +x /usr/local/bin/certbot-auto && \
     certbot-auto -n -h
 
-ENV NGINX_VERSION 1.11.5
+ENV NGINX_VERSION 1.11.7
 RUN mkdir -p /usr/local/nginx/logs && \
     curl -L https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | \
       tar xz -C /usr/local/nginx --strip-components 1 && \
@@ -22,7 +22,7 @@ RUN curl -L https://releases.hashicorp.com/consul-template/$CONSUL_TEMPLATE_VERS
     mv consul-template /usr/local/bin/ && \
     rm consul-template.zip
 
-ENV CONTAINERPILOT_VERSION 2.4.3
+ENV CONTAINERPILOT_VERSION 2.6.0
 RUN curl -L https://github.com/joyent/containerpilot/releases/download/$CONTAINERPILOT_VERSION/containerpilot-$CONTAINERPILOT_VERSION.tar.gz | \
       tar xz -C /usr/local/bin/
 
@@ -45,15 +45,15 @@ COPY etc /code/etc
 
 ENV CLIENT_SERVER_NAME www.dev.turbocarclub.com
 ENV CLIENT_URL https://www.dev.turbocarclub.com
-ENV CONSUL_URL consul-http
+ENV CONSUL_URL consul
 ENV KEY foo
+ENV LETSENCRYPT_ENABLED 0
 ENV MAIL_ENABLED 0
 ENV MAIL_FROM_ADDRESS support@turbocarclub.com
 ENV MAIL_FROM_NAME Turbo Car Club
 ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
 ENV REGIONS dev=https://www.dev.turbocarclub.com
 ENV SIGNAL_URL wss://signal.dev.turbocarclub.com
-ENV LETSENCRYPT_ENABLED 0
 
 # Bake version (git SHA1 revision) into the image
 ARG VERSION

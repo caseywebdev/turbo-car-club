@@ -4,8 +4,10 @@
     {
       "name": "signal",
       "port": 80,
+      "health": "curl -fso /dev/null localhost",
       "poll": 10,
-      "ttl": 30
+      "ttl": 30,
+      "consul": {"deregisterCriticalServiceAfter": "90m"}
     }
   ]
 }
