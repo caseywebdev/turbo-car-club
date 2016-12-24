@@ -2,6 +2,7 @@
   "private": true,
   "dependencies": {
     "ammo.js": "0.0.10",
+    "better-promise": "1.0.3",
     "jsonwebtoken": "7.2.1",
     "knex": "0.12.6",
     "live-socket": "0.10.9",

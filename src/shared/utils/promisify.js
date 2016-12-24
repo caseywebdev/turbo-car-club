@@ -1,7 +1,7 @@
-import {SyncPromise} from 'pave';
+import BetterPromise from 'better-promise';
 
 export default fn =>
   (...args) =>
-    new SyncPromise((resolve, reject) =>
+    new BetterPromise((resolve, reject) =>
       fn(...args, (er, res) => er ? reject(er) : resolve(res))
     );
