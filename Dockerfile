@@ -28,6 +28,10 @@ RUN curl -L https://github.com/joyent/containerpilot/releases/download/$CONTAINE
 
 WORKDIR /code
 
+# There's a bad dependency somewhere causing wrtc to fail building, but it works
+# fine if it's installed in isolation.
+RUN npm install wrtc
+
 # Install node modules
 COPY package.json /code/package.json
 RUN npm install
