@@ -1,15 +1,25 @@
-version: '2'
+version: '3'
+
+volumes:
+  build:
+  node-modules:
+  pg-data:
+  private:
 
 services:
-  persisted-data:
-    image: busybox:1.24.1
-    volumes:
-      - /etc/ssl/private
-      - /var/lib/postgresql/data
-    command: 'true'
+  consul:
+    image: quay.io/caseywebdev/consul:971a22057648e734ad5ff8b494d3d842de74e793
+    command: -dev
 
-  ephemeral-data:
-    image: &image quay.io/caseywebdev/turbo-car-club:ba5b36080d7083720566df7a16e20e2cab213ba4
+  postgres:
+    image: quay.io/caseywebdev/postgres:4442cadfa34066f68add438cd644238f3c6db4a0
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    depends_on:
+      - consul
+
+  cogs: &shared
+    image: quay.io/caseywebdev/turbo-car-club:ba5b36080d7083720566df7a16e20e2cab213ba4
     volumes:
       - ./.eslintrc:/code/.eslintrc
       - ./.stylelintrc:/code/.stylelintrc
@@ -17,28 +27,11 @@ services:
       - ./etc:/code/etc
       - ./package.json:/code/package.json
       - ./src:/code/src
-      - /code/build
-      - /code/node_modules
-    command: 'true'
-
-  consul:
-    image: quay.io/caseywebdev/consul:971a22057648e734ad5ff8b494d3d842de74e793
-    command: -dev
-
-  postgres:
-    image: quay.io/caseywebdev/postgres:4442cadfa34066f68add438cd644238f3c6db4a0
-    volumes_from:
-      - persisted-data
-    links:
-      - consul
-
-  cogs: &shared
-    image: *image
-    volumes_from:
-      - persisted-data
-      - ephemeral-data
+      - build:/code/build
+      - node-modules:/code/node_modules
+      - private:/etc/ssl/private
     command: bin/watch-build
-    links:
+    depends_on:
       - consul
 
   livereload:
@@ -61,6 +54,6 @@ services:
   signal:
     <<: *shared
     command: bin/watch-signal
-    links:
+    depends_on:
       - consul
       - postgres

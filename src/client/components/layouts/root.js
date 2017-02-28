@@ -1,29 +1,9 @@
+import {withPave} from 'pave-react';
 import Meta from '../meta';
-import React, {Component, PropTypes} from 'react';
+import React from 'react';
+import store from '../../utils/store';
 
-export default class extends Component {
-  static contextTypes = {
-    router: PropTypes.object.isRequired
-  };
+const render = ({props: {children}) =>
+  <Meta title='Turbo Car Club'>{children}</Meta>;
 
-  static childContextTypes = {
-    location: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired
-  };
-
-  static propTypes = {
-    children: PropTypes.node,
-    location: PropTypes.object.isRequired
-  };
-
-  getChildContext() {
-    return {
-      router: this.context.router,
-      location: this.props.location
-    };
-  }
-
-  render() {
-    return <Meta title='Turbo Car Club'>{this.props.children}</Meta>;
-  }
-}
+export default withPave(props => render({props}), {store});

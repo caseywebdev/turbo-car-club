@@ -1,5 +1,5 @@
 {
-  "consul": "{{ .CONSUL_URL }}:8500",
+  "consul": "{{ .CONSUL_URL }}",
   "preStart": "/code/bin/lb-pre-start",
   "services": [
     {
