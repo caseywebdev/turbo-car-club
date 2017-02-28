@@ -8,7 +8,8 @@ if [ "$CONSUL_AUTH" ]; then
     /usr/local/nginx/conf/consul_auth_basic_user_file
 fi
 
-while ! consul-template -once -consul-addr $CONSUL_URL \
+CONSUL_URL_WITHOUT_HTTP=`echo $CONSUL_URL | sed 's/http:\/\///'`
+while ! consul-template -once -consul-addr $CONSUL_URL_WITHOUT_HTTP \
   -template \
     /code/etc/nginx.conf.ctmpl:/usr/local/nginx/conf/nginx.conf \
   -template \
