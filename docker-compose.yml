@@ -2,7 +2,6 @@ version: '3'
 
 volumes:
   build:
-  node-modules:
   pg-data:
   private:
 
@@ -28,7 +27,6 @@ services:
       - ./package.json:/code/package.json
       - ./src:/code/src
       - build:/code/build
-      - node-modules:/code/node_modules
       - private:/etc/ssl/private
     command: bin/watch-build
     depends_on:
