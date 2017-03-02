@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-set -e
-
-CONSUL_URL_WITHOUT_HTTP=`echo $CONSUL_URL | sed 's/http:\/\///'`
-consul-template -once -consul-addr $CONSUL_URL_WITHOUT_HTTP \
-  -template \
-    '/code/etc/nginx.conf.ctmpl:/usr/local/nginx/conf/nginx.conf:nginx -s reload'

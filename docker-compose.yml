@@ -3,19 +3,21 @@ version: '3'
 volumes:
   build:
   pg-data:
-  private:
 
 services:
-  consul:
-    image: quay.io/caseywebdev/consul:971a22057648e734ad5ff8b494d3d842de74e793
-    command: -dev
+  # traefik:
+  #   image: traefik:1.1.2
+  #   volumes:
+  #     - ./etc/traefik.tml:/etc/traefik/traefik.toml
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   ports:
+  #     - '80:80'
+  #     - '443:443'
 
   postgres:
-    image: quay.io/caseywebdev/postgres:4442cadfa34066f68add438cd644238f3c6db4a0
+    image: postgres:9.6.2
     volumes:
       - pg-data:/var/lib/postgresql/data
-    depends_on:
-      - consul
 
   cogs: &shared
     image: quay.io/caseywebdev/turbo-car-club:8b4cdad2234d025b8ac89ba0f91274683e87fd99
@@ -27,31 +29,20 @@ services:
       - ./package.json:/code/package.json
       - ./src:/code/src
       - build:/code/build
-      - private:/etc/ssl/private
     command: bin/watch-build
-    depends_on:
-      - consul
 
   livereload:
     <<: *shared
     command: bin/livereload
 
-  lb:
+  client:
     <<: *shared
-    ports:
-      - '80:80'
-      - '443:443'
     environment:
-      LIVERELOAD_SERVER_NAME: livereload.dev.turbocarclub.com
-      LIVERELOAD_URL: https://livereload.dev.turbocarclub.com
-      CONSUL_AUTH: foo:bar
-      CONSUL_SERVER_NAME: consul.dev.turbocarclub.com
-      SIGNAL_SERVER_NAME: signal.dev.turbocarclub.com
-    command: bin/lb
+      LIVERELOAD_URL: http://livereload.dev.turbocarclub.com
+    command: bin/client
 
   signal:
     <<: *shared
     command: bin/watch-signal
     depends_on:
-      - consul
       - postgres

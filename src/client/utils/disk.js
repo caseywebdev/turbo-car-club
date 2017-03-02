@@ -1,10 +1,6 @@
 import config from '../config';
+import store from 'store';
 
-const {prefix} = config.disk;
+const {namespace} = config.disk;
 
-export default {
-  read: key => JSON.parse(localStorage[[prefix, key].join(':')] || null),
-  delete: key => delete localStorage[[prefix, key].join(':')],
-  write: (key, val) =>
-    localStorage[[prefix, key].join(':')] = JSON.stringify(val)
-};
+export default store.namespace(namespace);

@@ -27,7 +27,7 @@ const getPing = url => {
 const store = new Store({
   batchDelay: 1,
   cache: {
-    authToken: disk.read('authToken') || null,
+    authToken: disk.get('authToken', null),
     regions: _.map(config.regions, ({id}) => ({$ref: ['regionsById', id]})),
     regionsById: _.indexBy(config.regions, 'id')
   },
@@ -50,7 +50,7 @@ const store = new Store({
 });
 
 store.watch(['authToken'], () =>
-  disk.write('authToken', store.get(['authToken']))
+  disk.set('authToken', store.get(['authToken']))
 );
 
 live.on('pave', delta => store.update(delta));

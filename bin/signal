@@ -2,5 +2,4 @@
 
 set -e
 
-exec containerpilot -config file:///code/etc/containerpilot/signal.json \
-  node build/signal
+exec node build/signal

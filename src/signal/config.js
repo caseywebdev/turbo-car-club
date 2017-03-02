@@ -1,20 +1,20 @@
 import shared from '../shared/config';
 
-const ENV = process.env;
+const {env} = process;
 
 export default {
   ...shared,
   client: {
-    url: ENV.CLIENT_URL
+    url: env.CLIENT_URL
   },
-  key: ENV.KEY,
-  knex: {client: 'pg', connection: ENV.POSTGRES_URL},
+  key: env.KEY,
+  knex: {client: 'pg', connection: env.POSTGRES_URL},
   log: {name: 'signal'},
   mail: {
-    enabled: ENV.MAIL_ENABLED !== '0',
+    enabled: env.MAIL_ENABLED !== '0',
     from: {
-      name: ENV.MAIL_FROM_NAME,
-      address: ENV.MAIL_FROM_ADDRESS
+      name: env.MAIL_FROM_NAME,
+      address: env.MAIL_FROM_ADDRESS
     }
   },
   maxUserNameLength: 16,

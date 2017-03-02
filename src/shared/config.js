@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import Qs from 'qs';
 
-const ENV = typeof window === 'undefined' ? process.env : window;
+const {env} = typeof window === 'undefined' ? process : window;
 
 export default {
   fixedTimeStep: 1 / 60,
@@ -59,6 +59,6 @@ export default {
     invalidKey: new Error('Invalid or expired key'),
     unknown: new Error('An unknown error occurred')
   },
-  regions: _.map(Qs.parse(ENV.REGIONS), (url, id) => ({id, url})),
-  version: ENV.VERSION
+  regions: _.map(Qs.parse(env.REGIONS), (url, id) => ({id, url})),
+  version: env.VERSION
 };

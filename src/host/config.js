@@ -1,22 +1,11 @@
-import _ from 'underscore';
 import shared from '../shared/config';
 
-const ENV = process.env;
-
-var REQUIRED = [
-  'KEY',
-  'NAME'
-];
-
-var missing = _.reject(REQUIRED, _.partial(_.has, ENV));
-if (_.any(missing)) throw new Error('Missing env vars: ' + missing.join(', '));
+const {env} = process;
 
 export default {
   ...shared,
-  key: ENV.KEY,
-  name: ENV.NAME,
+  key: env.KEY,
+  name: env.NAME,
   log: {name: 'host'},
-  signal: {
-    url: ENV.SIGNAL_URL
-  }
+  signal: {url: env.SIGNAL_URL}
 };

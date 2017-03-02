@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -e
+
+ONLY_PUBLIC=1 ./bin/build
+
+exec nginx -c /code/etc/nginx.conf
