@@ -5,14 +5,14 @@ volumes:
   pg-data:
 
 services:
-  # traefik:
-  #   image: traefik:1.1.2
-  #   volumes:
-  #     - ./etc/traefik.tml:/etc/traefik/traefik.toml
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   ports:
-  #     - '80:80'
-  #     - '443:443'
+  traefik:
+    image: traefik:1.1.2
+    volumes:
+      - ./etc/traefik.toml:/etc/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - '80:80'
+      - '8080:8080'
 
   postgres:
     image: postgres:9.6.2
@@ -20,7 +20,7 @@ services:
       - pg-data:/var/lib/postgresql/data
 
   cogs: &shared
-    image: quay.io/caseywebdev/turbo-car-club:8b4cdad2234d025b8ac89ba0f91274683e87fd99
+    image: quay.io/caseywebdev/turbo-car-club:2c66a1278eb32de90dca4ca54a9b02b0710ca7c6
     volumes:
       - ./.eslintrc:/code/.eslintrc
       - ./.stylelintrc:/code/.stylelintrc
@@ -34,15 +34,27 @@ services:
   livereload:
     <<: *shared
     command: bin/livereload
+    labels:
+      traefik.enable: 'true'
+      traefik.port: '80'
+      traefik.frontend.rule: Host:livereload.dev.turbocarclub.com
 
   client:
     <<: *shared
     environment:
       LIVERELOAD_URL: http://livereload.dev.turbocarclub.com
     command: bin/client
+    labels:
+      traefik.enable: 'true'
+      traefik.port: '80'
+      traefik.frontend.rule: Host:www.dev.turbocarclub.com
 
   signal:
     <<: *shared
     command: bin/watch-signal
+    labels:
+      traefik.enable: 'true'
+      traefik.port: '80'
+      traefik.frontend.rule: Host:signal.dev.turbocarclub.com
     depends_on:
       - postgres

@@ -1,14 +1,16 @@
 import shared from '../shared/config';
 
+const {env} = window;
+
 export default {
   ...shared,
   disk: {
     namespace: 'tcc'
   },
   signal: {
-    url: window.SIGNAL_URL
+    url: env.SIGNAL_URL
   },
   livereload: {
-    url: window.LIVERELOAD_URL
+    url: env.LIVERELOAD_URL
   }
 };
