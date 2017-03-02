@@ -22,12 +22,12 @@ COPY .stylelintrc /code/.stylelintrc
 COPY bin/build /code/bin/build
 COPY etc/cogs.js /code/etc/cogs.js
 COPY src /code/src
+ENV CLIENT_URL http://www.dev.turbocarclub.com
 RUN MINIFY=1 bin/build
 
 COPY bin /code/bin
 COPY etc /code/etc
 
-ENV CLIENT_URL http://www.dev.turbocarclub.com
 ENV KEY foo
 ENV MAIL_ENABLED 0
 ENV MAIL_FROM_ADDRESS support@turbocarclub.com
