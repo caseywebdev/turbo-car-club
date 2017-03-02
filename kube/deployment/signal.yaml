@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: signal
-        image: quay.io/caseywebdev/turbo-car-club:master
+        image: quay.io/caseywebdev/turbo-car-club:07cf963d383264a327241ab4be2b8488c363dc5d
         command: ["bin/signal"]
         env:
         - name: AWS_ACCESS_KEY_ID

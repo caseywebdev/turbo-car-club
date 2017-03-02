@@ -1,9 +1,18 @@
+const url = require('url');
+
 const {env} = process;
 const MINIFY = env.MINIFY === '1';
-const ONLY_PUBLIC = env.ONLY_PUBLIC === '1';
+const ONLY_STATIC = env.ONLY_STATIC === '1';
+const {CLIENT_URL} = env;
+const CLIENT_SERVER_NAME = url.parse(CLIENT_URL).hostname;
 
-const PUBLIC = {
+const STATIC = {
   transformers: [
+    {
+      name: 'replace',
+      only: 'etc/nginx.conf',
+      options: {flags: 'g', patterns: {CLIENT_SERVER_NAME, CLIENT_URL}}
+    },
     {
       name: 'replace',
       only: 'src/client/public/index.html',
@@ -16,7 +25,10 @@ const PUBLIC = {
     },
     {name: 'imagemin', only: '**/*.svg', options: {plugins: {svgo: {}}}}
   ],
-  builds: {'src/client/public/**/*': {dir: 'build/client'}}
+  builds: {
+    'etc/nginx.conf': '/etc/nginx/nginx.conf',
+    'src/client/public/**/*': {dir: 'build/client'}
+  }
 };
 
 const SERVER = {
@@ -90,4 +102,4 @@ const CLIENT = {
   }
 };
 
-module.exports = ONLY_PUBLIC ? [PUBLIC] : [CLIENT, PUBLIC, SERVER, STYLES];
+module.exports = ONLY_STATIC ? [STATIC] : [CLIENT, STATIC, SERVER, STYLES];
