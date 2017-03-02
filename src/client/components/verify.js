@@ -1,15 +1,10 @@
 import Meta from './meta';
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
 import store from '../utils/store';
 
 export default class extends Component {
-  static contextTypes = {
-    location: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired
-  };
-
   componentDidMount() {
-    const {location: {query: {token}}, router: {replace}} = this.context;
+    const {location: {query: {token}}, router: {replace}} = this.props;
     if (!token) return replace('/');
     store
       .run({query: ['verify!', {token}]})
