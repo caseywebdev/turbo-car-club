@@ -6,6 +6,5 @@ export default {
   ...shared,
   key: env.KEY,
   name: env.NAME,
-  log: {name: 'host'},
-  signal: {url: env.SIGNAL_URL}
+  log: {name: 'host'}
 };

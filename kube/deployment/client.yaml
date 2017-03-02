@@ -11,9 +11,11 @@ spec:
     spec:
       containers:
       - name: client
-        image: quay.io/caseywebdev/turbo-car-club:2c66a1278eb32de90dca4ca54a9b02b0710ca7c6
+        image: quay.io/caseywebdev/turbo-car-club:master
         command: ["bin/client"]
         env:
+        - name: CLIENT_URL
+          value: https://www.turbocarclub.com
         - name: REGIONS
           value: uno=https://www.turbocarclub.com
         - name: SIGNAL_URL
@@ -22,8 +24,4 @@ spec:
         - containerPort: 80
         resources:
           requests:
-            cpu: "100m"
-            memory: "128Mi"
-          limits:
-            cpu: "200m"
-            memory: "512Mi"
+            cpu: 0

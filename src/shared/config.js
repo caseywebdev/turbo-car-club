@@ -59,6 +59,12 @@ export default {
     invalidKey: new Error('Invalid or expired key'),
     unknown: new Error('An unknown error occurred')
   },
+  client: {
+    url: env.CLIENT_URL
+  },
   regions: _.map(Qs.parse(env.REGIONS), (url, id) => ({id, url})),
+  signal: {
+    url: env.SIGNAL_URL
+  },
   version: env.VERSION
 };

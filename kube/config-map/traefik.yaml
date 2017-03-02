@@ -15,9 +15,9 @@ data:
         [entryPoints.https.tls]
     [acme]
       email = "c@sey.me"
-      storageFile = "/acme/acme.json"
+      storageFile = "/mnt/traefik-data/acme.json"
       entryPoint = "https"
-      caServer = "https://acme-staging.api.letsencrypt.org/directory"
       [[acme.domains]]
         main = "turbocarclub.com"
         sans = ["www.turbocarclub.com", "signal.turbocarclub.com"]
+    [kubernetes]

@@ -11,9 +11,19 @@ spec:
     spec:
       containers:
       - name: signal
-        image: quay.io/caseywebdev/turbo-car-club:2c66a1278eb32de90dca4ca54a9b02b0710ca7c6
+        image: quay.io/caseywebdev/turbo-car-club:master
         command: ["bin/signal"]
         env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: accessKeyId
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: secretAccessKey
         - name: CLIENT_URL
           value: https://www.turbocarclub.com
         - name: KEY
@@ -29,8 +39,4 @@ spec:
         - containerPort: 80
         resources:
           requests:
-            cpu: "100m"
-            memory: "128Mi"
-          limits:
-            cpu: "200m"
-            memory: "512Mi"
+            cpu: 0

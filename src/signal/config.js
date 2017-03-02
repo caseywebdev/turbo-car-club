@@ -4,12 +4,14 @@ const {env} = process;
 
 export default {
   ...shared,
-  client: {
-    url: env.CLIENT_URL
-  },
   key: env.KEY,
-  knex: {client: 'pg', connection: env.POSTGRES_URL},
-  log: {name: 'signal'},
+  knex: {
+    client: 'pg',
+    connection: env.POSTGRES_URL
+  },
+  log: {
+    name: 'signal'
+  },
   mail: {
     enabled: env.MAIL_ENABLED !== '0',
     from: {

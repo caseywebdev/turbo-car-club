@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: traefik
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      containers:
+      - name: traefik
+        image: traefik:1.1.2
+        ports:
+        - containerPort: 80
+          hostPort: 80
+        - containerPort: 443
+          hostPort: 443
+        - containerPort: 8080
+        volumeMounts:
+        - name: traefik-data
+          mountPath: /mnt/traefik-data
+        - name: traefik
+          mountPath: /etc/traefik
+        resources:
+          requests:
+            cpu: 0
+      volumes:
+        - name: traefik-data
+          gcePersistentDisk:
+            pdName: traefik-data
+            fsType: ext4
+        - name: traefik
+          configMap:
+            name: traefik

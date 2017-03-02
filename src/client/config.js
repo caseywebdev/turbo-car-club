@@ -7,9 +7,6 @@ export default {
   disk: {
     namespace: 'tcc'
   },
-  signal: {
-    url: env.SIGNAL_URL
-  },
   livereload: {
     url: env.LIVERELOAD_URL
   }
