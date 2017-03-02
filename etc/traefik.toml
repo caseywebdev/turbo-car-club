@@ -1,7 +1,7 @@
 [docker]
-domain = "dev.turbocarclub.com"
-watch = true
-exposedbydefault = false
+  domain = "dev.turbocarclub.com"
+  watch = true
+  exposedbydefault = false
 
 [web]
-address = ":8080"
+  address = ":8080"

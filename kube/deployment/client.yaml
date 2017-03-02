@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: client
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+      - name: client
+        image: quay.io/caseywebdev/turbo-car-club:2c66a1278eb32de90dca4ca54a9b02b0710ca7c6
+        command: ["bin/client"]
+        env:
+        - name: REGIONS
+          value: uno=https://www.turbocarclub.com
+        - name: SIGNAL_URL
+          value: wss://signal.turbocarclub.com
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "512Mi"
