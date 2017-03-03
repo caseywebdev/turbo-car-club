@@ -11,6 +11,7 @@ COPY .eslintrc /code/.eslintrc
 COPY .stylelintrc /code/.stylelintrc
 COPY bin/build /code/bin/build
 COPY etc/cogs.js /code/etc/cogs.js
+COPY etc/nginx.conf /code/etc/nginx.conf
 COPY src /code/src
 ENV CLIENT_URL http://www.dev.turbocarclub.com
 RUN MINIFY=1 bin/build
