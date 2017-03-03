@@ -1,12 +1,11 @@
 import _ from 'underscore';
+import {Store, Router} from 'pave';
 import config from '../config';
 import disk from './disk';
-import {Store, Router} from 'pave';
 import live from './live';
-import promisify from '../../shared/utils/promisify';
 import now from '../../shared/utils/now';
 
-const send = promisify(::live.send);
+const send = Promise.promisify(::live.send);
 
 const getMedian = ns => _.sortBy(ns)[Math.floor(ns.length / 2)];
 
