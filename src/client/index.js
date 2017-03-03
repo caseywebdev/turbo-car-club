@@ -3,7 +3,7 @@ import './utils/livereload';
 import 'whatwg-fetch';
 import React from 'react';
 import {render} from 'react-dom';
-import {Router, hashHistory as history} from 'react-router';
+import {browserHistory as history, Router} from 'react-router';
 import routes from './routes';
 
 render(<Router {...{history, routes}} />, document.getElementById('main'));
