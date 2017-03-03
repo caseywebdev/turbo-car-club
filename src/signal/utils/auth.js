@@ -1,6 +1,6 @@
 import authHost from './auth-host';
 import authUser from './auth-user';
-import BetterPromise from 'better-promise';
+import Promise from 'better-promise';
 import config from '../config';
 import db from './db';
 import verify from '../../shared/utils/verify';
@@ -8,7 +8,7 @@ import verify from '../../shared/utils/verify';
 const {key, errors: {invalidKey}} = config;
 
 export default (socket, token, {host: {name} = {}} = {}) => {
-  if (socket.userId || socket.host) return BetterPromise.resolve();
+  if (socket.userId || socket.host) return Promise.resolve();
 
   const data = verify(key, 'auth', token);
   if (!data) throw invalidKey;

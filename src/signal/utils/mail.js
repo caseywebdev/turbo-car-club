@@ -3,6 +3,7 @@ import log from './log';
 import nodemailer from 'nodemailer';
 import {markdown} from 'nodemailer-markdown';
 import nodemailerSesTransport from 'nodemailer-ses-transport';
+import Promise from 'better-promise';
 
 const transport = nodemailer.createTransport(nodemailerSesTransport());
 transport.use('compile', markdown());

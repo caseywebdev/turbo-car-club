@@ -1,13 +1,13 @@
 import {Store} from 'pave';
 import auth from '../utils/auth';
-import BetterPromise from 'better-promise';
+import Promise from 'better-promise';
 import config from '../config';
 import router from '../routes';
 
 const {invalidKey} = config.errors;
 
 const tryAuth = (socket, authToken) =>
-  BetterPromise
+  Promise
     .resolve()
     .then(() => authToken && auth(socket, authToken))
     .catch(er => {

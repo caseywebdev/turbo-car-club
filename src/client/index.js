@@ -1,4 +1,3 @@
-import '../shared/initializers/set-promise';
 import './utils/set-global';
 import './utils/livereload';
 import 'whatwg-fetch';

@@ -3,6 +3,7 @@ import {Store, Router} from 'pave';
 import config from '../config';
 import disk from './disk';
 import live from './live';
+import Promise from 'better-promise';
 import now from '../../shared/utils/now';
 
 const send = Promise.promisify(::live.send);

@@ -1,6 +1,7 @@
 import _ from 'underscore';
 import Live from 'live-socket';
 import log from '../utils/log';
+import Promise from 'better-promise';
 import ws from 'uws';
 
 import close from '../listeners/close';
