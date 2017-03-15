@@ -3,7 +3,7 @@ import {withPave} from 'pave-react';
 // import Home from './components/home';
 // import MainLayout from './components/layouts/main';
 import Meta from '../meta';
-import NotFound from './components/not-found';
+import NotFound from '../not-found';
 import React from 'react';
 import store from '../../utils/store';
 // import Verify from './components/verify';
