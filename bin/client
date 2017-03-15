@@ -2,6 +2,6 @@
 
 set -e
 
-ONLY_STATIC=1 ./bin/build
+ONLY_STATIC=1 bin/build
 
 exec nginx

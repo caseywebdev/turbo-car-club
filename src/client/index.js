@@ -1,12 +1,11 @@
-import './utils/set-global';
 import './utils/livereload';
+import './utils/set-global';
 import 'whatwg-fetch';
-import React from 'react';
 import {render} from 'react-dom';
-import {browserHistory as history, Router} from 'react-router';
-import routes from './routes';
+import React from 'react';
+import RootLayout from './components/layouts/root';
 
-render(<Router {...{history, routes}} />, document.getElementById('main'));
+render(<RootLayout />, document.getElementById('main'));
 
 // import Peer from '../../shared/peer';
 
