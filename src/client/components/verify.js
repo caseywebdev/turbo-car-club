@@ -1,11 +1,14 @@
 import Meta from './meta';
+import Qs from 'qs';
 import React, {Component} from 'react';
 import store from '../utils/store';
 
 export default class extends Component {
   componentDidMount() {
-    const {location: {query: {token}}, router: {replace}} = this.props;
+    const {location: {search}, history: {replace}} = this.props;
+    const {token} = Qs.parse(search);
     if (!token) return replace('/');
+
     store
       .run({query: ['verify!', {token}]})
       .then(() => replace('/'))
@@ -16,7 +19,7 @@ export default class extends Component {
     return (
       <Meta title='Verify'>
         <div>
-          Do verify stuff
+          Verifying...
         </div>
       </Meta>
     );
