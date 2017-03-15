@@ -6,7 +6,7 @@ import store from '../utils/store';
 export default class extends Component {
   componentDidMount() {
     const {location: {search}, history: {replace}} = this.props;
-    const {token} = Qs.parse(search);
+    const {token} = Qs.parse(search.slice(1));
     if (!token) return replace('/');
 
     store

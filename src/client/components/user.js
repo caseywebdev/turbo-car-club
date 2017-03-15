@@ -14,14 +14,14 @@ const signOut = ({props: {pave: {store}}}) => {
   live.socket.close();
 };
 
-const render = ({props: {pave: {cache: {user}, error, isLoading}}}) =>
+const render = ({props, props: {pave: {cache: {user}, error, isLoading}}}) =>
   <div>
     {
       user ?
         <div>
           <SetName />
-          <button onClick={signOut}>Sign Out</button>
-          <button onClick={expireTokens}>Expire Tokens</button>
+          <button onClick={() => signOut({props})}>Sign Out</button>
+          <button onClick={() => expireTokens({props})}>Expire Tokens</button>
           <img src={getAvatarUrl(user.emailHash)} />
         </div> :
       isLoading ? 'Loading...' :
