@@ -20,7 +20,7 @@ services:
       - pg-data:/var/lib/postgresql/data
 
   cogs: &shared
-    image: quay.io/coderiety/turbo-car-club:1369a7bd6b6d6e075be65f36fe213ab609623330
+    image: quay.io/coderiety/turbo-car-club:2f30289456ea6809cf879bb3a139008fc2e24a61
     volumes:
       - ./.eslintrc:/code/.eslintrc
       - ./.stylelintrc:/code/.stylelintrc
