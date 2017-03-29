@@ -11,7 +11,7 @@ services:
       - pg-data:/var/lib/postgresql/data
 
   cogs: &shared
-    image: quay.io/coderiety/turbo-car-club:57b8e52bae3bd182a120353ac3c3f2bbbaee8178
+    image: quay.io/coderiety/turbo-car-club:809e6613bb78a6d4779c37b17dd9e55b4ce9ebd5
     command: bin/watch-build
     environment:
       LIVERELOAD_URL: http://localhost:8081
