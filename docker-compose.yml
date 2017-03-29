@@ -11,7 +11,10 @@ services:
       - pg-data:/var/lib/postgresql/data
 
   cogs: &shared
-    image: quay.io/coderiety/turbo-car-club:2f30289456ea6809cf879bb3a139008fc2e24a61
+    image: quay.io/coderiety/turbo-car-club:57b8e52bae3bd182a120353ac3c3f2bbbaee8178
+    command: bin/watch-build
+    environment:
+      LIVERELOAD_URL: http://localhost:8081
     volumes:
       - ./.eslintrc:/code/.eslintrc
       - ./.stylelintrc:/code/.stylelintrc
@@ -20,7 +23,6 @@ services:
       - ./package.json:/code/package.json
       - ./src:/code/src
       - build:/code/build
-    command: bin/watch-build
 
   livereload:
     <<: *shared
@@ -31,8 +33,6 @@ services:
   client:
     <<: *shared
     command: bin/client
-    environment:
-      LIVERELOAD_URL: http://localhost:8081
     ports:
       - 80:80
 

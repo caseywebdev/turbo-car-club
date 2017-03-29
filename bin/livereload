@@ -2,4 +2,4 @@
 
 set -e
 
-exec node_modules/.bin/livereload -p 80
+exec node_modules/.bin/livereload build/client -p 80
