@@ -18,7 +18,7 @@
     "underscore.string": "3.3.4",
     "underscore": "1.8.3",
     "wrtc": "0.0.61",
-    "uws": "0.13.0"
+    "uws": "0.14.1"
   },
   "devDependencies": {
     "babel-eslint": "7.2.1",
