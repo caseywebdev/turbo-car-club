@@ -13,7 +13,7 @@ COPY bin/build /code/bin/build
 COPY etc/cogs.js /code/etc/cogs.js
 COPY etc/nginx.conf /code/etc/nginx.conf
 COPY src /code/src
-ENV CLIENT_URL http://www.dev.turbocarclub.com
+ENV CLIENT_URL http://localhost
 RUN MINIFY=1 bin/build
 
 COPY bin /code/bin
@@ -24,8 +24,8 @@ ENV MAIL_ENABLED 0
 ENV MAIL_FROM_ADDRESS support@turbocarclub.com
 ENV MAIL_FROM_NAME Turbo Car Club
 ENV POSTGRES_URL pg://postgres:postgres@postgres/postgres
-ENV REGIONS dev=http://www.dev.turbocarclub.com
-ENV SIGNAL_URL ws://signal.dev.turbocarclub.com
+ENV REGIONS dev=http://localhost
+ENV SIGNAL_URL ws://localhost:8080
 
 ARG VERSION
 ENV VERSION $VERSION
